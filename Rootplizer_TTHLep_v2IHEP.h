@@ -1,6 +1,8 @@
+#include <iostream>
+
 #include "TFile.h"
 #include "TTree.h"
-#include <iostream>
+#include "TMVA/Reader.h"
 
 #include "Lepton.cc"
 
@@ -8,7 +10,7 @@ using namespace std;
 ////
 //   Declare constants
 /////
-const int nentries = 10;//-1 is all entries  51 for first DiMuSR
+const int nentries = 1000;//-1 is all entries  51 for first DiMuSR
 const bool debug =false;
 string synchro = "";
 const double evt = 653077.;
@@ -25,6 +27,26 @@ void Muon_sel(string sample);
 void Event_sel();
 void Lep_sel();
 
+//Read MVA's
+void set_wgtMVA();
+double get_LeptonMVA(Lepton lep); 
+
+// lepton mva
+TMVA::Reader *mu_reader_;
+TMVA::Reader *ele_reader_;
+Float_t varpt;
+Float_t vareta;
+Float_t varneuRelIso;
+Float_t varchRelIso;
+Float_t varjetPtRel_in;
+Float_t varjetPtRatio_in;
+Float_t varjetBTagCSV_in;
+Float_t varjetNDauCharged_in;
+Float_t varsip3d;
+Float_t varmvaId;
+Float_t vardxy;
+Float_t vardz;
+Float_t varSegCompat;
 
 //variables to be read
 //Event
@@ -51,8 +73,45 @@ vector<double>* rMuon_loose; TBranch* b_rMuon_loose =0;
 vector<double>* rMuon_miniIsoRel; TBranch* b_rMuon_miniIsoRel =0;
 vector<double>* rMuon_charge; TBranch* b_rMuon_charge =0;
 vector<double>* rMuon_pdgId; TBranch* b_rMuon_pdgId =0;
+vector<double>* rMuon_isGlobal; TBranch* b_rMuon_isGlobal =0;
+vector<double>* rMuon_chi2; TBranch* b_rMuon_chi2 =0;
+vector<double>* rMuon_chi2LocalPosition; TBranch* b_rMuon_chi2LocalPosition =0;
+vector<double>* rMuon_trkKink; TBranch* b_rMuon_trkKink =0;
+vector<double>* rMuon_validFraction; TBranch* b_rMuon_validFraction =0;
+vector<double>* rMuon_segmentCompatibility; TBranch* b_rMuon_segmentCompatibility =0;
+vector<double>* rMuon_jetptratio; TBranch* b_rMuon_jetptratio =0;
+vector<double>* rMuon_jetpt; TBranch* b_rMuon_jetpt =0;
+vector<double>* rMuon_jetcsv; TBranch* b_rMuon_jetcsv =0;
+vector<double>* rMuon_lepjetchtrks; TBranch* b_rMuon_lepjetchtrks =0;
+vector<double>* rMuon_miniIsoCh; TBranch* b_rMuon_miniIsoCh =0;
+vector<double>* rMuon_miniIsoPUsub; TBranch* b_rMuon_miniIsoPUsub =0;
+vector<double>* rMuon_ptrel; TBranch* b_rMuon_ptrel =0;
+vector<double>* rMuon_pTErrOVpT_it; TBranch* b_rMuon_pTErrOVpT_it =0;
+vector<double>* rMuon_px; TBranch* b_rMuon_px =0;
+vector<double>* rMuon_py; TBranch* b_rMuon_py =0;
+vector<double>* rMuon_pz; TBranch* b_rMuon_pz =0;
+vector<double>* rMuon_jetdr; TBranch* b_rMuon_jetdr =0;
+vector<double>* rMuon_gen_pt; TBranch* b_rMuon_gen_pt =0;
+vector<double>* rMuon_gen_eta; TBranch* b_rMuon_gen_eta =0;
+vector<double>* rMuon_gen_phi; TBranch* b_rMuon_gen_phi =0;
+vector<double>* rMuon_gen_en; TBranch* b_rMuon_gen_en =0;
+vector<double>* rMuon_gen_pdgId; TBranch* b_rMuon_gen_pdgId =0;
+vector<double>* rMuon_genMother_pt; TBranch* b_rMuon_genMother_pt =0;
+vector<double>* rMuon_genMother_eta; TBranch* b_rMuon_genMother_eta =0;
+vector<double>* rMuon_genMother_phi; TBranch* b_rMuon_genMother_phi =0;
+vector<double>* rMuon_genMother_en; TBranch* b_rMuon_genMother_en =0;
+vector<double>* rMuon_genMother_pdgId; TBranch* b_rMuon_genMother_pdgId =0;
+vector<double>* rMuon_genGrandMother_pt; TBranch* b_rMuon_genGrandMother_pt =0;
+vector<double>* rMuon_genGrandMother_eta; TBranch* b_rMuon_genGrandMother_eta =0;
+vector<double>* rMuon_genGrandMother_phi; TBranch* b_rMuon_genGrandMother_phi =0;
+vector<double>* rMuon_genGrandMother_en; TBranch* b_rMuon_genGrandMother_en =0;
+vector<double>* rMuon_genGrandMother_pdgId; TBranch* b_rMuon_genGrandMother_pdgId =0;
+vector<double>* rMuon_gen_isPromptFinalState; TBranch* b_rMuon_gen_isPromptFinalState =0;
+vector<double>* rMuon_gen_isDirectPromptTauDecayProductFinalState; TBranch* b_rMuon_gen_isDirectPromptTauDecayProductFinalState =0;
 
 //variables to be written
+
+// Event level variables
 double EVENT_event;
 double EVENT_genWeight;
 double HiggsDecay;
@@ -64,6 +123,10 @@ double Met_type1PF_phi;
 double Met_type1PF_sumEt;
 double Met_type1PF_shiftedPtUp;
 double Met_type1PF_shiftedPtDown;
+double Muon_numLoose;
+double Muon_numFake;
+double Muon_numTight;
+
 
 //Lepton
 vector<Lepton>* leptons = new std::vector<Lepton>;
@@ -79,6 +142,50 @@ vector<double>* Lepton_miniIsoRel = new std::vector<double>;
 vector<double>* Lepton_loose = new std::vector<double>;
 vector<double>* Lepton_charge = new std::vector<double>;
 vector<double>* Lepton_pdgId = new std::vector<double>;
+vector<double>* Lepton_isGlobal = new std::vector<double>;
+vector<double>* Lepton_chi2 = new std::vector<double>;
+vector<double>* Lepton_chi2LocalPosition = new std::vector<double>;
+vector<double>* Lepton_trkKink = new std::vector<double>;
+vector<double>* Lepton_validFraction = new std::vector<double>;
+vector<double>* Lepton_segmentCompatibility = new std::vector<double>;
+vector<double>* Lepton_jetptratio = new std::vector<double>;
+vector<double>* Lepton_jetpt = new std::vector<double>;
+vector<double>* Lepton_jetcsv = new std::vector<double>;
+vector<double>* Lepton_lepjetchtrks = new std::vector<double>;
+vector<double>* Lepton_miniIsoCh = new std::vector<double>;
+vector<double>* Lepton_miniIsoPUsub = new std::vector<double>;
+vector<double>* Lepton_ptrel = new std::vector<double>;
+vector<double>* Lepton_pTErrOVpT_it = new std::vector<double>;
+vector<double>* Lepton_px = new std::vector<double>;
+vector<double>* Lepton_py = new std::vector<double>;
+vector<double>* Lepton_pz = new std::vector<double>;
+vector<double>* Lepton_jetdr = new std::vector<double>;
+vector<double>* Lepton_gen_pt = new std::vector<double>;
+vector<double>* Lepton_gen_eta = new std::vector<double>;
+vector<double>* Lepton_gen_phi = new std::vector<double>;
+vector<double>* Lepton_gen_en = new std::vector<double>;
+vector<double>* Lepton_gen_pdgId = new std::vector<double>;
+vector<double>* Lepton_genMother_pt = new std::vector<double>;
+vector<double>* Lepton_genMother_eta = new std::vector<double>;
+vector<double>* Lepton_genMother_phi = new std::vector<double>;
+vector<double>* Lepton_genMother_en = new std::vector<double>;
+vector<double>* Lepton_genMother_pdgId = new std::vector<double>;
+vector<double>* Lepton_genGrandMother_pt = new std::vector<double>;
+vector<double>* Lepton_genGrandMother_eta = new std::vector<double>;
+vector<double>* Lepton_genGrandMother_phi = new std::vector<double>;
+vector<double>* Lepton_genGrandMother_en = new std::vector<double>;
+vector<double>* Lepton_genGrandMother_pdgId = new std::vector<double>;
+vector<double>* Lepton_gen_isPromptFinalState = new std::vector<double>;
+vector<double>* Lepton_gen_isDirectPromptTauDecayProductFinalState = new std::vector<double>;
 
 //new variables
 vector<double>* Lepton_cut = new std::vector<double>;
+vector<double>* Lepton_BDT = new std::vector<double>;
+vector<double>* Lepton_corrpt = new std::vector<double>;
+vector<double>* Lepton_FR = new std::vector<double>;
+vector<double>* Lepton_CF = new std::vector<double>;
+vector<double>* Lepton_passConversion = new std::vector<double>;
+vector<double>* Lepton_passMuTightCharge = new std::vector<double>;
+vector<double>* Lepton_passEleTightCharge = new std::vector<double>;
+vector<double>* Lepton_passMissHit = new std::vector<double>;
+vector<double>* Lepton_isMatchRightCharge = new std::vector<double>;

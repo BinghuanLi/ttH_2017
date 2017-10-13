@@ -16,9 +16,9 @@ workpath = "/publicfs/cms/user/libh/Test/Rootplizer/analyzer"
 #  CaseC   No       Yes     Jet_LooseID: you can not read it from ntuplas if there is not, but you want to save in rootplas 
 
 # Variable Case
-#Case = "CaseA"
+Case = "CaseA"
 #Case = "CaseB"
-Case = "CaseC"
+#Case = "CaseC"
 # Variable Definition
 
 rObject = "Muon"
@@ -29,8 +29,8 @@ VariableNames = [
 # CaseA Variables
 #"Muon_pt","Muon_eta","Muon_phi","Muon_energy","Muon_dxy_pv","Muon_dz_pv","Muon_IP3Dsig_it",
 #"Muon_loose","Muon_miniIsoRel",
-
 #"charge","pdgId",
+
 "isGlobal","chi2","chi2LocalPosition","trkKink","validFraction","segmentCompatibility",
 "jetptratio","jetcsv","lepjetchtrks","miniIsoCh","miniIsoPUsub","ptrel",
 "pTErrOVpT_it","px","py","pz","jetdr",
@@ -42,8 +42,9 @@ VariableNames = [
 #Case B
 
 # Case C
-"BDT","isMedium_ST","corrpt","FR","CF",
-"passConversion","passMuTightCharge","passEleTightCharge","passMissHit","isMatchRightCharge",
+
+#"BDT","isMedium_ST","corrpt","FR","CF",
+#"passConversion","passMuTightCharge","passEleTightCharge","passMissHit","isMatchRightCharge",
 
 
 ]
