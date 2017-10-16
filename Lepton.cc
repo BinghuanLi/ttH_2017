@@ -37,13 +37,32 @@ bool Lepton::mu_isTight_tthlep(bool isMedium){
 
 void Lepton::set_Wp_tthlep(bool isMedium){
     // set lepton working point 
-    if(mu_isTight_tthlep(isMedium) && mu_isfake_tthlep() && mu_isLoose_tthlep()) cut=3;// Tight
-    else if(mu_isfake_tthlep() && mu_isLoose_tthlep()) cut=2;// fakeable
-    else if(mu_isLoose_tthlep())cut=1;// loose
+    //Muon
+    if(fabs(pdgId)==13){
+        if(mu_isTight_tthlep(isMedium) && mu_isfake_tthlep() && mu_isLoose_tthlep()) cut=3;// Tight
+        else if(mu_isfake_tthlep() && mu_isLoose_tthlep()) cut=2;// fakeable
+        else if(mu_isLoose_tthlep())cut=1;// loose
+    }
 }
 
 
-void Lepton::set_conept(bool isMedium){
+void Lepton::cal_conept(bool isMedium){
     // set conept: BDT, pt and jetpt needs to be set before calling this function
-    corrpt = (isMedium && BDT > 0.9) ?  pt : 0.9 * jetpt;
+    //Muon
+    if(fabs(pdgId)==13){
+        corrpt = (isMedium && BDT > 0.9) ?  pt : 0.9 * jetpt;
+    }
 }
+
+
+void Lepton::cal_tight_property(){
+    //Muon
+    if(fabs(pdgId)==13){
+        // set electron related variables to 1
+        passConversion = 1;
+        passEleTightCharge = 1;
+        passMissHit = 1;
+        if(fabs(pTErrOVpT_it)<0.2)passMuTightCharge=1;
+        else passMuTightCharge=0;
+    }
+};

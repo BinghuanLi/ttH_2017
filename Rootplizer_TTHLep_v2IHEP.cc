@@ -158,14 +158,14 @@ void Muon_sel(string sample){
         bool isMedium_ST = mu_isMedium( rMuon_isGlobal->at(mu_en), rMuon_chi2->at(mu_en), rMuon_chi2LocalPosition->at(mu_en) , rMuon_trkKink->at(mu_en), rMuon_loose->at(mu_en), rMuon_validFraction->at(mu_en) , rMuon_segmentCompatibility->at(mu_en) , isHIPSafe);
         
         // pt, jetpt and BDT of Muon has to be seted before calling conept
-        Muon.set_conept(isMedium_ST);
+        Muon.cal_conept(isMedium_ST);
         
         // check whether Muon pass tth fakeable lepton selection
         if(Muon.mu_isfake_tthlep())mu_numFake++;
 
         // check whether Muon pass tth tight lepton selection
         if(Muon.mu_isTight_tthlep(isMedium_ST))mu_numTight++;
-        
+       
         Muon.gen_pt= rMuon_gen_pt->at(mu_en);
         Muon.gen_eta= rMuon_gen_eta->at(mu_en);
         Muon.gen_phi= rMuon_gen_phi->at(mu_en);
@@ -183,9 +183,10 @@ void Muon_sel(string sample){
         Muon.genGrandMother_pdgId= rMuon_genGrandMother_pdgId->at(mu_en);
         Muon.gen_isPromptFinalState= rMuon_gen_isPromptFinalState->at(mu_en);
         Muon.gen_isDirectPromptTauDecayProductFinalState= rMuon_gen_isDirectPromptTauDecayProductFinalState->at(mu_en);
-        
-        // initialize variables needed for tth fake lepton selection
+       
+        // calculate new variables 
         Muon.set_Wp_tthlep( isMedium_ST );
+        Muon.cal_tight_property();
         leptons->push_back(Muon);    
     }
     Muon_numLoose = mu_numLoose;
