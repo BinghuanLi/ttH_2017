@@ -17,6 +17,7 @@ const double evt = 653077.;
 const bool sync_top = false;
 string sample = "mc";
 bool isHIPSafe = true;
+string data_path = "/home/binghuan/Work/RootTestFiles/TTHLep_2017/data/weights/";
 
 //Variable handleling
 void rSetBranchAddress(TTree* readingtree, string sample);
@@ -47,6 +48,18 @@ Float_t varmvaId;
 Float_t vardxy;
 Float_t vardz;
 Float_t varSegCompat;
+
+//Charge Flip
+string ChargeFlipName = data_path + "QF_data_el.root";
+TFile* CFfile = new TFile(ChargeFlipName.c_str(), "read");
+TH2F* hist_cf = (TH2F*) CFfile->Get("chargeMisId");
+
+//Fake Rate
+string FakeRateName = data_path + "FR_data_ttH_mva.root";
+TFile* FRfile = new TFile(FakeRateName.c_str(),"read");
+TH2F* hist_mu_fr = (TH2F*) FRfile->Get("FR_mva090_mu_data_comb");
+TH2F* hist_el_fr = (TH2F*) FRfile->Get("FR_mva090_el_data_comb_NC");
+
 
 //variables to be read
 //Event

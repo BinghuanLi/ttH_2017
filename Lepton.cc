@@ -66,3 +66,12 @@ void Lepton::cal_tight_property(){
         else passMuTightCharge=0;
     }
 };
+        
+        
+double Lepton::get_valX_valY_binContent(TH2F* h, double valX, double valY){
+    int binX  = std::max(1, std::min(h->GetNbinsX(), h->GetXaxis()->FindBin(valX)));
+    int binY = std::max(1, std::min(h->GetNbinsY(), h->GetYaxis()->FindBin(std::abs(valY))));
+    return h->GetBinContent(binX, binY);
+};
+
+

@@ -1,4 +1,4 @@
-#include "TLorentzVector.h"
+#include "TH2F.h"
 
 class Lepton {
     // this class define leptons
@@ -55,7 +55,7 @@ class Lepton {
         double passMuTightCharge;
         double passEleTightCharge;
         double passMissHit;
-        double isMatchRightCharge;
+        double isMatchRightCharge = 1.; // lepton match gen right charge? default 1 (yes)
         
         // lepton gen
         double gen_pt;
@@ -83,5 +83,6 @@ class Lepton {
         void set_Wp_tthlep(bool isMedium);
         void cal_conept(bool isMedium);
         void cal_tight_property();
+        double get_valX_valY_binContent(TH2F* h, double valX, double valY);
 
 };

@@ -51,6 +51,8 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
 // Anaysis functions
 ////
 void set_wgtMVA(){
+    string ele_wgt = data_path + "el_BDTG.weights.xml";
+    string mu_wgt = data_path + "mu_BDTG.weights.xml";
     mu_reader_ = new TMVA::Reader("!Color:!Silent");
     ele_reader_ = new TMVA::Reader("!Color:!Silent");
     std::vector<TMVA::Reader *> mvas = { ele_reader_, mu_reader_ };
@@ -69,8 +71,8 @@ void set_wgtMVA(){
     }
     ele_reader_->AddVariable("LepGood_mvaIdSpring16HZZ", &varmvaId);
     mu_reader_->AddVariable("LepGood_segmentCompatibility", &varSegCompat);
-    ele_reader_->BookMVA("BDTG method", "/home/binghuan/Work/RootTestFiles/TTHLep_2017/data/weights/el_BDTG.weights.xml");
-    mu_reader_->BookMVA("BDTG method", "/home/binghuan/Work/RootTestFiles/TTHLep_2017/data/weights/mu_BDTG.weights.xml");
+    ele_reader_->BookMVA("BDTG method",ele_wgt); 
+    mu_reader_->BookMVA("BDTG method",mu_wgt); 
 }; 
 
 
@@ -187,6 +189,9 @@ void Muon_sel(string sample){
         // calculate new variables 
         Muon.set_Wp_tthlep( isMedium_ST );
         Muon.cal_tight_property();
+        Muon.CF = 1.;
+        Muon.FR = Muon.get_valX_valY_binContent(hist_mu_fr, Muon.corrpt, Muon.eta);
+        if(!(Muon.gen_pdgId * Muon.charge<0 && Muon.gen_pdgId!=-999))Muon.isMatchRightCharge=0.;
         leptons->push_back(Muon);    
     }
     Muon_numLoose = mu_numLoose;
