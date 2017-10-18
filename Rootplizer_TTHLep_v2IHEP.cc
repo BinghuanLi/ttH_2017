@@ -108,16 +108,19 @@ bool mu_isMedium( double isGlobal, double chi_square, double chi2_localposition,
 
 //utils
 double deltaPhi(double phi1, double phi2){
- double result = phi1 - phi2;
- while (result > M_PI) result -= 2*M_PI;
- while (result <= -M_PI) result += 2*M_PI;
- return result;
+    double result = phi1 - phi2;
+    while (result > M_PI) result -= 2*M_PI;
+    while (result <= -M_PI) result += 2*M_PI;
+    return result;
 }
 double deltaEta(double eta1, double eta2){
- return (eta1-eta2);
+    return (eta1-eta2);
 };
 double deltaR(double dphi, double deta){
- return sqrt(pow(dphi,2)+pow(deta,2));
+    return sqrt(pow(dphi,2)+pow(deta,2));
+};
+bool compare_pt(const Lepton& LeptonA, const Lepton& LeptonB){
+    return LeptonA.pt > LeptonB.pt;
 };
 
 
@@ -198,7 +201,7 @@ void Muon_sel(string sample){
         // calculate new variables 
         Muon.set_Wp_tthlep( isMedium_ST, mu_numLoose, mu_numFake, mu_numTight );
         Muon.cal_tight_property();
-        Muon.CF = 1.;
+        Muon.CF = 0.;
         Muon.FR = Muon.get_valX_valY_binContent(hist_mu_fr, Muon.corrpt, Muon.eta);
         if(!(Muon.gen_pdgId * Muon.charge<0 && Muon.gen_pdgId!=-999))Muon.isMatchRightCharge=0.;
         leptons->push_back(Muon);    
@@ -275,9 +278,39 @@ void patElectron_sel(string sample){
         patElectron.dPhiIn= rpatElectron_dPhiIn->at(ele_en);
         patElectron.ooEmooP= rpatElectron_ooEmooP->at(ele_en);
        
+        patElectron.isGsfCtfScPixChargeConsistent= rpatElectron_isGsfCtfScPixChargeConsistent->at(ele_en);
+        patElectron.isGsfScPixChargeConsistent= rpatElectron_isGsfScPixChargeConsistent->at(ele_en);
+        patElectron.passConversion= rpatElectron_passConversionVeto->at(ele_en);
+        patElectron.gen_pt= rpatElectron_gen_pt->at(ele_en);
+        patElectron.gen_eta= rpatElectron_gen_eta->at(ele_en);
+        patElectron.gen_phi= rpatElectron_gen_phi->at(ele_en);
+        patElectron.gen_en= rpatElectron_gen_en->at(ele_en);
+        patElectron.gen_pdgId= rpatElectron_gen_pdgId->at(ele_en);
+        patElectron.genMother_pt= rpatElectron_genMother_pt->at(ele_en);
+        patElectron.genMother_eta= rpatElectron_genMother_eta->at(ele_en);
+        patElectron.genMother_phi= rpatElectron_genMother_phi->at(ele_en);
+        patElectron.genMother_en= rpatElectron_genMother_en->at(ele_en);
+        patElectron.genMother_pdgId= rpatElectron_genMother_pdgId->at(ele_en);
+        patElectron.genGrandMother_pt= rpatElectron_genGrandMother_pt->at(ele_en);
+        patElectron.genGrandMother_eta= rpatElectron_genGrandMother_eta->at(ele_en);
+        patElectron.genGrandMother_phi= rpatElectron_genGrandMother_phi->at(ele_en);
+        patElectron.genGrandMother_en= rpatElectron_genGrandMother_en->at(ele_en);
+        patElectron.genGrandMother_pdgId= rpatElectron_genGrandMother_pdgId->at(ele_en);
+        patElectron.gen_isPromptFinalState= rpatElectron_gen_isPromptFinalState->at(ele_en);
+        patElectron.gen_isDirectPromptTauDecayProductFinalState= rpatElectron_gen_isDirectPromptTauDecayProductFinalState->at(ele_en);
+        
         // calculate new variables 
         // pass ismedium boolean, always true for electron
         patElectron.set_Wp_tthlep(true, ele_numLoose, ele_numFake, ele_numTight ); 
+        patElectron.cal_tight_property();
+        patElectron.CF = patElectron.get_valX_valY_binContent(
+            hist_cf, patElectron.corrpt,patElectron.eta);
+        patElectron.FR = patElectron.get_valX_valY_binContent(
+            hist_el_fr, patElectron.corrpt,patElectron.eta);
+        if(!(patElectron.gen_pdgId * patElectron.charge<0 && patElectron.gen_pdgId!=-999))
+            patElectron.isMatchRightCharge=0.;
+        leptons->push_back(patElectron);    
+        
     }
     patElectron_numLoose = ele_numLoose;
     patElectron_numFake =  ele_numFake;
@@ -286,6 +319,7 @@ void patElectron_sel(string sample){
 
 
 void Lep_sel(){
+    sort(leptons->begin(), leptons->end(), compare_pt); 
     for(uint lep_en=0; lep_en < leptons->size(); lep_en++){
         Lepton_pt->push_back(leptons->at(lep_en).pt);
         Lepton_eta->push_back(leptons->at(lep_en).eta);
@@ -485,6 +519,9 @@ void rSetBranchAddress(TTree* readingtree, string sample){
     readingtree->SetBranchAddress("patElectron_dEtaIn",&rpatElectron_dEtaIn,&b_rpatElectron_dEtaIn);
     readingtree->SetBranchAddress("patElectron_dPhiIn",&rpatElectron_dPhiIn,&b_rpatElectron_dPhiIn);
     readingtree->SetBranchAddress("patElectron_ooEmooP",&rpatElectron_ooEmooP,&b_rpatElectron_ooEmooP);
+    readingtree->SetBranchAddress("patElectron_isGsfCtfScPixChargeConsistent",&rpatElectron_isGsfCtfScPixChargeConsistent,&b_rpatElectron_isGsfCtfScPixChargeConsistent);
+    readingtree->SetBranchAddress("patElectron_isGsfScPixChargeConsistent",&rpatElectron_isGsfScPixChargeConsistent,&b_rpatElectron_isGsfScPixChargeConsistent);
+    readingtree->SetBranchAddress("patElectron_passConversionVeto",&rpatElectron_passConversionVeto,&b_rpatElectron_passConversionVeto);
 };
 
 
@@ -783,4 +820,7 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rpatElectron_dPhiIn->GetEntry(tentry);
     b_rpatElectron_ooEmooP->GetEntry(tentry);
     b_rpatElectron_mvaValue_HZZ->GetEntry(tentry);
+    b_rpatElectron_isGsfCtfScPixChargeConsistent->GetEntry(tentry);
+    b_rpatElectron_isGsfScPixChargeConsistent->GetEntry(tentry);
+    b_rpatElectron_passConversionVeto->GetEntry(tentry);
 };

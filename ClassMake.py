@@ -16,8 +16,8 @@ workpath = "/publicfs/cms/user/libh/Test/Rootplizer/analyzer"
 #  CaseC   No       Yes     Jet_LooseID: you can not read it from ntuplas if there is not, but you want to save in rootplas 
 
 # Variable Case
-Case = "CaseA"
-#Case = "CaseB"
+#Case = "CaseA"
+Case = "CaseB"
 #Case = "CaseC"
 # Variable Definition
 
@@ -27,18 +27,19 @@ wObject = "Lepton"
 VariableType  = "double"
 VariableNames = [
 # CaseA Variables
-"pt","eta","phi","energy",
-"IP3Dsig","miniIsoRel","charge","pdgId","gsfTrack_dxy_pv","gsfTrack_dz_pv",
+#"pt","eta","phi","energy",
+#"IP3Dsig","miniIsoRel","charge","pdgId","gsfTrack_dxy_pv","gsfTrack_dz_pv",
 
 
-"jetptratio","jetcsv","lepjetchtrks","miniIsoCh","miniIsoPUsub","ptrel",
-"px","py","pz","jetdr",
-"gen_pt","gen_eta","gen_phi","gen_en","gen_pdgId",
-"genMother_pt","genMother_eta","genMother_phi","genMother_en","genMother_pdgId",
-"genGrandMother_pt","genGrandMother_eta","genGrandMother_phi","genGrandMother_en","genGrandMother_pdgId",
-"gen_isPromptFinalState","gen_isDirectPromptTauDecayProductFinalState",
+#"jetptratio","jetcsv","lepjetchtrks","miniIsoCh","miniIsoPUsub","ptrel",
+#"px","py","pz","jetdr",
+#"gen_pt","gen_eta","gen_phi","gen_en","gen_pdgId",
+#"genMother_pt","genMother_eta","genMother_phi","genMother_en","genMother_pdgId",
+#"genGrandMother_pt","genGrandMother_eta","genGrandMother_phi","genGrandMother_en","genGrandMother_pdgId",
+#"gen_isPromptFinalState","gen_isDirectPromptTauDecayProductFinalState",
 
-"SCeta","expectedMissingInnerHits","full5x5_sigmaIetaIeta","hOverE","dEtaIn","dPhiIn","ooEmooP", # Electron only
+#"SCeta","expectedMissingInnerHits","full5x5_sigmaIetaIeta","hOverE","dEtaIn","dPhiIn","ooEmooP", # Electron only
+"isGsfCtfScPixChargeConsistent","isGsfScPixChargeConsistent",
 
 #"isGlobal","chi2","chi2LocalPosition","trkKink","validFraction","segmentCompatibility","pTErrOVpT_it", # Muon only
 

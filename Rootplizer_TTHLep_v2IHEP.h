@@ -37,7 +37,7 @@ void Lep_sel();
 double deltaPhi(double phi1, double phi2);
 double deltaEta(double eta1, double eta2);
 double deltaR(double dphi, double deta);
-
+bool compare_pt(const Lepton& LeptonA, const Lepton& LeptonB);
 
 //Read MVA's
 void set_wgtMVA();
@@ -145,6 +145,7 @@ vector<double>* rpatElectron_gsfTrack_dxy_pv; TBranch* b_rpatElectron_gsfTrack_d
 vector<double>* rpatElectron_gsfTrack_dz_pv; TBranch* b_rpatElectron_gsfTrack_dz_pv =0;
 vector<double>* rpatElectron_jetptratio; TBranch* b_rpatElectron_jetptratio =0;
 vector<double>* rpatElectron_jetcsv; TBranch* b_rpatElectron_jetcsv =0;
+vector<double>* rpatElectron_passConversionVeto; TBranch* b_rpatElectron_passConversionVeto =0;
 vector<double>* rpatElectron_jetpt; TBranch* b_rpatElectron_jetpt =0;
 vector<double>* rpatElectron_lepjetchtrks; TBranch* b_rpatElectron_lepjetchtrks =0;
 vector<double>* rpatElectron_miniIsoCh; TBranch* b_rpatElectron_miniIsoCh =0;
@@ -179,6 +180,8 @@ vector<double>* rpatElectron_hOverE; TBranch* b_rpatElectron_hOverE =0;
 vector<double>* rpatElectron_dEtaIn; TBranch* b_rpatElectron_dEtaIn =0;
 vector<double>* rpatElectron_dPhiIn; TBranch* b_rpatElectron_dPhiIn =0;
 vector<double>* rpatElectron_ooEmooP; TBranch* b_rpatElectron_ooEmooP =0;
+vector<double>* rpatElectron_isGsfCtfScPixChargeConsistent; TBranch* b_rpatElectron_isGsfCtfScPixChargeConsistent =0;
+vector<double>* rpatElectron_isGsfScPixChargeConsistent; TBranch* b_rpatElectron_isGsfScPixChargeConsistent =0;
 
 //variables to be written
 

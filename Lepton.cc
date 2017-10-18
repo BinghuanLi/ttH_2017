@@ -164,8 +164,20 @@ void Lepton::cal_tight_property(){
         passConversion = 1;
         passEleTightCharge = 1;
         passMissHit = 1;
-        if(fabs(pTErrOVpT_it)<0.2)passMuTightCharge=1;
-        else passMuTightCharge=0;
+        if(fabs(pTErrOVpT_it)<0.2) passMuTightCharge= 1;
+        else passMuTightCharge = 0;
+    }
+    //Electron
+    if(fabs(pdgId)==11){
+        // set muon related variables to 1
+        passMuTightCharge=1;
+        if(expectedMissingInnerHits==0) passMissHit = 1;
+        else passMissHit = 0;
+        if((isGsfCtfScPixChargeConsistent + isGsfScPixChargeConsistent)>1){
+             passEleTightCharge = 1;
+        }else{
+             passEleTightCharge = 0;
+        }
     }
 };
         

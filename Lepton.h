@@ -56,6 +56,8 @@ class Lepton {
         double dEtaIn = -999.;
         double dPhiIn = -999.;
         double ooEmooP = -999.;
+        double isGsfCtfScPixChargeConsistent = -999;
+        double isGsfScPixChargeConsistent = -999;
         
         
         // New variables
