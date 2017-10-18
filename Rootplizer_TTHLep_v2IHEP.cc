@@ -36,6 +36,8 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
         rGetEntry(tentry, sample);
         //Muon
         Muon_sel(sample);
+        //Electron
+        patElectron_sel(sample);
         Lep_sel();
         //Event
         Event_sel();
@@ -85,7 +87,7 @@ double get_LeptonMVA(Lepton lep){
     varjetPtRatio_in = min(lep.jetptratio,1.5);
     varjetBTagCSV_in = max(lep.jetcsv,0.); 
     varjetNDauCharged_in =lep.lepjetchtrks; 
-    varsip3d = lep.IP3Dsig_it;
+    varsip3d = lep.IP3Dsig;
     vardxy = log(abs(lep.dxy_pv)); 
     vardz =  log(abs(lep.dz_pv)); 
     varSegCompat = lep.segmentCompatibility; 
@@ -104,6 +106,21 @@ bool mu_isMedium( double isGlobal, double chi_square, double chi2_localposition,
 };
 
 
+//utils
+double deltaPhi(double phi1, double phi2){
+ double result = phi1 - phi2;
+ while (result > M_PI) result -= 2*M_PI;
+ while (result <= -M_PI) result += 2*M_PI;
+ return result;
+}
+double deltaEta(double eta1, double eta2){
+ return (eta1-eta2);
+};
+double deltaR(double dphi, double deta){
+ return sqrt(pow(dphi,2)+pow(deta,2));
+};
+
+
 ////
 //Object Selection
 ////
@@ -112,9 +129,9 @@ void Muon_sel(string sample){
     if(sample == "data"){
         cout<<" Hi, I'm data!"<<endl;
     }
-    double mu_numLoose = 0;
-    double mu_numFake = 0;
-    double mu_numTight = 0;
+    int mu_numLoose = 0;
+    int mu_numFake = 0;
+    int mu_numTight = 0;
     for(uint mu_en = 0; mu_en<rMuon_pt->size(); mu_en++){
         Lepton Muon;
         
@@ -125,13 +142,12 @@ void Muon_sel(string sample){
         Muon.energy= rMuon_energy->at(mu_en);
         Muon.dxy_pv= rMuon_dxy_pv->at(mu_en);
         Muon.dz_pv= rMuon_dz_pv->at(mu_en);
-        Muon.IP3Dsig_it= rMuon_IP3Dsig_it->at(mu_en);
+        Muon.IP3Dsig= rMuon_IP3Dsig_it->at(mu_en);
         Muon.loose= rMuon_loose->at(mu_en);
         Muon.miniIsoRel= rMuon_miniIsoRel->at(mu_en);
         
         // check whether Muon pass tth loose lepton selection
-        if(!(Muon.mu_isLoose_tthlep()))continue;
-        mu_numLoose++;
+        if(!(Muon.mu_isLoose_tthlep())) continue;
         
         Muon.isGlobal= rMuon_isGlobal->at(mu_en);
         Muon.chi2= rMuon_chi2->at(mu_en);
@@ -151,7 +167,6 @@ void Muon_sel(string sample){
         Muon.py= rMuon_py->at(mu_en);
         Muon.pz= rMuon_pz->at(mu_en);
         Muon.jetdr= rMuon_jetdr->at(mu_en);
-        Muon.jetpt= rMuon_jetpt->at(mu_en);
         Muon.charge= rMuon_charge->at(mu_en);
         Muon.pdgId= rMuon_pdgId->at(mu_en);
         
@@ -161,12 +176,6 @@ void Muon_sel(string sample){
         
         // pt, jetpt and BDT of Muon has to be seted before calling conept
         Muon.cal_conept(isMedium_ST);
-        
-        // check whether Muon pass tth fakeable lepton selection
-        if(Muon.mu_isfake_tthlep())mu_numFake++;
-
-        // check whether Muon pass tth tight lepton selection
-        if(Muon.mu_isTight_tthlep(isMedium_ST))mu_numTight++;
        
         Muon.gen_pt= rMuon_gen_pt->at(mu_en);
         Muon.gen_eta= rMuon_gen_eta->at(mu_en);
@@ -187,7 +196,7 @@ void Muon_sel(string sample){
         Muon.gen_isDirectPromptTauDecayProductFinalState= rMuon_gen_isDirectPromptTauDecayProductFinalState->at(mu_en);
        
         // calculate new variables 
-        Muon.set_Wp_tthlep( isMedium_ST );
+        Muon.set_Wp_tthlep( isMedium_ST, mu_numLoose, mu_numFake, mu_numTight );
         Muon.cal_tight_property();
         Muon.CF = 1.;
         Muon.FR = Muon.get_valX_valY_binContent(hist_mu_fr, Muon.corrpt, Muon.eta);
@@ -200,6 +209,82 @@ void Muon_sel(string sample){
 }
 
 
+//Electron
+void patElectron_sel(string sample){
+    if(sample == "data"){
+        cout<<" Hi, I'm data!"<<endl;
+    }
+    int ele_numLoose = 0;
+    int ele_numFake = 0;
+    int ele_numTight = 0;
+    for(uint ele_en = 0; ele_en<rpatElectron_pt->size(); ele_en++){
+        Lepton patElectron;
+        
+        // initialize needed variables for ele_isLoose_tthlep()
+        patElectron.pt= rpatElectron_pt->at(ele_en);
+        patElectron.eta= rpatElectron_eta->at(ele_en);
+        patElectron.phi= rpatElectron_phi->at(ele_en);
+        patElectron.energy= rpatElectron_energy->at(ele_en);
+        patElectron.IP3Dsig= rpatElectron_IP3Dsig->at(ele_en);
+        patElectron.miniIsoRel= rpatElectron_miniIsoRel->at(ele_en);
+        patElectron.dxy_pv= rpatElectron_gsfTrack_dxy_pv->at(ele_en);
+        patElectron.dz_pv= rpatElectron_gsfTrack_dz_pv->at(ele_en);
+        patElectron.SCeta= rpatElectron_SCeta->at(ele_en);
+        patElectron.expectedMissingInnerHits= rpatElectron_expectedMissingInnerHits->at(ele_en);
+        
+        // check whether ele overlaps with tth loose muon
+        bool ismatched = false; 
+        for(uint lep_en=0; lep_en < leptons->size(); lep_en++){
+            Lepton Muon = leptons->at(lep_en);
+            if(!(fabs(Muon.pdgId)==13)) continue; // skip if it's not a muon
+            if(deltaR(deltaPhi(Muon.phi,patElectron.phi),deltaEta(Muon.eta,patElectron.eta))<0.05){
+                ismatched = true; 
+                break; 
+            }
+        }
+        if(ismatched) continue;
+        
+        // check whether ele pass tth loose lepton selection
+        if(!(patElectron.ele_isLoose_tthlep())) continue;
+        
+        // few variables needs to be seted before set BDT
+        patElectron.charge= rpatElectron_charge->at(ele_en);
+        patElectron.pdgId= rpatElectron_pdgId->at(ele_en);
+        patElectron.jetptratio= rpatElectron_jetptratio->at(ele_en);
+        patElectron.jetcsv= rpatElectron_jetcsv->at(ele_en);
+        patElectron.jetpt= rpatElectron_jetpt->at(ele_en);
+        patElectron.lepjetchtrks= rpatElectron_lepjetchtrks->at(ele_en);
+        patElectron.miniIsoCh= rpatElectron_miniIsoCh->at(ele_en);
+        patElectron.miniIsoPUsub= rpatElectron_miniIsoPUsub->at(ele_en);
+        patElectron.ptrel= rpatElectron_ptrel->at(ele_en);
+        patElectron.px= rpatElectron_px->at(ele_en);
+        patElectron.py= rpatElectron_py->at(ele_en);
+        patElectron.pz= rpatElectron_pz->at(ele_en);
+        patElectron.jetdr= rpatElectron_jetdr->at(ele_en);
+        patElectron.mvaValue_HZZ= rpatElectron_mvaValue_HZZ->at(ele_en);
+        patElectron.BDT = get_LeptonMVA(patElectron);
+    
+        // pt, jetpt and BDT of electron has to be seted before calling conept
+        // pass ismedium boolean, always true for electron
+        patElectron.cal_conept(true); 
+       
+        // few variables needs to be seted before check fabkeable selection
+        patElectron.full5x5_sigmaIetaIeta= rpatElectron_full5x5_sigmaIetaIeta->at(ele_en);
+        patElectron.hOverE= rpatElectron_hOverE->at(ele_en);
+        patElectron.dEtaIn= rpatElectron_dEtaIn->at(ele_en);
+        patElectron.dPhiIn= rpatElectron_dPhiIn->at(ele_en);
+        patElectron.ooEmooP= rpatElectron_ooEmooP->at(ele_en);
+       
+        // calculate new variables 
+        // pass ismedium boolean, always true for electron
+        patElectron.set_Wp_tthlep(true, ele_numLoose, ele_numFake, ele_numTight ); 
+    }
+    patElectron_numLoose = ele_numLoose;
+    patElectron_numFake =  ele_numFake;
+    patElectron_numTight = ele_numTight;
+}
+
+
 void Lep_sel(){
     for(uint lep_en=0; lep_en < leptons->size(); lep_en++){
         Lepton_pt->push_back(leptons->at(lep_en).pt);
@@ -208,7 +293,7 @@ void Lep_sel(){
         Lepton_energy->push_back(leptons->at(lep_en).energy);
         Lepton_dxy_pv->push_back(leptons->at(lep_en).dxy_pv);
         Lepton_dz_pv->push_back(leptons->at(lep_en).dz_pv);
-        Lepton_IP3Dsig_it->push_back(leptons->at(lep_en).IP3Dsig_it);
+        Lepton_IP3Dsig->push_back(leptons->at(lep_en).IP3Dsig);
         Lepton_loose->push_back(leptons->at(lep_en).loose);
         Lepton_miniIsoRel->push_back(leptons->at(lep_en).loose);
         Lepton_charge->push_back(leptons->at(lep_en).charge);
@@ -258,6 +343,14 @@ void Lep_sel(){
         Lepton_genGrandMother_pdgId->push_back(leptons->at(lep_en).genGrandMother_pdgId);
         Lepton_gen_isPromptFinalState->push_back(leptons->at(lep_en).gen_isPromptFinalState);
         Lepton_gen_isDirectPromptTauDecayProductFinalState->push_back(leptons->at(lep_en).gen_isDirectPromptTauDecayProductFinalState);
+        Lepton_SCeta->push_back(leptons->at(lep_en).SCeta);
+        Lepton_mvaValue_HZZ->push_back(leptons->at(lep_en).mvaValue_HZZ);
+        Lepton_expectedMissingInnerHits->push_back(leptons->at(lep_en).expectedMissingInnerHits);
+        Lepton_full5x5_sigmaIetaIeta->push_back(leptons->at(lep_en).full5x5_sigmaIetaIeta);
+        Lepton_hOverE->push_back(leptons->at(lep_en).hOverE);
+        Lepton_dEtaIn->push_back(leptons->at(lep_en).dEtaIn);
+        Lepton_dPhiIn->push_back(leptons->at(lep_en).dPhiIn);
+        Lepton_ooEmooP->push_back(leptons->at(lep_en).ooEmooP);
     }
 };
 
@@ -345,6 +438,53 @@ void rSetBranchAddress(TTree* readingtree, string sample){
     readingtree->SetBranchAddress("Muon_genGrandMother_pdgId",&rMuon_genGrandMother_pdgId,&b_rMuon_genGrandMother_pdgId);
     readingtree->SetBranchAddress("Muon_gen_isPromptFinalState",&rMuon_gen_isPromptFinalState,&b_rMuon_gen_isPromptFinalState);
     readingtree->SetBranchAddress("Muon_gen_isDirectPromptTauDecayProductFinalState",&rMuon_gen_isDirectPromptTauDecayProductFinalState,&b_rMuon_gen_isDirectPromptTauDecayProductFinalState);
+    //Electron
+    readingtree->SetBranchAddress("patElectron_pt",&rpatElectron_pt,&b_rpatElectron_pt);
+    readingtree->SetBranchAddress("patElectron_eta",&rpatElectron_eta,&b_rpatElectron_eta);
+    readingtree->SetBranchAddress("patElectron_phi",&rpatElectron_phi,&b_rpatElectron_phi);
+    readingtree->SetBranchAddress("patElectron_energy",&rpatElectron_energy,&b_rpatElectron_energy);
+    readingtree->SetBranchAddress("patElectron_IP3Dsig",&rpatElectron_IP3Dsig,&b_rpatElectron_IP3Dsig);
+    readingtree->SetBranchAddress("patElectron_miniIsoRel",&rpatElectron_miniIsoRel,&b_rpatElectron_miniIsoRel);
+    readingtree->SetBranchAddress("patElectron_charge",&rpatElectron_charge,&b_rpatElectron_charge);
+    readingtree->SetBranchAddress("patElectron_pdgId",&rpatElectron_pdgId,&b_rpatElectron_pdgId);
+    readingtree->SetBranchAddress("patElectron_gsfTrack_dxy_pv",&rpatElectron_gsfTrack_dxy_pv,&b_rpatElectron_gsfTrack_dxy_pv);
+    readingtree->SetBranchAddress("patElectron_gsfTrack_dz_pv",&rpatElectron_gsfTrack_dz_pv,&b_rpatElectron_gsfTrack_dz_pv);
+    readingtree->SetBranchAddress("patElectron_jetptratio",&rpatElectron_jetptratio,&b_rpatElectron_jetptratio);
+    readingtree->SetBranchAddress("patElectron_jetcsv",&rpatElectron_jetcsv,&b_rpatElectron_jetcsv);
+    readingtree->SetBranchAddress("patElectron_jetpt",&rpatElectron_jetpt,&b_rpatElectron_jetpt);
+    readingtree->SetBranchAddress("patElectron_lepjetchtrks",&rpatElectron_lepjetchtrks,&b_rpatElectron_lepjetchtrks);
+    readingtree->SetBranchAddress("patElectron_miniIsoCh",&rpatElectron_miniIsoCh,&b_rpatElectron_miniIsoCh);
+    readingtree->SetBranchAddress("patElectron_miniIsoPUsub",&rpatElectron_miniIsoPUsub,&b_rpatElectron_miniIsoPUsub);
+    readingtree->SetBranchAddress("patElectron_ptrel",&rpatElectron_ptrel,&b_rpatElectron_ptrel);
+    readingtree->SetBranchAddress("patElectron_px",&rpatElectron_px,&b_rpatElectron_px);
+    readingtree->SetBranchAddress("patElectron_py",&rpatElectron_py,&b_rpatElectron_py);
+    readingtree->SetBranchAddress("patElectron_pz",&rpatElectron_pz,&b_rpatElectron_pz);
+    readingtree->SetBranchAddress("patElectron_jetdr",&rpatElectron_jetdr,&b_rpatElectron_jetdr);
+    readingtree->SetBranchAddress("patElectron_gen_pt",&rpatElectron_gen_pt,&b_rpatElectron_gen_pt);
+    readingtree->SetBranchAddress("patElectron_gen_eta",&rpatElectron_gen_eta,&b_rpatElectron_gen_eta);
+    readingtree->SetBranchAddress("patElectron_gen_phi",&rpatElectron_gen_phi,&b_rpatElectron_gen_phi);
+    readingtree->SetBranchAddress("patElectron_gen_en",&rpatElectron_gen_en,&b_rpatElectron_gen_en);
+    readingtree->SetBranchAddress("patElectron_gen_pdgId",&rpatElectron_gen_pdgId,&b_rpatElectron_gen_pdgId);
+    readingtree->SetBranchAddress("patElectron_genMother_pt",&rpatElectron_genMother_pt,&b_rpatElectron_genMother_pt);
+    readingtree->SetBranchAddress("patElectron_genMother_eta",&rpatElectron_genMother_eta,&b_rpatElectron_genMother_eta);
+    readingtree->SetBranchAddress("patElectron_genMother_phi",&rpatElectron_genMother_phi,&b_rpatElectron_genMother_phi);
+    readingtree->SetBranchAddress("patElectron_genMother_en",&rpatElectron_genMother_en,&b_rpatElectron_genMother_en);
+    readingtree->SetBranchAddress("patElectron_genMother_pdgId",&rpatElectron_genMother_pdgId,&b_rpatElectron_genMother_pdgId);
+    readingtree->SetBranchAddress("patElectron_genGrandMother_pt",&rpatElectron_genGrandMother_pt,&b_rpatElectron_genGrandMother_pt);
+    readingtree->SetBranchAddress("patElectron_genGrandMother_eta",&rpatElectron_genGrandMother_eta,&b_rpatElectron_genGrandMother_eta);
+    readingtree->SetBranchAddress("patElectron_genGrandMother_phi",&rpatElectron_genGrandMother_phi,&b_rpatElectron_genGrandMother_phi);
+    readingtree->SetBranchAddress("patElectron_genGrandMother_en",&rpatElectron_genGrandMother_en,&b_rpatElectron_genGrandMother_en);
+    readingtree->SetBranchAddress("patElectron_genGrandMother_pdgId",&rpatElectron_genGrandMother_pdgId,&b_rpatElectron_genGrandMother_pdgId);
+    readingtree->SetBranchAddress("patElectron_gen_isPromptFinalState",&rpatElectron_gen_isPromptFinalState,&b_rpatElectron_gen_isPromptFinalState);
+    readingtree->SetBranchAddress("patElectron_gen_isDirectPromptTauDecayProductFinalState",&rpatElectron_gen_isDirectPromptTauDecayProductFinalState,&b_rpatElectron_gen_isDirectPromptTauDecayProductFinalState);
+    readingtree->SetBranchAddress("patElectron_SCeta",&rpatElectron_SCeta,&b_rpatElectron_SCeta);
+    readingtree->SetBranchAddress("patElectron_mvaValue_HZZ",&rpatElectron_mvaValue_HZZ,&b_rpatElectron_mvaValue_HZZ);
+    readingtree->SetBranchAddress("patElectron_expectedMissingInnerHits",&rpatElectron_expectedMissingInnerHits,&b_rpatElectron_expectedMissingInnerHits);
+    readingtree->SetBranchAddress("patElectron_full5x5_sigmaIetaIeta",&rpatElectron_full5x5_sigmaIetaIeta,&b_rpatElectron_full5x5_sigmaIetaIeta);
+    readingtree->SetBranchAddress("patElectron_hOverE",&rpatElectron_hOverE,&b_rpatElectron_hOverE);
+    readingtree->SetBranchAddress("patElectron_dEtaIn",&rpatElectron_dEtaIn,&b_rpatElectron_dEtaIn);
+    readingtree->SetBranchAddress("patElectron_dPhiIn",&rpatElectron_dPhiIn,&b_rpatElectron_dPhiIn);
+    readingtree->SetBranchAddress("patElectron_ooEmooP",&rpatElectron_ooEmooP,&b_rpatElectron_ooEmooP);
 };
 
 
@@ -367,6 +507,9 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("Muon_numLoose",&Muon_numLoose);
     newtree->Branch("Muon_numFake",&Muon_numFake);
     newtree->Branch("Muon_numTight",&Muon_numTight);
+    newtree->Branch("patElectron_numLoose",&patElectron_numLoose);
+    newtree->Branch("patElectron_numFake",&patElectron_numFake);
+    newtree->Branch("patElectron_numTight",&patElectron_numTight);
     //Lepton
     newtree->Branch("Lepton_pt",&Lepton_pt);
     newtree->Branch("Lepton_eta",&Lepton_eta);
@@ -374,7 +517,7 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("Lepton_energy",&Lepton_energy);
     newtree->Branch("Lepton_dxy_pv",&Lepton_dxy_pv);
     newtree->Branch("Lepton_dz_pv",&Lepton_dz_pv);
-    newtree->Branch("Lepton_IP3Dsig_it",&Lepton_IP3Dsig_it);
+    newtree->Branch("Lepton_IP3Dsig",&Lepton_IP3Dsig);
     newtree->Branch("Lepton_loose",&Lepton_loose);
     newtree->Branch("Lepton_miniIsoRel",&Lepton_miniIsoRel);
     newtree->Branch("Lepton_charge",&Lepton_charge);
@@ -397,6 +540,14 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("Lepton_py",&Lepton_py);
     newtree->Branch("Lepton_pz",&Lepton_pz);
     newtree->Branch("Lepton_jetdr",&Lepton_jetdr);
+    newtree->Branch("Lepton_SCeta",&Lepton_SCeta);
+    newtree->Branch("Lepton_mvaValue_HZZ",&Lepton_mvaValue_HZZ);
+    newtree->Branch("Lepton_expectedMissingInnerHits",&Lepton_expectedMissingInnerHits);
+    newtree->Branch("Lepton_full5x5_sigmaIetaIeta",&Lepton_full5x5_sigmaIetaIeta);
+    newtree->Branch("Lepton_hOverE",&Lepton_hOverE);
+    newtree->Branch("Lepton_dEtaIn",&Lepton_dEtaIn);
+    newtree->Branch("Lepton_dPhiIn",&Lepton_dPhiIn);
+    newtree->Branch("Lepton_ooEmooP",&Lepton_ooEmooP);
     // gen variables
     newtree->Branch("Lepton_gen_pt",&Lepton_gen_pt);
     newtree->Branch("Lepton_gen_eta",&Lepton_gen_eta);
@@ -448,6 +599,9 @@ void wClearInitialization(string sample){
     Muon_numLoose= -999;
     Muon_numFake= -999;
     Muon_numTight= -999;
+    patElectron_numLoose= -999;
+    patElectron_numFake= -999;
+    patElectron_numTight= -999;
     // Lepton
     leptons->clear();
     Lepton_pt->clear();
@@ -456,7 +610,7 @@ void wClearInitialization(string sample){
     Lepton_energy->clear();
     Lepton_dxy_pv->clear();
     Lepton_dz_pv->clear();
-    Lepton_IP3Dsig_it->clear();
+    Lepton_IP3Dsig->clear();
     Lepton_loose->clear();
     Lepton_miniIsoRel->clear();
     Lepton_charge->clear();
@@ -479,6 +633,14 @@ void wClearInitialization(string sample){
     Lepton_py->clear();
     Lepton_pz->clear();
     Lepton_jetdr->clear();
+    Lepton_SCeta->clear();
+    Lepton_mvaValue_HZZ->clear();
+    Lepton_expectedMissingInnerHits->clear();
+    Lepton_full5x5_sigmaIetaIeta->clear();
+    Lepton_hOverE->clear();
+    Lepton_dEtaIn->clear();
+    Lepton_dPhiIn->clear();
+    Lepton_ooEmooP->clear();
     // gen
     Lepton_gen_pt->clear();
     Lepton_gen_eta->clear();
@@ -557,7 +719,6 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rMuon_py->GetEntry(tentry);
     b_rMuon_pz->GetEntry(tentry);
     b_rMuon_jetdr->GetEntry(tentry);
-    // new
     b_rMuon_gen_pt->GetEntry(tentry);
     b_rMuon_gen_eta->GetEntry(tentry);
     b_rMuon_gen_phi->GetEntry(tentry);
@@ -575,4 +736,51 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rMuon_genGrandMother_pdgId->GetEntry(tentry);
     b_rMuon_gen_isPromptFinalState->GetEntry(tentry);
     b_rMuon_gen_isDirectPromptTauDecayProductFinalState->GetEntry(tentry);
+    //Electron
+    b_rpatElectron_pt->GetEntry(tentry);
+    b_rpatElectron_eta->GetEntry(tentry);
+    b_rpatElectron_phi->GetEntry(tentry);
+    b_rpatElectron_energy->GetEntry(tentry);
+    b_rpatElectron_IP3Dsig->GetEntry(tentry);
+    b_rpatElectron_miniIsoRel->GetEntry(tentry);
+    b_rpatElectron_charge->GetEntry(tentry);
+    b_rpatElectron_pdgId->GetEntry(tentry);
+    b_rpatElectron_gsfTrack_dxy_pv->GetEntry(tentry);
+    b_rpatElectron_gsfTrack_dz_pv->GetEntry(tentry);
+    b_rpatElectron_jetptratio->GetEntry(tentry);
+    b_rpatElectron_jetcsv->GetEntry(tentry);
+    b_rpatElectron_jetpt->GetEntry(tentry);
+    b_rpatElectron_lepjetchtrks->GetEntry(tentry);
+    b_rpatElectron_miniIsoCh->GetEntry(tentry);
+    b_rpatElectron_miniIsoPUsub->GetEntry(tentry);
+    b_rpatElectron_ptrel->GetEntry(tentry);
+    b_rpatElectron_px->GetEntry(tentry);
+    b_rpatElectron_py->GetEntry(tentry);
+    b_rpatElectron_pz->GetEntry(tentry);
+    b_rpatElectron_jetdr->GetEntry(tentry);
+    b_rpatElectron_gen_pt->GetEntry(tentry);
+    b_rpatElectron_gen_eta->GetEntry(tentry);
+    b_rpatElectron_gen_phi->GetEntry(tentry);
+    b_rpatElectron_gen_en->GetEntry(tentry);
+    b_rpatElectron_gen_pdgId->GetEntry(tentry);
+    b_rpatElectron_genMother_pt->GetEntry(tentry);
+    b_rpatElectron_genMother_eta->GetEntry(tentry);
+    b_rpatElectron_genMother_phi->GetEntry(tentry);
+    b_rpatElectron_genMother_en->GetEntry(tentry);
+    b_rpatElectron_genMother_pdgId->GetEntry(tentry);
+    b_rpatElectron_genGrandMother_pt->GetEntry(tentry);
+    b_rpatElectron_genGrandMother_eta->GetEntry(tentry);
+    b_rpatElectron_genGrandMother_phi->GetEntry(tentry);
+    b_rpatElectron_genGrandMother_en->GetEntry(tentry);
+    b_rpatElectron_genGrandMother_pdgId->GetEntry(tentry);
+    b_rpatElectron_gen_isPromptFinalState->GetEntry(tentry);
+    b_rpatElectron_gen_isDirectPromptTauDecayProductFinalState->GetEntry(tentry);
+    b_rpatElectron_SCeta->GetEntry(tentry);
+    b_rpatElectron_expectedMissingInnerHits->GetEntry(tentry);
+    b_rpatElectron_full5x5_sigmaIetaIeta->GetEntry(tentry);
+    b_rpatElectron_hOverE->GetEntry(tentry);
+    b_rpatElectron_dEtaIn->GetEntry(tentry);
+    b_rpatElectron_dPhiIn->GetEntry(tentry);
+    b_rpatElectron_ooEmooP->GetEntry(tentry);
+    b_rpatElectron_mvaValue_HZZ->GetEntry(tentry);
 };

@@ -19,14 +19,25 @@ string sample = "mc";
 bool isHIPSafe = true;
 string data_path = "/home/binghuan/Work/RootTestFiles/TTHLep_2017/data/weights/";
 
+
 //Variable handleling
 void rSetBranchAddress(TTree* readingtree, string sample);
 void wSetBranchAddress(TTree* newtree, string sample);
 void wClearInitialization(string sample);
 void rGetEntry(Long64_t tentry, string sample);
 void Muon_sel(string sample);
+void patElectron_sel(string sample);
 void Event_sel();
 void Lep_sel();
+
+
+/////
+//utils
+/////
+double deltaPhi(double phi1, double phi2);
+double deltaEta(double eta1, double eta2);
+double deltaR(double dphi, double deta);
+
 
 //Read MVA's
 void set_wgtMVA();
@@ -121,6 +132,53 @@ vector<double>* rMuon_genGrandMother_en; TBranch* b_rMuon_genGrandMother_en =0;
 vector<double>* rMuon_genGrandMother_pdgId; TBranch* b_rMuon_genGrandMother_pdgId =0;
 vector<double>* rMuon_gen_isPromptFinalState; TBranch* b_rMuon_gen_isPromptFinalState =0;
 vector<double>* rMuon_gen_isDirectPromptTauDecayProductFinalState; TBranch* b_rMuon_gen_isDirectPromptTauDecayProductFinalState =0;
+//Electron
+vector<double>* rpatElectron_pt; TBranch* b_rpatElectron_pt =0;
+vector<double>* rpatElectron_eta; TBranch* b_rpatElectron_eta =0;
+vector<double>* rpatElectron_phi; TBranch* b_rpatElectron_phi =0;
+vector<double>* rpatElectron_energy; TBranch* b_rpatElectron_energy =0;
+vector<double>* rpatElectron_IP3Dsig; TBranch* b_rpatElectron_IP3Dsig =0;
+vector<double>* rpatElectron_miniIsoRel; TBranch* b_rpatElectron_miniIsoRel =0;
+vector<double>* rpatElectron_charge; TBranch* b_rpatElectron_charge =0;
+vector<double>* rpatElectron_pdgId; TBranch* b_rpatElectron_pdgId =0;
+vector<double>* rpatElectron_gsfTrack_dxy_pv; TBranch* b_rpatElectron_gsfTrack_dxy_pv =0;
+vector<double>* rpatElectron_gsfTrack_dz_pv; TBranch* b_rpatElectron_gsfTrack_dz_pv =0;
+vector<double>* rpatElectron_jetptratio; TBranch* b_rpatElectron_jetptratio =0;
+vector<double>* rpatElectron_jetcsv; TBranch* b_rpatElectron_jetcsv =0;
+vector<double>* rpatElectron_jetpt; TBranch* b_rpatElectron_jetpt =0;
+vector<double>* rpatElectron_lepjetchtrks; TBranch* b_rpatElectron_lepjetchtrks =0;
+vector<double>* rpatElectron_miniIsoCh; TBranch* b_rpatElectron_miniIsoCh =0;
+vector<double>* rpatElectron_miniIsoPUsub; TBranch* b_rpatElectron_miniIsoPUsub =0;
+vector<double>* rpatElectron_ptrel; TBranch* b_rpatElectron_ptrel =0;
+vector<double>* rpatElectron_px; TBranch* b_rpatElectron_px =0;
+vector<double>* rpatElectron_py; TBranch* b_rpatElectron_py =0;
+vector<double>* rpatElectron_pz; TBranch* b_rpatElectron_pz =0;
+vector<double>* rpatElectron_jetdr; TBranch* b_rpatElectron_jetdr =0;
+vector<double>* rpatElectron_gen_pt; TBranch* b_rpatElectron_gen_pt =0;
+vector<double>* rpatElectron_gen_eta; TBranch* b_rpatElectron_gen_eta =0;
+vector<double>* rpatElectron_gen_phi; TBranch* b_rpatElectron_gen_phi =0;
+vector<double>* rpatElectron_gen_en; TBranch* b_rpatElectron_gen_en =0;
+vector<double>* rpatElectron_gen_pdgId; TBranch* b_rpatElectron_gen_pdgId =0;
+vector<double>* rpatElectron_genMother_pt; TBranch* b_rpatElectron_genMother_pt =0;
+vector<double>* rpatElectron_genMother_eta; TBranch* b_rpatElectron_genMother_eta =0;
+vector<double>* rpatElectron_genMother_phi; TBranch* b_rpatElectron_genMother_phi =0;
+vector<double>* rpatElectron_genMother_en; TBranch* b_rpatElectron_genMother_en =0;
+vector<double>* rpatElectron_genMother_pdgId; TBranch* b_rpatElectron_genMother_pdgId =0;
+vector<double>* rpatElectron_genGrandMother_pt; TBranch* b_rpatElectron_genGrandMother_pt =0;
+vector<double>* rpatElectron_genGrandMother_eta; TBranch* b_rpatElectron_genGrandMother_eta =0;
+vector<double>* rpatElectron_genGrandMother_phi; TBranch* b_rpatElectron_genGrandMother_phi =0;
+vector<double>* rpatElectron_genGrandMother_en; TBranch* b_rpatElectron_genGrandMother_en =0;
+vector<double>* rpatElectron_genGrandMother_pdgId; TBranch* b_rpatElectron_genGrandMother_pdgId =0;
+vector<double>* rpatElectron_gen_isPromptFinalState; TBranch* b_rpatElectron_gen_isPromptFinalState =0;
+vector<double>* rpatElectron_gen_isDirectPromptTauDecayProductFinalState; TBranch* b_rpatElectron_gen_isDirectPromptTauDecayProductFinalState =0;
+vector<double>* rpatElectron_SCeta; TBranch* b_rpatElectron_SCeta =0;
+vector<double>* rpatElectron_mvaValue_HZZ; TBranch* b_rpatElectron_mvaValue_HZZ =0;
+vector<double>* rpatElectron_expectedMissingInnerHits; TBranch* b_rpatElectron_expectedMissingInnerHits =0;
+vector<double>* rpatElectron_full5x5_sigmaIetaIeta; TBranch* b_rpatElectron_full5x5_sigmaIetaIeta =0;
+vector<double>* rpatElectron_hOverE; TBranch* b_rpatElectron_hOverE =0;
+vector<double>* rpatElectron_dEtaIn; TBranch* b_rpatElectron_dEtaIn =0;
+vector<double>* rpatElectron_dPhiIn; TBranch* b_rpatElectron_dPhiIn =0;
+vector<double>* rpatElectron_ooEmooP; TBranch* b_rpatElectron_ooEmooP =0;
 
 //variables to be written
 
@@ -139,6 +197,9 @@ double Met_type1PF_shiftedPtDown;
 double Muon_numLoose;
 double Muon_numFake;
 double Muon_numTight;
+double patElectron_numLoose;
+double patElectron_numFake;
+double patElectron_numTight;
 
 
 //Lepton
@@ -150,7 +211,7 @@ vector<double>* Lepton_phi = new std::vector<double>;
 vector<double>* Lepton_energy = new std::vector<double>;
 vector<double>* Lepton_dxy_pv = new std::vector<double>;
 vector<double>* Lepton_dz_pv = new std::vector<double>;
-vector<double>* Lepton_IP3Dsig_it = new std::vector<double>;
+vector<double>* Lepton_IP3Dsig = new std::vector<double>;
 vector<double>* Lepton_miniIsoRel = new std::vector<double>;
 vector<double>* Lepton_loose = new std::vector<double>;
 vector<double>* Lepton_charge = new std::vector<double>;
@@ -190,6 +251,14 @@ vector<double>* Lepton_genGrandMother_en = new std::vector<double>;
 vector<double>* Lepton_genGrandMother_pdgId = new std::vector<double>;
 vector<double>* Lepton_gen_isPromptFinalState = new std::vector<double>;
 vector<double>* Lepton_gen_isDirectPromptTauDecayProductFinalState = new std::vector<double>;
+vector<double>* Lepton_SCeta = new std::vector<double>;
+vector<double>* Lepton_mvaValue_HZZ = new std::vector<double>;
+vector<double>* Lepton_expectedMissingInnerHits = new std::vector<double>;
+vector<double>* Lepton_full5x5_sigmaIetaIeta = new std::vector<double>;
+vector<double>* Lepton_hOverE = new std::vector<double>;
+vector<double>* Lepton_dEtaIn = new std::vector<double>;
+vector<double>* Lepton_dPhiIn = new std::vector<double>;
+vector<double>* Lepton_ooEmooP = new std::vector<double>;
 
 //new variables
 vector<double>* Lepton_cut = new std::vector<double>;

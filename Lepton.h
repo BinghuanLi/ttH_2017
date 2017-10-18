@@ -10,79 +10,98 @@ class Lepton {
         ~Lepton() = default;
 
         // member
-        //readable variables 
+        // readable variables 
+        // common variables
         // reco variables
-        double pt;
-        double eta;
-        double phi;
-        double energy;
-        double dxy_pv;
-        double dz_pv;
-        double IP3Dsig_it;
-        double miniIsoRel;
-        double charge;
-        double isGlobal;
-        double chi2;
-        double chi2LocalPosition;
-        double trkKink;
-        double validFraction;
-        double segmentCompatibility;
-        double jetpt;
-        double jetptratio;
-        double jetcsv;
-        double lepjetchtrks;
-        double miniIsoCh;
-        double miniIsoPUsub;
-        double ptrel;
-        double pTErrOVpT_it;
-        double px;
-        double py;
-        double pz;
-        double jetdr;
-        double mvaValue_HZZ;
+        double pt = -999.;
+        double eta = -999.;
+        double phi = -999.;
+        double energy = -999.;
+        double dxy_pv = -999.;
+        double dz_pv = -999.;
+        double IP3Dsig = -999.;
+        double miniIsoRel = -999.;
+        double charge = -999.;
+        double jetpt = -999.;
+        double jetptratio = -999.;
+        double jetcsv = -999.;
+        double lepjetchtrks = -999.;
+        double miniIsoCh = -999.;
+        double miniIsoPUsub = -999.;
+        double ptrel = -999.;
+        double px = -999.;
+        double py = -999.;
+        double pz = -999.;
+        double jetdr = -999.;
         
         // lepton id
-        double loose;
-        double pdgId;
+        double loose = -999.;
+        double pdgId = -999.;
         
-        // new variables
-        double cut; 
-        double BDT;
-        double corrpt;
-        double FR;
-        double CF;
-        double passConversion;
-        double passMuTightCharge;
-        double passEleTightCharge;
-        double passMissHit;
+        // Muon variables
+        double isGlobal = -999.;
+        double chi2 = -999.;
+        double chi2LocalPosition = -999.;
+        double trkKink = -999.;
+        double validFraction = -999.;
+        double segmentCompatibility = -999.;
+        double pTErrOVpT_it = -999.;
+        
+        // Electron variables
+        double mvaValue_HZZ = -999.; 
+        double SCeta = -999.;
+        double expectedMissingInnerHits = -999.;
+        double full5x5_sigmaIetaIeta = -999.;
+        double hOverE = -999.;
+        double dEtaIn = -999.;
+        double dPhiIn = -999.;
+        double ooEmooP = -999.;
+        
+        
+        // New variables
+        double cut = -999.; 
+        double BDT = -999.;
+        double corrpt = -999.;
+        double FR = -999.;
+        double CF = -999.;
+        double passConversion = -999.;
+        double passMuTightCharge = -999.;
+        double passEleTightCharge = -999.;
+        double passMissHit = -999.;
         double isMatchRightCharge = 1.; // lepton match gen right charge? default 1 (yes)
         
         // lepton gen
-        double gen_pt;
-        double gen_eta;
-        double gen_phi;
-        double gen_en;
-        double gen_pdgId;
-        double genMother_pt;
-        double genMother_eta;
-        double genMother_phi;
-        double genMother_en;
-        double genMother_pdgId;
-        double genGrandMother_pt;
-        double genGrandMother_eta;
-        double genGrandMother_phi;
-        double genGrandMother_en;
-        double genGrandMother_pdgId;
-        double gen_isPromptFinalState;
-        double gen_isDirectPromptTauDecayProductFinalState;
+        double gen_pt = -999.;
+        double gen_eta = -999.;
+        double gen_phi = -999.;
+        double gen_en = -999.;
+        double gen_pdgId = -999.;
+        double genMother_pt = -999.;
+        double genMother_eta = -999.;
+        double genMother_phi = -999.;
+        double genMother_en = -999.;
+        double genMother_pdgId = -999.;
+        double genGrandMother_pt = -999.;
+        double genGrandMother_eta = -999.;
+        double genGrandMother_phi = -999.;
+        double genGrandMother_en = -999.;
+        double genGrandMother_pdgId = -999.;
+        double gen_isPromptFinalState = -999.;
+        double gen_isDirectPromptTauDecayProductFinalState = -999.;
 
         // Object Identification
         bool mu_isLoose_tthlep();
         bool mu_isfake_tthlep();
         bool mu_isTight_tthlep(bool isMedium);
+        bool ele_isLoose_tthlep();
+        bool ele_isfake_tthlep();
+        bool ele_isTight_tthlep();
         void set_Wp_tthlep(bool isMedium);
+        void set_Wp_tthlep(bool isMedium, int& numLoose, int& numfake, int& numtight);
         void cal_conept(bool isMedium);
         void cal_tight_property();
         double get_valX_valY_binContent(TH2F* h, double valX, double valY);
 
+    private:
+        bool ele_passCuts();
 };
