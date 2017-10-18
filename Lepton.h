@@ -98,7 +98,6 @@ class Lepton {
         bool ele_isLoose_tthlep();
         bool ele_isfake_tthlep();
         bool ele_isTight_tthlep();
-        void set_Wp_tthlep(bool isMedium);
         void set_Wp_tthlep(bool isMedium, int& numLoose, int& numfake, int& numtight);
         void cal_conept(bool isMedium);
         void cal_tight_property();

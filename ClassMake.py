@@ -17,18 +17,18 @@ workpath = "/publicfs/cms/user/libh/Test/Rootplizer/analyzer"
 
 # Variable Case
 #Case = "CaseA"
-Case = "CaseB"
-#Case = "CaseC"
+#Case = "CaseB"
+Case = "CaseC"
 # Variable Definition
 
-rObject = "patElectron"
-wObject = "Lepton"
+rObject = "Tau"
+wObject = "tau"
 
 VariableType  = "double"
 VariableNames = [
 # CaseA Variables
-#"pt","eta","phi","energy",
-#"IP3Dsig","miniIsoRel","charge","pdgId","gsfTrack_dxy_pv","gsfTrack_dz_pv",
+#"pt","eta","phi","energy","charge",
+#"IP3Dsig","miniIsoRel","pdgId","gsfTrack_dxy_pv","gsfTrack_dz_pv",
 
 
 #"jetptratio","jetcsv","lepjetchtrks","miniIsoCh","miniIsoPUsub","ptrel",
@@ -38,14 +38,21 @@ VariableNames = [
 #"genGrandMother_pt","genGrandMother_eta","genGrandMother_phi","genGrandMother_en","genGrandMother_pdgId",
 #"gen_isPromptFinalState","gen_isDirectPromptTauDecayProductFinalState",
 
-#"SCeta","expectedMissingInnerHits","full5x5_sigmaIetaIeta","hOverE","dEtaIn","dPhiIn","ooEmooP", # Electron only
-"isGsfCtfScPixChargeConsistent","isGsfScPixChargeConsistent",
+# Electron only
+#"SCeta","expectedMissingInnerHits","full5x5_sigmaIetaIeta","hOverE","dEtaIn","dPhiIn","ooEmooP", 
+#"isGsfCtfScPixChargeConsistent","isGsfScPixChargeConsistent",
 
 #"isGlobal","chi2","chi2LocalPosition","trkKink","validFraction","segmentCompatibility","pTErrOVpT_it", # Muon only
+
+#Taus
+#"packedLeadTauCand_dz","packedLeadTauCand_dxy","byLooseIsolationMVArun2v1DBdR03oldDMwLT","decayModeFinding"
+#"byMediumIsolationMVArun2v1DBdR03oldDMwLT",
 
 #Case B
 
 # Case C
+
+"cut",
 
 #"BDT","isMedium_ST","corrpt","FR","CF",
 #"passConversion","passMuTightCharge","passEleTightCharge","passMissHit","isMatchRightCharge",
@@ -76,8 +83,8 @@ WTreeptr = "newtree"
 #Name of Current Entry
 ParEntry = "tentry"
 #Name of index in Push_back
-ParSel = "ele_en"
-ParWrite = "lep_en"
+ParSel = "tau_en"
+ParWrite = "tau_en"
 
 ###################
 ### Script itself
@@ -120,7 +127,7 @@ if Case == "CaseA":
 
  print >> vector, "   //Write variables"
  for Variable in VariableNames:
-     print >> vector, "        "+wObject+"_"+Variable+"->push_back(leptons->at("+ParWrite+")."+Variable+");"
+     print >> vector, "        "+wObject+"_"+Variable+"->push_back(taus->at("+ParWrite+")."+Variable+");"
 
 elif Case == "CaseB":
  print >> vector, "//This is CaseB"
@@ -173,4 +180,4 @@ elif Case == "CaseC":
 
  print >> vector, "   //Write variables"
  for Variable in VariableNames:
-     print >> vector, "        "+wObject+"_"+Variable+"->push_back(leptons->at("+ParWrite+")."+Variable+");"
+     print >> vector, "        "+wObject+"_"+Variable+"->push_back(taus->at("+ParWrite+")."+Variable+");"

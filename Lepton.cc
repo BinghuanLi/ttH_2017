@@ -119,8 +119,7 @@ void Lepton::set_Wp_tthlep(bool isMedium, int& numLoose, int& numFake, int& numt
             numLoose ++;
         }else if(mu_isLoose_tthlep()){
             cut=1;
-            numLoose ++;
-            // loose
+            numLoose ++;// loose
         }
     }
     //Electron
@@ -136,8 +135,7 @@ void Lepton::set_Wp_tthlep(bool isMedium, int& numLoose, int& numFake, int& numt
             numLoose ++;
         }else if(ele_isLoose_tthlep()){
             cut=1;
-            numLoose ++;
-            // loose
+            numLoose ++;// loose
         }
     }
 }

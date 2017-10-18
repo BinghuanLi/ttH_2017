@@ -38,6 +38,8 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
         Muon_sel(sample);
         //Electron
         patElectron_sel(sample);
+        //Tau
+        Tau_sel();
         Lep_sel();
         //Event
         Event_sel();
@@ -310,13 +312,61 @@ void patElectron_sel(string sample){
         if(!(patElectron.gen_pdgId * patElectron.charge<0 && patElectron.gen_pdgId!=-999))
             patElectron.isMatchRightCharge=0.;
         leptons->push_back(patElectron);    
-        
     }
     patElectron_numLoose = ele_numLoose;
     patElectron_numFake =  ele_numFake;
     patElectron_numTight = ele_numTight;
 }
 
+
+void Tau_sel(){
+    int tau_numLoose = 0;
+    int tau_numMedium = 0;
+    for(uint tau_en = 0; tau_en<rTau_pt->size(); tau_en++){
+        Tau tau;
+        tau.pt= rTau_pt->at(tau_en);
+        tau.eta= rTau_eta->at(tau_en);
+        tau.phi= rTau_phi->at(tau_en);
+        tau.energy= rTau_energy->at(tau_en);
+        tau.charge= rTau_charge->at(tau_en);
+        tau.packedLeadTauCand_dz= rTau_packedLeadTauCand_dz->at(tau_en);
+        tau.packedLeadTauCand_dxy= rTau_packedLeadTauCand_dxy->at(tau_en);
+        tau.byLooseIsolationMVArun2v1DBdR03oldDMwLT= rTau_byLooseIsolationMVArun2v1DBdR03oldDMwLT->at(tau_en);
+        tau.byMediumIsolationMVArun2v1DBdR03oldDMwLT= rTau_byMediumIsolationMVArun2v1DBdR03oldDMwLT->at(tau_en);
+        tau.decayModeFinding= rTau_decayModeFinding->at(tau_en);
+        
+        // check whether tau overlaps with tth loose leptons
+        bool ismatched = false; 
+        for(uint lep_en=0; lep_en < leptons->size(); lep_en++){
+            Lepton lep = leptons->at(lep_en);
+            if(deltaR(deltaPhi(lep.phi,tau.phi),deltaEta(lep.eta,tau.eta))<0.4){
+                ismatched = true; 
+                break; 
+            }
+        }
+        if(ismatched) continue;
+        
+        // check whether ele pass tth loose lepton selection
+        if(!(tau.tau_isLoose_tthlep())) continue;
+
+        // calculate new variables 
+        tau.set_Wp_tthlep(tau_numLoose, tau_numMedium);
+        Tau_pt->push_back(rTau_pt->at(tau_en));
+        Tau_eta->push_back(rTau_eta->at(tau_en));
+        Tau_phi->push_back(rTau_phi->at(tau_en));
+        Tau_energy->push_back(rTau_energy->at(tau_en));
+        Tau_charge->push_back(rTau_charge->at(tau_en));
+        Tau_packedLeadTauCand_dxy->push_back(rTau_packedLeadTauCand_dxy->at(tau_en));
+        Tau_packedLeadTauCand_dz->push_back(rTau_packedLeadTauCand_dz->at(tau_en));
+        Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT->push_back(rTau_byLooseIsolationMVArun2v1DBdR03oldDMwLT->at(tau_en));
+        Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT->push_back(rTau_byMediumIsolationMVArun2v1DBdR03oldDMwLT->at(tau_en));
+        Tau_decayModeFinding->push_back(rTau_decayModeFinding->at(tau_en));
+        Tau_cut->push_back(tau.cut);
+        taus->push_back(tau);    
+    }
+    Tau_numMedium = tau_numMedium; 
+    Tau_numLoose = tau_numLoose; 
+}
 
 void Lep_sel(){
     sort(leptons->begin(), leptons->end(), compare_pt); 
@@ -522,6 +572,17 @@ void rSetBranchAddress(TTree* readingtree, string sample){
     readingtree->SetBranchAddress("patElectron_isGsfCtfScPixChargeConsistent",&rpatElectron_isGsfCtfScPixChargeConsistent,&b_rpatElectron_isGsfCtfScPixChargeConsistent);
     readingtree->SetBranchAddress("patElectron_isGsfScPixChargeConsistent",&rpatElectron_isGsfScPixChargeConsistent,&b_rpatElectron_isGsfScPixChargeConsistent);
     readingtree->SetBranchAddress("patElectron_passConversionVeto",&rpatElectron_passConversionVeto,&b_rpatElectron_passConversionVeto);
+    //Tau
+    readingtree->SetBranchAddress("Tau_pt",&rTau_pt,&b_rTau_pt);
+    readingtree->SetBranchAddress("Tau_eta",&rTau_eta,&b_rTau_eta);
+    readingtree->SetBranchAddress("Tau_phi",&rTau_phi,&b_rTau_phi);
+    readingtree->SetBranchAddress("Tau_energy",&rTau_energy,&b_rTau_energy);
+    readingtree->SetBranchAddress("Tau_charge",&rTau_charge,&b_rTau_charge);
+    readingtree->SetBranchAddress("Tau_packedLeadTauCand_dz",&rTau_packedLeadTauCand_dz,&b_rTau_packedLeadTauCand_dz);
+    readingtree->SetBranchAddress("Tau_packedLeadTauCand_dxy",&rTau_packedLeadTauCand_dxy,&b_rTau_packedLeadTauCand_dxy);
+    readingtree->SetBranchAddress("Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT",&rTau_byLooseIsolationMVArun2v1DBdR03oldDMwLT,&b_rTau_byLooseIsolationMVArun2v1DBdR03oldDMwLT);
+    readingtree->SetBranchAddress("Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT",&rTau_byMediumIsolationMVArun2v1DBdR03oldDMwLT,&b_rTau_byMediumIsolationMVArun2v1DBdR03oldDMwLT);
+    readingtree->SetBranchAddress("Tau_decayModeFinding",&rTau_decayModeFinding,&b_rTau_decayModeFinding);
 };
 
 
@@ -547,6 +608,8 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("patElectron_numLoose",&patElectron_numLoose);
     newtree->Branch("patElectron_numFake",&patElectron_numFake);
     newtree->Branch("patElectron_numTight",&patElectron_numTight);
+    newtree->Branch("Tau_numLoose",&Tau_numLoose);
+    newtree->Branch("Tau_numMedium",&Tau_numMedium);
     //Lepton
     newtree->Branch("Lepton_pt",&Lepton_pt);
     newtree->Branch("Lepton_eta",&Lepton_eta);
@@ -614,6 +677,18 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("Lepton_passEleTightCharge",&Lepton_passEleTightCharge);
     newtree->Branch("Lepton_passMissHit",&Lepton_passMissHit);
     newtree->Branch("Lepton_isMatchRightCharge",&Lepton_isMatchRightCharge);
+    //Tau
+    newtree->Branch("Tau_pt",&Tau_pt);
+    newtree->Branch("Tau_eta",&Tau_eta);
+    newtree->Branch("Tau_phi",&Tau_phi);
+    newtree->Branch("Tau_energy",&Tau_energy);
+    newtree->Branch("Tau_charge",&Tau_charge);
+    newtree->Branch("Tau_packedLeadTauCand_dz",&Tau_packedLeadTauCand_dz);
+    newtree->Branch("Tau_packedLeadTauCand_dxy",&Tau_packedLeadTauCand_dxy);
+    newtree->Branch("Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT",&Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT);
+    newtree->Branch("Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT",&Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT);
+    newtree->Branch("Tau_decayModeFinding",&Tau_decayModeFinding);
+    newtree->Branch("Tau_cut",&Tau_cut);
 };
 
 
@@ -639,6 +714,8 @@ void wClearInitialization(string sample){
     patElectron_numLoose= -999;
     patElectron_numFake= -999;
     patElectron_numTight= -999;
+    Tau_numLoose= -999;
+    Tau_numMedium= -999;
     // Lepton
     leptons->clear();
     Lepton_pt->clear();
@@ -707,6 +784,18 @@ void wClearInitialization(string sample){
     Lepton_passEleTightCharge->clear();
     Lepton_passMissHit->clear();
     Lepton_isMatchRightCharge->clear();
+    //Tau
+    Tau_pt->clear();
+    Tau_eta->clear();
+    Tau_phi->clear();
+    Tau_energy->clear();
+    Tau_charge->clear();
+    Tau_packedLeadTauCand_dz->clear();
+    Tau_packedLeadTauCand_dxy->clear();
+    Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT->clear();
+    Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT->clear();
+    Tau_decayModeFinding->clear();
+    Tau_cut->clear();
 };
 
 
@@ -823,4 +912,15 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rpatElectron_isGsfCtfScPixChargeConsistent->GetEntry(tentry);
     b_rpatElectron_isGsfScPixChargeConsistent->GetEntry(tentry);
     b_rpatElectron_passConversionVeto->GetEntry(tentry);
+    //Tau
+    b_rTau_pt->GetEntry(tentry);
+    b_rTau_eta->GetEntry(tentry);
+    b_rTau_phi->GetEntry(tentry);
+    b_rTau_energy->GetEntry(tentry);
+    b_rTau_charge->GetEntry(tentry);
+    b_rTau_packedLeadTauCand_dz->GetEntry(tentry);
+    b_rTau_packedLeadTauCand_dxy->GetEntry(tentry);
+    b_rTau_byLooseIsolationMVArun2v1DBdR03oldDMwLT->GetEntry(tentry);
+    b_rTau_byMediumIsolationMVArun2v1DBdR03oldDMwLT->GetEntry(tentry);
+    b_rTau_decayModeFinding->GetEntry(tentry);
 };

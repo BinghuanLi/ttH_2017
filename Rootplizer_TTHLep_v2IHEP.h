@@ -5,6 +5,7 @@
 #include "TMVA/Reader.h"
 
 #include "Lepton.cc"
+#include "Tau.cc"
 
 using namespace std;
 ////
@@ -27,6 +28,7 @@ void wClearInitialization(string sample);
 void rGetEntry(Long64_t tentry, string sample);
 void Muon_sel(string sample);
 void patElectron_sel(string sample);
+void Tau_sel();
 void Event_sel();
 void Lep_sel();
 
@@ -183,6 +185,18 @@ vector<double>* rpatElectron_ooEmooP; TBranch* b_rpatElectron_ooEmooP =0;
 vector<double>* rpatElectron_isGsfCtfScPixChargeConsistent; TBranch* b_rpatElectron_isGsfCtfScPixChargeConsistent =0;
 vector<double>* rpatElectron_isGsfScPixChargeConsistent; TBranch* b_rpatElectron_isGsfScPixChargeConsistent =0;
 
+//Tau
+vector<double>* rTau_pt; TBranch* b_rTau_pt =0;
+vector<double>* rTau_eta; TBranch* b_rTau_eta =0;
+vector<double>* rTau_phi; TBranch* b_rTau_phi =0;
+vector<double>* rTau_energy; TBranch* b_rTau_energy =0;
+vector<double>* rTau_charge; TBranch* b_rTau_charge =0;
+vector<double>* rTau_packedLeadTauCand_dz; TBranch* b_rTau_packedLeadTauCand_dz =0;
+vector<double>* rTau_packedLeadTauCand_dxy; TBranch* b_rTau_packedLeadTauCand_dxy =0;
+vector<double>* rTau_byLooseIsolationMVArun2v1DBdR03oldDMwLT; TBranch* b_rTau_byLooseIsolationMVArun2v1DBdR03oldDMwLT =0;
+vector<double>* rTau_byMediumIsolationMVArun2v1DBdR03oldDMwLT; TBranch* b_rTau_byMediumIsolationMVArun2v1DBdR03oldDMwLT =0;
+vector<double>* rTau_decayModeFinding; TBranch* b_rTau_decayModeFinding =0;
+
 //variables to be written
 
 // Event level variables
@@ -203,6 +217,8 @@ double Muon_numTight;
 double patElectron_numLoose;
 double patElectron_numFake;
 double patElectron_numTight;
+double Tau_numLoose;
+double Tau_numMedium;
 
 
 //Lepton
@@ -274,3 +290,18 @@ vector<double>* Lepton_passMuTightCharge = new std::vector<double>;
 vector<double>* Lepton_passEleTightCharge = new std::vector<double>;
 vector<double>* Lepton_passMissHit = new std::vector<double>;
 vector<double>* Lepton_isMatchRightCharge = new std::vector<double>;
+
+// Tau
+vector<Tau>* taus = new std::vector<Tau>;
+
+vector<double>* Tau_pt = new std::vector<double>;
+vector<double>* Tau_eta = new std::vector<double>;
+vector<double>* Tau_phi = new std::vector<double>;
+vector<double>* Tau_energy = new std::vector<double>;
+vector<double>* Tau_charge = new std::vector<double>;
+vector<double>* Tau_packedLeadTauCand_dz = new std::vector<double>;
+vector<double>* Tau_packedLeadTauCand_dxy = new std::vector<double>;
+vector<double>* Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT = new std::vector<double>;
+vector<double>* Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT = new std::vector<double>;
+vector<double>* Tau_decayModeFinding = new std::vector<double>;
+vector<double>* Tau_cut = new std::vector<double>;
