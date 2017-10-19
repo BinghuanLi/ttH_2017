@@ -6,6 +6,7 @@
 
 #include "Lepton.cc"
 #include "Tau.cc"
+#include "Jet.cc"
 
 using namespace std;
 ////
@@ -29,6 +30,7 @@ void rGetEntry(Long64_t tentry, string sample);
 void Muon_sel(string sample);
 void patElectron_sel(string sample);
 void Tau_sel();
+void Jet_sel(string sample); 
 void Event_sel();
 void Lep_sel();
 
@@ -39,7 +41,7 @@ void Lep_sel();
 double deltaPhi(double phi1, double phi2);
 double deltaEta(double eta1, double eta2);
 double deltaR(double dphi, double deta);
-bool compare_pt(const Lepton& LeptonA, const Lepton& LeptonB);
+bool byPt(const Lepton& LeptonA, const Lepton& LeptonB);
 
 //Read MVA's
 void set_wgtMVA();
@@ -197,6 +199,66 @@ vector<double>* rTau_byLooseIsolationMVArun2v1DBdR03oldDMwLT; TBranch* b_rTau_by
 vector<double>* rTau_byMediumIsolationMVArun2v1DBdR03oldDMwLT; TBranch* b_rTau_byMediumIsolationMVArun2v1DBdR03oldDMwLT =0;
 vector<double>* rTau_decayModeFinding; TBranch* b_rTau_decayModeFinding =0;
 
+//Jet
+vector<double>* rJet_pt; TBranch* b_rJet_pt =0;
+vector<double>* rJet_eta; TBranch* b_rJet_eta =0;
+vector<double>* rJet_phi; TBranch* b_rJet_phi =0;
+vector<double>* rJet_energy; TBranch* b_rJet_energy =0;
+vector<double>* rJet_genMother_pt; TBranch* b_rJet_genMother_pt =0;
+vector<double>* rJet_genMother_eta; TBranch* b_rJet_genMother_eta =0;
+vector<double>* rJet_genMother_phi; TBranch* b_rJet_genMother_phi =0;
+vector<double>* rJet_genMother_en; TBranch* b_rJet_genMother_en =0;
+vector<double>* rJet_genMother_pdgId; TBranch* b_rJet_genMother_pdgId =0;
+vector<double>* rJet_genGrandMother_pt; TBranch* b_rJet_genGrandMother_pt =0;
+vector<double>* rJet_genGrandMother_eta; TBranch* b_rJet_genGrandMother_eta =0;
+vector<double>* rJet_genGrandMother_phi; TBranch* b_rJet_genGrandMother_phi =0;
+vector<double>* rJet_genGrandMother_en; TBranch* b_rJet_genGrandMother_en =0;
+vector<double>* rJet_genGrandMother_pdgId; TBranch* b_rJet_genGrandMother_pdgId =0;
+vector<double>* rJet_Uncorr_pt; TBranch* b_rJet_Uncorr_pt =0;
+vector<double>* rJet_neutralHadEnergyFraction; TBranch* b_rJet_neutralHadEnergyFraction =0;
+vector<double>* rJet_neutralEmEnergyFraction; TBranch* b_rJet_neutralEmEnergyFraction =0;
+vector<double>* rJet_chargedMultiplicity; TBranch* b_rJet_chargedMultiplicity =0;
+vector<double>* rJet_numberOfConstituents; TBranch* b_rJet_numberOfConstituents =0;
+vector<double>* rJet_chargedHadronEnergyFraction; TBranch* b_rJet_chargedHadronEnergyFraction =0;
+vector<double>* rJet_chargedEmEnergyFraction; TBranch* b_rJet_chargedEmEnergyFraction =0;
+vector<double>* rJet_pfCombinedInclusiveSecondaryVertexV2BJetTags; TBranch* b_rJet_pfCombinedInclusiveSecondaryVertexV2BJetTags =0;
+vector<double>* rJet_pfCombinedMVAV2BJetTags; TBranch* b_rJet_pfCombinedMVAV2BJetTags =0;
+vector<double>* rJet_JesSF; TBranch* b_rJet_JesSF =0;
+vector<double>* rJet_JesSFup; TBranch* b_rJet_JesSFup =0;
+vector<double>* rJet_JesSFdown; TBranch* b_rJet_JesSFdown =0;
+vector<double>* rJet_JerSF; TBranch* b_rJet_JerSF =0;
+vector<double>* rJet_JerSFup; TBranch* b_rJet_JerSFup =0;
+vector<double>* rJet_JerSFdown; TBranch* b_rJet_JerSFdown =0;
+vector<double>* rJet_qg; TBranch* b_rJet_qg =0;
+vector<double>* rJet_axis2; TBranch* b_rJet_axis2 =0;
+vector<double>* rJet_ptD; TBranch* b_rJet_ptD =0;
+vector<double>* rJet_mult; TBranch* b_rJet_mult =0;
+vector<double>* rJet_partonFlavour; TBranch* b_rJet_partonFlavour =0;
+vector<double>* rJet_hadronFlavour; TBranch* b_rJet_hadronFlavour =0;
+vector<double>* rJet_genpt; TBranch* b_rJet_genpt =0;
+vector<double>* rJet_geneta; TBranch* b_rJet_geneta =0;
+vector<double>* rJet_genphi; TBranch* b_rJet_genphi =0;
+vector<double>* rJet_genenergy; TBranch* b_rJet_genenergy =0;
+vector<double>* rJet_btag_sf; TBranch* b_rJet_btag_sf =0;
+vector<double>* rJet_btag_jesup; TBranch* b_rJet_btag_jesup =0;
+vector<double>* rJet_btag_jesdown; TBranch* b_rJet_btag_jesdown =0;
+vector<double>* rJet_btag_hfup; TBranch* b_rJet_btag_hfup =0;
+vector<double>* rJet_btag_hfdown; TBranch* b_rJet_btag_hfdown =0;
+vector<double>* rJet_btag_hfstat1up; TBranch* b_rJet_btag_hfstat1up =0;
+vector<double>* rJet_btag_hfstat1down; TBranch* b_rJet_btag_hfstat1down =0;
+vector<double>* rJet_btag_hfstat2up; TBranch* b_rJet_btag_hfstat2up =0;
+vector<double>* rJet_btag_hfstat2down; TBranch* b_rJet_btag_hfstat2down =0;
+vector<double>* rJet_btag_lfup; TBranch* b_rJet_btag_lfup =0;
+vector<double>* rJet_btag_lfdown; TBranch* b_rJet_btag_lfdown =0;
+vector<double>* rJet_btag_lfstat1up; TBranch* b_rJet_btag_lfstat1up =0;
+vector<double>* rJet_btag_lfstat1down; TBranch* b_rJet_btag_lfstat1down =0;
+vector<double>* rJet_btag_lfstat2up; TBranch* b_rJet_btag_lfstat2up =0;
+vector<double>* rJet_btag_lfstat2down; TBranch* b_rJet_btag_lfstat2down =0;
+vector<double>* rJet_btag_cerr1up; TBranch* b_rJet_btag_cerr1up =0;
+vector<double>* rJet_btag_cerr1down; TBranch* b_rJet_btag_cerr1down =0;
+vector<double>* rJet_btag_cerr2up; TBranch* b_rJet_btag_cerr2up =0;
+vector<double>* rJet_btag_cerr2down; TBranch* b_rJet_btag_cerr2down =0;
+
 //variables to be written
 
 // Event level variables
@@ -219,6 +281,29 @@ double patElectron_numFake;
 double patElectron_numTight;
 double Tau_numLoose;
 double Tau_numMedium;
+double Jet_numLoose;
+double Jet_numbLoose;
+double Jet_numbMedium;
+double Jet_numbTight;
+double BWeight;
+double BWeightLFup;
+double BWeightLFdown;
+double BWeightHFup;
+double BWeightHFdown;
+double BWeightJESup;
+double BWeightJESdown;
+double BWeightLFStats1up;
+double BWeightLFStats1down;
+double BWeightLFStats2up;
+double BWeightLFStats2down;
+double BWeightHFStats1up;
+double BWeightHFStats1down;
+double BWeightHFStats2up;
+double BWeightHFStats2down;
+double BWeightCErr1up;
+double BWeightCErr1down;
+double BWeightCErr2up;
+double BWeightCErr2down;
 
 
 //Lepton
@@ -305,3 +390,36 @@ vector<double>* Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT = new std::vector<do
 vector<double>* Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT = new std::vector<double>;
 vector<double>* Tau_decayModeFinding = new std::vector<double>;
 vector<double>* Tau_cut = new std::vector<double>;
+
+// Jet
+vector<Jet>* jets = new std::vector<Jet>;
+
+vector<double>* Jet_cut = new std::vector<double>;
+vector<double>* Jet_bcut = new std::vector<double>;
+vector<double>* Jet_pt = new std::vector<double>;
+vector<double>* Jet_eta = new std::vector<double>;
+vector<double>* Jet_phi = new std::vector<double>;
+vector<double>* Jet_energy = new std::vector<double>;
+vector<double>* Jet_genMother_pt = new std::vector<double>;
+vector<double>* Jet_genMother_eta = new std::vector<double>;
+vector<double>* Jet_genMother_phi = new std::vector<double>;
+vector<double>* Jet_genMother_en = new std::vector<double>;
+vector<double>* Jet_genMother_pdgId = new std::vector<double>;
+vector<double>* Jet_genGrandMother_pt = new std::vector<double>;
+vector<double>* Jet_genGrandMother_eta = new std::vector<double>;
+vector<double>* Jet_genGrandMother_phi = new std::vector<double>;
+vector<double>* Jet_genGrandMother_en = new std::vector<double>;
+vector<double>* Jet_genGrandMother_pdgId = new std::vector<double>;
+vector<double>* Jet_Uncorr_pt = new std::vector<double>;
+vector<double>* Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags = new std::vector<double>;
+vector<double>* Jet_pfCombinedMVAV2BJetTags = new std::vector<double>;
+vector<double>* Jet_qg = new std::vector<double>;
+vector<double>* Jet_axis2 = new std::vector<double>;
+vector<double>* Jet_ptD = new std::vector<double>;
+vector<double>* Jet_mult = new std::vector<double>;
+vector<double>* Jet_partonFlavour = new std::vector<double>;
+vector<double>* Jet_hadronFlavour = new std::vector<double>;
+vector<double>* Jet_genpt = new std::vector<double>;
+vector<double>* Jet_geneta = new std::vector<double>;
+vector<double>* Jet_genphi = new std::vector<double>;
+vector<double>* Jet_genenergy = new std::vector<double>;

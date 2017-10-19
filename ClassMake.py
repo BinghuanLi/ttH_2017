@@ -17,26 +17,28 @@ workpath = "/publicfs/cms/user/libh/Test/Rootplizer/analyzer"
 
 # Variable Case
 #Case = "CaseA"
-#Case = "CaseB"
-Case = "CaseC"
+Case = "CaseB"
+#Case = "CaseC"
 # Variable Definition
 
-rObject = "Tau"
-wObject = "tau"
+rObject = "Jet"
+wObject = "Jet"
 
 VariableType  = "double"
 VariableNames = [
 # CaseA Variables
-#"pt","eta","phi","energy","charge",
+"pt","eta","phi","energy",
+"pt","eta","phi","energy",
+#"charge",
 #"IP3Dsig","miniIsoRel","pdgId","gsfTrack_dxy_pv","gsfTrack_dz_pv",
 
 
 #"jetptratio","jetcsv","lepjetchtrks","miniIsoCh","miniIsoPUsub","ptrel",
 #"px","py","pz","jetdr",
-#"gen_pt","gen_eta","gen_phi","gen_en","gen_pdgId",
-#"genMother_pt","genMother_eta","genMother_phi","genMother_en","genMother_pdgId",
-#"genGrandMother_pt","genGrandMother_eta","genGrandMother_phi","genGrandMother_en","genGrandMother_pdgId",
-#"gen_isPromptFinalState","gen_isDirectPromptTauDecayProductFinalState",
+"gen_pt","gen_eta","gen_phi","gen_en","gen_pdgId",
+"genMother_pt","genMother_eta","genMother_phi","genMother_en","genMother_pdgId",
+"genGrandMother_pt","genGrandMother_eta","genGrandMother_phi","genGrandMother_en","genGrandMother_pdgId",
+"gen_isPromptFinalState","gen_isDirectPromptTauDecayProductFinalState",
 
 # Electron only
 #"SCeta","expectedMissingInnerHits","full5x5_sigmaIetaIeta","hOverE","dEtaIn","dPhiIn","ooEmooP", 
@@ -48,11 +50,31 @@ VariableNames = [
 #"packedLeadTauCand_dz","packedLeadTauCand_dxy","byLooseIsolationMVArun2v1DBdR03oldDMwLT","decayModeFinding"
 #"byMediumIsolationMVArun2v1DBdR03oldDMwLT",
 
+#Jets
+"Uncorr_pt",
+"pfCombinedInclusiveSecondaryVertexV2BJetTags","pfCombinedMVAV2BJetTags",
+#"px","py","pz","mass",
+"qg","axis2","ptD","mult",
+"partonFlavour","hadronFlavour","genpt","geneta","genphi","genenergy",
+
+#"JesSF","JesSFup","JesSFdown","JerSF","JerSFup","JerSFdown",
+#"neutralHadEnergyFraction","neutralEmEnergyFraction","chargedMultiplicity","numberOfConstituents","chargedHadronEnergyFraction", "chargedEmEnergyFraction",
+#"btag_sf",
+#"btag_jesup","btag_jesdown",
+#"btag_hfup","btag_hfdown",
+#"btag_hfstat1up","btag_hfstat1down",
+#"btag_hfstat2up","btag_hfstat2down",
+#"btag_lfup","btag_lfdown",
+#"btag_lfstat1up","btag_lfstat1down",
+#"btag_lfstat2up","btag_lfstat2down",
+#"btag_cerr1up","btag_cerr1down",
+#"btag_cerr2up","btag_cerr2down",
+
 #Case B
 
 # Case C
 
-"cut",
+#"cut",
 
 #"BDT","isMedium_ST","corrpt","FR","CF",
 #"passConversion","passMuTightCharge","passEleTightCharge","passMissHit","isMatchRightCharge",
@@ -123,11 +145,11 @@ if Case == "CaseA":
  
  print >> vector, "   //Intialize variables"
  for Variable in VariableNames:
-     print >> vector, "        "+rObject+"."+Variable+"= r"+rObject+"_"+Variable+"->at("+ParSel+");"
+     print >> vector, "        jet."+Variable+"= r"+rObject+"_"+Variable+"->at("+ParSel+");"
 
  print >> vector, "   //Write variables"
  for Variable in VariableNames:
-     print >> vector, "        "+wObject+"_"+Variable+"->push_back(taus->at("+ParWrite+")."+Variable+");"
+     print >> vector, "        "+wObject+"_"+Variable+"->push_back(jets->at("+ParWrite+")."+Variable+");"
 
 elif Case == "CaseB":
  print >> vector, "//This is CaseB"
@@ -180,4 +202,4 @@ elif Case == "CaseC":
 
  print >> vector, "   //Write variables"
  for Variable in VariableNames:
-     print >> vector, "        "+wObject+"_"+Variable+"->push_back(taus->at("+ParWrite+")."+Variable+");"
+     print >> vector, "        "+wObject+"_"+Variable+"->push_back(jets->at("+ParWrite+")."+Variable+");"

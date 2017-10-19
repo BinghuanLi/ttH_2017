@@ -40,6 +40,8 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
         patElectron_sel(sample);
         //Tau
         Tau_sel();
+        //Jet
+        Jet_sel(sample);
         Lep_sel();
         //Event
         Event_sel();
@@ -121,7 +123,7 @@ double deltaEta(double eta1, double eta2){
 double deltaR(double dphi, double deta){
     return sqrt(pow(dphi,2)+pow(deta,2));
 };
-bool compare_pt(const Lepton& LeptonA, const Lepton& LeptonB){
+bool byPt(const Lepton& LeptonA, const Lepton& LeptonB){
     return LeptonA.pt > LeptonB.pt;
 };
 
@@ -319,6 +321,7 @@ void patElectron_sel(string sample){
 }
 
 
+//Tau
 void Tau_sel(){
     int tau_numLoose = 0;
     int tau_numMedium = 0;
@@ -368,8 +371,206 @@ void Tau_sel(){
     Tau_numLoose = tau_numLoose; 
 }
 
+
+void Jet_sel(string sample){
+    if(sample == "data"){
+        cout<<" Hi, I'm data!"<<endl;
+    }
+    int jet_numLoose   = 0;
+    int jet_numbLoose = 0;
+    int jet_numbMedium = 0;
+    int jet_numbTight = 0;
+    double sf_BWeight= 1.;
+    double sf_BWeightLFup= 1.;
+    double sf_BWeightLFdown= 1.;
+    double sf_BWeightHFup= 1.;
+    double sf_BWeightHFdown= 1.;
+    double sf_BWeightHFStats1up= 1.;
+    double sf_BWeightHFStats1down= 1.;
+    double sf_BWeightLFStats1up= 1.;
+    double sf_BWeightLFStats1down= 1.;
+    double sf_BWeightHFStats2up= 1.;
+    double sf_BWeightHFStats2down= 1.;
+    double sf_BWeightLFStats2up= 1.;
+    double sf_BWeightLFStats2down= 1.;
+    double sf_BWeightCErr1up= 1.;
+    double sf_BWeightCErr1down= 1.;
+    double sf_BWeightCErr2up= 1.;
+    double sf_BWeightCErr2down= 1.;
+    double sf_BWeightJESup= 1.;
+    double sf_BWeightJESdown= 1.;
+    for(uint jet_en = 0; jet_en<rJet_pt->size(); jet_en++){
+        Jet jet;
+        jet.pt = rJet_Uncorr_pt->at(jet_en)*rJet_JesSF->at(jet_en);
+        jet.energy = rJet_energy->at(jet_en)*rJet_Uncorr_pt->at(jet_en)/rJet_pt->at(jet_en)*rJet_JesSF->at(jet_en);
+        jet.eta = rJet_eta->at(jet_en);
+        jet.phi = rJet_phi->at(jet_en);
+        
+        // check whether jet overlaps with tth loose leptons
+        bool ismatched = false; 
+        for(uint lep_en=0; lep_en < leptons->size(); lep_en++){
+            Lepton lep = leptons->at(lep_en);
+            if(lep.cut <=1) continue; // skip loose lepton
+            if(deltaR(deltaPhi(lep.phi,jet.phi),deltaEta(lep.eta,jet.eta))<0.4){
+                ismatched = true; 
+                break; 
+            }
+        }
+        if(ismatched) continue;
+        
+        // check whether jet overlaps with tau
+        for(uint tau_en=0; tau_en < taus->size(); tau_en++){
+            Tau tau = taus->at(tau_en);
+            if(deltaR(deltaPhi(tau.phi,jet.phi),deltaEta(tau.eta,jet.eta))<0.4){
+                ismatched = true; 
+                break; 
+            }
+        }
+        if(ismatched) continue;
+       
+        // set variables neeeded for jet_isLoose()
+        jet.neutralHadEnergyFraction= rJet_neutralHadEnergyFraction->at(jet_en);
+        jet.neutralEmEnergyFraction= rJet_neutralEmEnergyFraction->at(jet_en);
+        jet.chargedMultiplicity= rJet_chargedMultiplicity->at(jet_en);
+        jet.numberOfConstituents= rJet_numberOfConstituents->at(jet_en);
+        jet.chargedHadronEnergyFraction= rJet_chargedHadronEnergyFraction->at(jet_en);
+        jet.chargedEmEnergyFraction= rJet_chargedEmEnergyFraction->at(jet_en);
+        
+        // check whether jet pass loose jet selection 
+        if(!jet.jet_isLoose()) continue;
+
+        jet.JesSF= rJet_JesSF->at(jet_en);
+        jet.JesSFup= rJet_JesSFup->at(jet_en);
+        jet.JesSFdown= rJet_JesSFdown->at(jet_en);
+        jet.JerSF= rJet_JerSF->at(jet_en);
+        jet.JerSFup= rJet_JerSFup->at(jet_en);
+        jet.JerSFdown= rJet_JerSFdown->at(jet_en);
+        jet.btag_sf= rJet_btag_sf->at(jet_en);
+        jet.btag_jesup= rJet_btag_jesup->at(jet_en);
+        jet.btag_jesdown= rJet_btag_jesdown->at(jet_en);
+        jet.btag_hfup= rJet_btag_hfup->at(jet_en);
+        jet.btag_hfdown= rJet_btag_hfdown->at(jet_en);
+        jet.btag_hfstat1up= rJet_btag_hfstat1up->at(jet_en);
+        jet.btag_hfstat1down= rJet_btag_hfstat1down->at(jet_en);
+        jet.btag_hfstat2up= rJet_btag_hfstat2up->at(jet_en);
+        jet.btag_hfstat2down= rJet_btag_hfstat2down->at(jet_en);
+        jet.btag_lfup= rJet_btag_lfup->at(jet_en);
+        jet.btag_lfdown= rJet_btag_lfdown->at(jet_en);
+        jet.btag_lfstat1up= rJet_btag_lfstat1up->at(jet_en);
+        jet.btag_lfstat1down= rJet_btag_lfstat1down->at(jet_en);
+        jet.btag_lfstat2up= rJet_btag_lfstat2up->at(jet_en);
+        jet.btag_lfstat2down= rJet_btag_lfstat2down->at(jet_en);
+        jet.btag_cerr1up= rJet_btag_cerr1up->at(jet_en);
+        jet.btag_cerr1down= rJet_btag_cerr1down->at(jet_en);
+        jet.btag_cerr2up= rJet_btag_cerr2up->at(jet_en);
+        jet.btag_cerr2down= rJet_btag_cerr2down->at(jet_en);
+        jet.genMother_pt= rJet_genMother_pt->at(jet_en);
+        jet.genMother_eta= rJet_genMother_eta->at(jet_en);
+        jet.genMother_phi= rJet_genMother_phi->at(jet_en);
+        jet.genMother_en= rJet_genMother_en->at(jet_en);
+        jet.genMother_pdgId= rJet_genMother_pdgId->at(jet_en);
+        jet.genGrandMother_pt= rJet_genGrandMother_pt->at(jet_en);
+        jet.genGrandMother_eta= rJet_genGrandMother_eta->at(jet_en);
+        jet.genGrandMother_phi= rJet_genGrandMother_phi->at(jet_en);
+        jet.genGrandMother_en= rJet_genGrandMother_en->at(jet_en);
+        jet.genGrandMother_pdgId= rJet_genGrandMother_pdgId->at(jet_en);
+        jet.Uncorr_pt= rJet_Uncorr_pt->at(jet_en);
+        jet.pfCombinedInclusiveSecondaryVertexV2BJetTags= rJet_pfCombinedInclusiveSecondaryVertexV2BJetTags->at(jet_en);
+        jet.pfCombinedMVAV2BJetTags= rJet_pfCombinedMVAV2BJetTags->at(jet_en);
+        jet.qg= rJet_qg->at(jet_en);
+        jet.axis2= rJet_axis2->at(jet_en);
+        jet.ptD= rJet_ptD->at(jet_en);
+        jet.mult= rJet_mult->at(jet_en);
+        jet.partonFlavour= rJet_partonFlavour->at(jet_en);
+        jet.hadronFlavour= rJet_hadronFlavour->at(jet_en);
+        jet.genpt= rJet_genpt->at(jet_en);
+        jet.geneta= rJet_geneta->at(jet_en);
+        jet.genphi= rJet_genphi->at(jet_en);
+        jet.genenergy= rJet_genenergy->at(jet_en);
+        
+        // calculate new variables 
+        jet.set_Wp_jets(jet_numLoose);
+        jet.set_Wp_bdisc(jet_numbLoose, jet_numbMedium, jet_numbTight);
+         
+        Jet_cut->push_back(jet.cut);
+        Jet_bcut->push_back(jet.bcut);
+        Jet_qg->push_back(rJet_qg->at(jet_en));
+        Jet_axis2->push_back(rJet_axis2->at(jet_en));
+        Jet_ptD->push_back(rJet_ptD->at(jet_en));
+        Jet_mult->push_back(rJet_mult->at(jet_en));
+        Jet_partonFlavour->push_back(rJet_partonFlavour->at(jet_en));
+        Jet_hadronFlavour->push_back(rJet_hadronFlavour->at(jet_en));
+        Jet_genpt->push_back(rJet_genpt->at(jet_en));
+        Jet_geneta->push_back(rJet_geneta->at(jet_en));
+        Jet_genphi->push_back(rJet_genphi->at(jet_en));
+        Jet_genenergy->push_back(rJet_genenergy->at(jet_en));
+        Jet_Uncorr_pt->push_back(rJet_Uncorr_pt->at(jet_en));
+        Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags->push_back(rJet_pfCombinedInclusiveSecondaryVertexV2BJetTags->at(jet_en));
+        Jet_pfCombinedMVAV2BJetTags->push_back(rJet_pfCombinedMVAV2BJetTags->at(jet_en));
+        Jet_genMother_pt->push_back(rJet_genMother_pt->at(jet_en));
+        Jet_genMother_eta->push_back(rJet_genMother_eta->at(jet_en));
+        Jet_genMother_phi->push_back(rJet_genMother_phi->at(jet_en));
+        Jet_genMother_en->push_back(rJet_genMother_en->at(jet_en));
+        Jet_genMother_pdgId->push_back(rJet_genMother_pdgId->at(jet_en));
+        Jet_genGrandMother_pt->push_back(rJet_genGrandMother_pt->at(jet_en));
+        Jet_genGrandMother_eta->push_back(rJet_genGrandMother_eta->at(jet_en));
+        Jet_genGrandMother_phi->push_back(rJet_genGrandMother_phi->at(jet_en));
+        Jet_genGrandMother_en->push_back(rJet_genGrandMother_en->at(jet_en));
+        Jet_genGrandMother_pdgId->push_back(rJet_genGrandMother_pdgId->at(jet_en));
+        Jet_pt->push_back(rJet_pt->at(jet_en));
+        Jet_eta->push_back(rJet_eta->at(jet_en));
+        Jet_phi->push_back(rJet_phi->at(jet_en));
+        Jet_energy->push_back(rJet_energy->at(jet_en));
+        
+        jets->push_back(jet);
+  
+        sf_BWeight *=rJet_btag_sf->at(jet_en);
+        sf_BWeightLFup *= rJet_btag_lfup->at(jet_en);
+        sf_BWeightLFdown *= rJet_btag_lfdown->at(jet_en);
+        sf_BWeightHFup *= rJet_btag_hfup->at(jet_en);
+        sf_BWeightHFdown *= rJet_btag_hfdown->at(jet_en);
+        sf_BWeightHFStats1up *= rJet_btag_hfstat1up->at(jet_en);
+        sf_BWeightHFStats1down *= rJet_btag_hfstat1down->at(jet_en);
+        sf_BWeightLFStats1up *= rJet_btag_lfstat1up->at(jet_en);
+        sf_BWeightLFStats1down *= rJet_btag_lfstat1down->at(jet_en);
+        sf_BWeightHFStats2up *= rJet_btag_hfstat2up->at(jet_en);
+        sf_BWeightHFStats2down *= rJet_btag_hfstat2down->at(jet_en);
+        sf_BWeightLFStats2up *= rJet_btag_lfstat2up->at(jet_en);
+        sf_BWeightLFStats2down *= rJet_btag_lfstat2down->at(jet_en);
+        sf_BWeightCErr1up *= rJet_btag_cerr1up->at(jet_en);
+        sf_BWeightCErr1down *= rJet_btag_cerr1down->at(jet_en);
+        sf_BWeightCErr2up *= rJet_btag_cerr2up->at(jet_en);
+        sf_BWeightCErr2down *= rJet_btag_cerr2down->at(jet_en);
+        sf_BWeightJESup *= rJet_btag_jesup->at(jet_en);
+        sf_BWeightJESdown *= rJet_btag_jesdown->at(jet_en);
+    }
+    BWeight = sf_BWeight;
+    BWeightLFup = sf_BWeightLFup;
+    BWeightLFdown = sf_BWeightLFdown;
+    BWeightHFup = sf_BWeightHFup;
+    BWeightHFdown = sf_BWeightHFdown;
+    BWeightHFStats1up = sf_BWeightHFStats1up;
+    BWeightHFStats1down = sf_BWeightHFStats1down;
+    BWeightLFStats1up = sf_BWeightLFStats1up;
+    BWeightLFStats1down = sf_BWeightLFStats1down;
+    BWeightHFStats2up = sf_BWeightHFStats2up;
+    BWeightHFStats2down = sf_BWeightHFStats2down;
+    BWeightLFStats2up = sf_BWeightLFStats2up;
+    BWeightLFStats2down = sf_BWeightLFStats2down;
+    BWeightCErr1up = sf_BWeightCErr1up;
+    BWeightCErr1down = sf_BWeightCErr1down;
+    BWeightCErr2up = sf_BWeightCErr2up;
+    BWeightCErr2down = sf_BWeightCErr2down;
+    BWeightJESup = sf_BWeightJESup;
+    BWeightJESdown = sf_BWeightJESdown;
+    Jet_numLoose = jet_numLoose;
+    Jet_numbLoose = jet_numbLoose;
+    Jet_numbMedium = jet_numbMedium;
+    Jet_numbTight = jet_numbTight;
+}; 
+
 void Lep_sel(){
-    sort(leptons->begin(), leptons->end(), compare_pt); 
+    sort(leptons->begin(), leptons->end(), byPt); 
     for(uint lep_en=0; lep_en < leptons->size(); lep_en++){
         Lepton_pt->push_back(leptons->at(lep_en).pt);
         Lepton_eta->push_back(leptons->at(lep_en).eta);
@@ -583,6 +784,65 @@ void rSetBranchAddress(TTree* readingtree, string sample){
     readingtree->SetBranchAddress("Tau_byLooseIsolationMVArun2v1DBdR03oldDMwLT",&rTau_byLooseIsolationMVArun2v1DBdR03oldDMwLT,&b_rTau_byLooseIsolationMVArun2v1DBdR03oldDMwLT);
     readingtree->SetBranchAddress("Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT",&rTau_byMediumIsolationMVArun2v1DBdR03oldDMwLT,&b_rTau_byMediumIsolationMVArun2v1DBdR03oldDMwLT);
     readingtree->SetBranchAddress("Tau_decayModeFinding",&rTau_decayModeFinding,&b_rTau_decayModeFinding);
+    // Jets
+    readingtree->SetBranchAddress("Jet_pt",&rJet_pt,&b_rJet_pt);
+    readingtree->SetBranchAddress("Jet_eta",&rJet_eta,&b_rJet_eta);
+    readingtree->SetBranchAddress("Jet_phi",&rJet_phi,&b_rJet_phi);
+    readingtree->SetBranchAddress("Jet_energy",&rJet_energy,&b_rJet_energy);
+    readingtree->SetBranchAddress("Jet_genMother_pt",&rJet_genMother_pt,&b_rJet_genMother_pt);
+    readingtree->SetBranchAddress("Jet_genMother_eta",&rJet_genMother_eta,&b_rJet_genMother_eta);
+    readingtree->SetBranchAddress("Jet_genMother_phi",&rJet_genMother_phi,&b_rJet_genMother_phi);
+    readingtree->SetBranchAddress("Jet_genMother_en",&rJet_genMother_en,&b_rJet_genMother_en);
+    readingtree->SetBranchAddress("Jet_genMother_pdgId",&rJet_genMother_pdgId,&b_rJet_genMother_pdgId);
+    readingtree->SetBranchAddress("Jet_genGrandMother_pt",&rJet_genGrandMother_pt,&b_rJet_genGrandMother_pt);
+    readingtree->SetBranchAddress("Jet_genGrandMother_eta",&rJet_genGrandMother_eta,&b_rJet_genGrandMother_eta);
+    readingtree->SetBranchAddress("Jet_genGrandMother_phi",&rJet_genGrandMother_phi,&b_rJet_genGrandMother_phi);
+    readingtree->SetBranchAddress("Jet_genGrandMother_en",&rJet_genGrandMother_en,&b_rJet_genGrandMother_en);
+    readingtree->SetBranchAddress("Jet_genGrandMother_pdgId",&rJet_genGrandMother_pdgId,&b_rJet_genGrandMother_pdgId);
+    readingtree->SetBranchAddress("Jet_Uncorr_pt",&rJet_Uncorr_pt,&b_rJet_Uncorr_pt);
+    readingtree->SetBranchAddress("Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags",&rJet_pfCombinedInclusiveSecondaryVertexV2BJetTags,&b_rJet_pfCombinedInclusiveSecondaryVertexV2BJetTags);
+    readingtree->SetBranchAddress("Jet_pfCombinedMVAV2BJetTags",&rJet_pfCombinedMVAV2BJetTags,&b_rJet_pfCombinedMVAV2BJetTags);
+    readingtree->SetBranchAddress("Jet_qg",&rJet_qg,&b_rJet_qg);
+    readingtree->SetBranchAddress("Jet_axis2",&rJet_axis2,&b_rJet_axis2);
+    readingtree->SetBranchAddress("Jet_ptD",&rJet_ptD,&b_rJet_ptD);
+    readingtree->SetBranchAddress("Jet_mult",&rJet_mult,&b_rJet_mult);
+    readingtree->SetBranchAddress("Jet_partonFlavour",&rJet_partonFlavour,&b_rJet_partonFlavour);
+    readingtree->SetBranchAddress("Jet_hadronFlavour",&rJet_hadronFlavour,&b_rJet_hadronFlavour);
+    readingtree->SetBranchAddress("Jet_genpt",&rJet_genpt,&b_rJet_genpt);
+    readingtree->SetBranchAddress("Jet_geneta",&rJet_geneta,&b_rJet_geneta);
+    readingtree->SetBranchAddress("Jet_genphi",&rJet_genphi,&b_rJet_genphi);
+    readingtree->SetBranchAddress("Jet_genenergy",&rJet_genenergy,&b_rJet_genenergy);
+    readingtree->SetBranchAddress("Jet_JesSF",&rJet_JesSF,&b_rJet_JesSF);
+    readingtree->SetBranchAddress("Jet_JesSFup",&rJet_JesSFup,&b_rJet_JesSFup);
+    readingtree->SetBranchAddress("Jet_JesSFdown",&rJet_JesSFdown,&b_rJet_JesSFdown);
+    readingtree->SetBranchAddress("Jet_JerSF",&rJet_JerSF,&b_rJet_JerSF);
+    readingtree->SetBranchAddress("Jet_JerSFup",&rJet_JerSFup,&b_rJet_JerSFup);
+    readingtree->SetBranchAddress("Jet_JerSFdown",&rJet_JerSFdown,&b_rJet_JerSFdown);
+    readingtree->SetBranchAddress("Jet_neutralHadEnergyFraction",&rJet_neutralHadEnergyFraction,&b_rJet_neutralHadEnergyFraction);
+    readingtree->SetBranchAddress("Jet_neutralEmEnergyFraction",&rJet_neutralEmEnergyFraction,&b_rJet_neutralEmEnergyFraction);
+    readingtree->SetBranchAddress("Jet_chargedMultiplicity",&rJet_chargedMultiplicity,&b_rJet_chargedMultiplicity);
+    readingtree->SetBranchAddress("Jet_numberOfConstituents",&rJet_numberOfConstituents,&b_rJet_numberOfConstituents);
+    readingtree->SetBranchAddress("Jet_chargedHadronEnergyFraction",&rJet_chargedHadronEnergyFraction,&b_rJet_chargedHadronEnergyFraction);
+    readingtree->SetBranchAddress("Jet_chargedEmEnergyFraction",&rJet_chargedEmEnergyFraction,&b_rJet_chargedEmEnergyFraction);
+    readingtree->SetBranchAddress("Jet_btag_sf",&rJet_btag_sf,&b_rJet_btag_sf);
+    readingtree->SetBranchAddress("Jet_btag_jesup",&rJet_btag_jesup,&b_rJet_btag_jesup);
+    readingtree->SetBranchAddress("Jet_btag_jesdown",&rJet_btag_jesdown,&b_rJet_btag_jesdown);
+    readingtree->SetBranchAddress("Jet_btag_hfup",&rJet_btag_hfup,&b_rJet_btag_hfup);
+    readingtree->SetBranchAddress("Jet_btag_hfdown",&rJet_btag_hfdown,&b_rJet_btag_hfdown);
+    readingtree->SetBranchAddress("Jet_btag_hfstat1up",&rJet_btag_hfstat1up,&b_rJet_btag_hfstat1up);
+    readingtree->SetBranchAddress("Jet_btag_hfstat1down",&rJet_btag_hfstat1down,&b_rJet_btag_hfstat1down);
+    readingtree->SetBranchAddress("Jet_btag_hfstat2up",&rJet_btag_hfstat2up,&b_rJet_btag_hfstat2up);
+    readingtree->SetBranchAddress("Jet_btag_hfstat2down",&rJet_btag_hfstat2down,&b_rJet_btag_hfstat2down);
+    readingtree->SetBranchAddress("Jet_btag_lfup",&rJet_btag_lfup,&b_rJet_btag_lfup);
+    readingtree->SetBranchAddress("Jet_btag_lfdown",&rJet_btag_lfdown,&b_rJet_btag_lfdown);
+    readingtree->SetBranchAddress("Jet_btag_lfstat1up",&rJet_btag_lfstat1up,&b_rJet_btag_lfstat1up);
+    readingtree->SetBranchAddress("Jet_btag_lfstat1down",&rJet_btag_lfstat1down,&b_rJet_btag_lfstat1down);
+    readingtree->SetBranchAddress("Jet_btag_lfstat2up",&rJet_btag_lfstat2up,&b_rJet_btag_lfstat2up);
+    readingtree->SetBranchAddress("Jet_btag_lfstat2down",&rJet_btag_lfstat2down,&b_rJet_btag_lfstat2down);
+    readingtree->SetBranchAddress("Jet_btag_cerr1up",&rJet_btag_cerr1up,&b_rJet_btag_cerr1up);
+    readingtree->SetBranchAddress("Jet_btag_cerr1down",&rJet_btag_cerr1down,&b_rJet_btag_cerr1down);
+    readingtree->SetBranchAddress("Jet_btag_cerr2up",&rJet_btag_cerr2up,&b_rJet_btag_cerr2up);
+    readingtree->SetBranchAddress("Jet_btag_cerr2down",&rJet_btag_cerr2down,&b_rJet_btag_cerr2down);
 };
 
 
@@ -610,6 +870,29 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("patElectron_numTight",&patElectron_numTight);
     newtree->Branch("Tau_numLoose",&Tau_numLoose);
     newtree->Branch("Tau_numMedium",&Tau_numMedium);
+    newtree->Branch("Jet_numLoose",&Jet_numLoose);
+    newtree->Branch("Jet_numbLoose",&Jet_numbLoose);
+    newtree->Branch("Jet_numbMedium",&Jet_numbMedium);
+    newtree->Branch("Jet_numbTight",&Jet_numbTight);
+    newtree->Branch("BWeight",&BWeight);
+    newtree->Branch("BWeightLFup",&BWeightLFup);
+    newtree->Branch("BWeightLFdown",&BWeightLFdown);
+    newtree->Branch("BWeightHFup",&BWeightHFup);
+    newtree->Branch("BWeightHFdown",&BWeightHFdown);
+    newtree->Branch("BWeightJESup",&BWeightJESup);
+    newtree->Branch("BWeightJESdown",&BWeightJESdown);
+    newtree->Branch("BWeightLFStats1up",&BWeightLFStats1up);
+    newtree->Branch("BWeightLFStats1down",&BWeightLFStats1down);
+    newtree->Branch("BWeightLFStats2up",&BWeightLFStats2up);
+    newtree->Branch("BWeightLFStats2down",&BWeightLFStats2down);
+    newtree->Branch("BWeightHFStats1up",&BWeightHFStats1up);
+    newtree->Branch("BWeightHFStats1down",&BWeightHFStats1down);
+    newtree->Branch("BWeightHFStats2up",&BWeightHFStats2up);
+    newtree->Branch("BWeightHFStats2down",&BWeightHFStats2down);
+    newtree->Branch("BWeightCErr1up",&BWeightCErr1up);
+    newtree->Branch("BWeightCErr1down",&BWeightCErr1down);
+    newtree->Branch("BWeightCErr2up",&BWeightCErr2up);
+    newtree->Branch("BWeightCErr2down",&BWeightCErr2down);
     //Lepton
     newtree->Branch("Lepton_pt",&Lepton_pt);
     newtree->Branch("Lepton_eta",&Lepton_eta);
@@ -689,6 +972,37 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT",&Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT);
     newtree->Branch("Tau_decayModeFinding",&Tau_decayModeFinding);
     newtree->Branch("Tau_cut",&Tau_cut);
+    // Jets
+    newtree->Branch("Jet_pt",&Jet_pt);
+    newtree->Branch("Jet_eta",&Jet_eta);
+    newtree->Branch("Jet_phi",&Jet_phi);
+    newtree->Branch("Jet_energy",&Jet_energy);
+    newtree->Branch("Jet_genMother_pt",&Jet_genMother_pt);
+    newtree->Branch("Jet_genMother_eta",&Jet_genMother_eta);
+    newtree->Branch("Jet_genMother_phi",&Jet_genMother_phi);
+    newtree->Branch("Jet_genMother_en",&Jet_genMother_en);
+    newtree->Branch("Jet_genMother_pdgId",&Jet_genMother_pdgId);
+    newtree->Branch("Jet_genGrandMother_pt",&Jet_genGrandMother_pt);
+    newtree->Branch("Jet_genGrandMother_eta",&Jet_genGrandMother_eta);
+    newtree->Branch("Jet_genGrandMother_phi",&Jet_genGrandMother_phi);
+    newtree->Branch("Jet_genGrandMother_en",&Jet_genGrandMother_en);
+    newtree->Branch("Jet_genGrandMother_pdgId",&Jet_genGrandMother_pdgId);
+    newtree->Branch("Jet_Uncorr_pt",&Jet_Uncorr_pt);
+    newtree->Branch("Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags",&Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags);
+    newtree->Branch("Jet_pfCombinedMVAV2BJetTags",&Jet_pfCombinedMVAV2BJetTags);
+    newtree->Branch("Jet_qg",&Jet_qg);
+    newtree->Branch("Jet_axis2",&Jet_axis2);
+    newtree->Branch("Jet_ptD",&Jet_ptD);
+    newtree->Branch("Jet_mult",&Jet_mult);
+    newtree->Branch("Jet_partonFlavour",&Jet_partonFlavour);
+    newtree->Branch("Jet_hadronFlavour",&Jet_hadronFlavour);
+    newtree->Branch("Jet_genpt",&Jet_genpt);
+    newtree->Branch("Jet_geneta",&Jet_geneta);
+    newtree->Branch("Jet_genphi",&Jet_genphi);
+    newtree->Branch("Jet_genenergy",&Jet_genenergy);
+    // new variables
+    newtree->Branch("Jet_cut",&Jet_cut);
+    newtree->Branch("Jet_bcut",&Jet_bcut);
 };
 
 
@@ -716,6 +1030,29 @@ void wClearInitialization(string sample){
     patElectron_numTight= -999;
     Tau_numLoose= -999;
     Tau_numMedium= -999;
+    Jet_numLoose= -999;
+    Jet_numbLoose= -999;
+    Jet_numbMedium= -999;
+    Jet_numbTight= -999;
+    BWeight= -999;
+    BWeightLFup= -999;
+    BWeightLFdown= -999;
+    BWeightHFup= -999;
+    BWeightHFdown= -999;
+    BWeightJESup= -999;
+    BWeightJESdown= -999;
+    BWeightLFStats1up= -999;
+    BWeightLFStats1down= -999;
+    BWeightLFStats2up= -999;
+    BWeightLFStats2down= -999;
+    BWeightHFStats1up= -999;
+    BWeightHFStats1down= -999;
+    BWeightHFStats2up= -999;
+    BWeightHFStats2down= -999;
+    BWeightCErr1up= -999;
+    BWeightCErr1down= -999;
+    BWeightCErr2up= -999;
+    BWeightCErr2down= -999;
     // Lepton
     leptons->clear();
     Lepton_pt->clear();
@@ -785,6 +1122,7 @@ void wClearInitialization(string sample){
     Lepton_passMissHit->clear();
     Lepton_isMatchRightCharge->clear();
     //Tau
+    taus->clear();
     Tau_pt->clear();
     Tau_eta->clear();
     Tau_phi->clear();
@@ -796,6 +1134,37 @@ void wClearInitialization(string sample){
     Tau_byMediumIsolationMVArun2v1DBdR03oldDMwLT->clear();
     Tau_decayModeFinding->clear();
     Tau_cut->clear();
+    //Jet
+    jets->clear();
+    Jet_pt->clear();
+    Jet_eta->clear();
+    Jet_phi->clear();
+    Jet_energy->clear();
+    Jet_genMother_pt->clear();
+    Jet_genMother_eta->clear();
+    Jet_genMother_phi->clear();
+    Jet_genMother_en->clear();
+    Jet_genMother_pdgId->clear();
+    Jet_genGrandMother_pt->clear();
+    Jet_genGrandMother_eta->clear();
+    Jet_genGrandMother_phi->clear();
+    Jet_genGrandMother_en->clear();
+    Jet_genGrandMother_pdgId->clear();
+    Jet_Uncorr_pt->clear();
+    Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags->clear();
+    Jet_pfCombinedMVAV2BJetTags->clear();
+    Jet_qg->clear();
+    Jet_axis2->clear();
+    Jet_ptD->clear();
+    Jet_mult->clear();
+    Jet_partonFlavour->clear();
+    Jet_hadronFlavour->clear();
+    Jet_genpt->clear();
+    Jet_geneta->clear();
+    Jet_genphi->clear();
+    Jet_genenergy->clear();
+    Jet_cut->clear();
+    Jet_bcut->clear();
 };
 
 
@@ -923,4 +1292,63 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rTau_byLooseIsolationMVArun2v1DBdR03oldDMwLT->GetEntry(tentry);
     b_rTau_byMediumIsolationMVArun2v1DBdR03oldDMwLT->GetEntry(tentry);
     b_rTau_decayModeFinding->GetEntry(tentry);
+    //Jet
+    b_rJet_pt->GetEntry(tentry);
+    b_rJet_eta->GetEntry(tentry);
+    b_rJet_phi->GetEntry(tentry);
+    b_rJet_energy->GetEntry(tentry);
+    b_rJet_genMother_pt->GetEntry(tentry);
+    b_rJet_genMother_eta->GetEntry(tentry);
+    b_rJet_genMother_phi->GetEntry(tentry);
+    b_rJet_genMother_en->GetEntry(tentry);
+    b_rJet_genMother_pdgId->GetEntry(tentry);
+    b_rJet_genGrandMother_pt->GetEntry(tentry);
+    b_rJet_genGrandMother_eta->GetEntry(tentry);
+    b_rJet_genGrandMother_phi->GetEntry(tentry);
+    b_rJet_genGrandMother_en->GetEntry(tentry);
+    b_rJet_genGrandMother_pdgId->GetEntry(tentry);
+    b_rJet_Uncorr_pt->GetEntry(tentry);
+    b_rJet_pfCombinedInclusiveSecondaryVertexV2BJetTags->GetEntry(tentry);
+    b_rJet_pfCombinedMVAV2BJetTags->GetEntry(tentry);
+    b_rJet_qg->GetEntry(tentry);
+    b_rJet_axis2->GetEntry(tentry);
+    b_rJet_ptD->GetEntry(tentry);
+    b_rJet_mult->GetEntry(tentry);
+    b_rJet_partonFlavour->GetEntry(tentry);
+    b_rJet_hadronFlavour->GetEntry(tentry);
+    b_rJet_genpt->GetEntry(tentry);
+    b_rJet_geneta->GetEntry(tentry);
+    b_rJet_genphi->GetEntry(tentry);
+    b_rJet_genenergy->GetEntry(tentry);
+    b_rJet_JesSF->GetEntry(tentry);
+    b_rJet_JesSFup->GetEntry(tentry);
+    b_rJet_JesSFdown->GetEntry(tentry);
+    b_rJet_JerSF->GetEntry(tentry);
+    b_rJet_JerSFup->GetEntry(tentry);
+    b_rJet_JerSFdown->GetEntry(tentry);
+    b_rJet_neutralHadEnergyFraction->GetEntry(tentry);
+    b_rJet_neutralEmEnergyFraction->GetEntry(tentry);
+    b_rJet_chargedMultiplicity->GetEntry(tentry);
+    b_rJet_numberOfConstituents->GetEntry(tentry);
+    b_rJet_chargedHadronEnergyFraction->GetEntry(tentry);
+    b_rJet_chargedEmEnergyFraction->GetEntry(tentry);
+    b_rJet_btag_sf->GetEntry(tentry);
+    b_rJet_btag_jesup->GetEntry(tentry);
+    b_rJet_btag_jesdown->GetEntry(tentry);
+    b_rJet_btag_hfup->GetEntry(tentry);
+    b_rJet_btag_hfdown->GetEntry(tentry);
+    b_rJet_btag_hfstat1up->GetEntry(tentry);
+    b_rJet_btag_hfstat1down->GetEntry(tentry);
+    b_rJet_btag_hfstat2up->GetEntry(tentry);
+    b_rJet_btag_hfstat2down->GetEntry(tentry);
+    b_rJet_btag_lfup->GetEntry(tentry);
+    b_rJet_btag_lfdown->GetEntry(tentry);
+    b_rJet_btag_lfstat1up->GetEntry(tentry);
+    b_rJet_btag_lfstat1down->GetEntry(tentry);
+    b_rJet_btag_lfstat2up->GetEntry(tentry);
+    b_rJet_btag_lfstat2down->GetEntry(tentry);
+    b_rJet_btag_cerr1up->GetEntry(tentry);
+    b_rJet_btag_cerr1down->GetEntry(tentry);
+    b_rJet_btag_cerr2up->GetEntry(tentry);
+    b_rJet_btag_cerr2down->GetEntry(tentry);
 };
