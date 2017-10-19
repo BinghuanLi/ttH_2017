@@ -42,6 +42,8 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
         Tau_sel();
         //Jet
         Jet_sel(sample);
+        //BoostJet
+        BoostedJet_sel();
         Lep_sel();
         //Event
         Event_sel();
@@ -517,10 +519,10 @@ void Jet_sel(string sample){
         Jet_genGrandMother_phi->push_back(rJet_genGrandMother_phi->at(jet_en));
         Jet_genGrandMother_en->push_back(rJet_genGrandMother_en->at(jet_en));
         Jet_genGrandMother_pdgId->push_back(rJet_genGrandMother_pdgId->at(jet_en));
-        Jet_pt->push_back(rJet_pt->at(jet_en));
+        Jet_pt->push_back(jet.pt);
         Jet_eta->push_back(rJet_eta->at(jet_en));
         Jet_phi->push_back(rJet_phi->at(jet_en));
-        Jet_energy->push_back(rJet_energy->at(jet_en));
+        Jet_energy->push_back(jet.energy);
         
         jets->push_back(jet);
   
@@ -568,6 +570,97 @@ void Jet_sel(string sample){
     Jet_numbMedium = jet_numbMedium;
     Jet_numbTight = jet_numbTight;
 }; 
+
+
+void BoostedJet_sel(){
+    int top_numSoft   = 0;
+    int top_numLoose = 0;
+    int top_numMedium = 0;
+    int top_numTight = 0;
+    int w_numLoose = 0;
+    int w_numTight = 0;
+    for(uint boostedjet_en = 0; boostedjet_en<rBoostedJet_pt->size(); boostedjet_en++){
+        BoostJet boostjet;
+        boostjet.pt = rBoostedJet_Uncorr_pt->at(boostedjet_en)*rBoostedJet_JesSF->at(boostedjet_en);
+        boostjet.energy = rBoostedJet_energy->at(boostedjet_en)*rBoostedJet_Uncorr_pt->at(boostedjet_en)/rBoostedJet_pt->at(boostedjet_en)*rBoostedJet_JesSF->at(boostedjet_en);
+        boostjet.eta = rBoostedJet_eta->at(boostedjet_en);
+        boostjet.phi = rBoostedJet_phi->at(boostedjet_en);
+        // check whether boostedjet overlaps with tth loose leptons
+        bool ismatched = false; 
+        for(uint lep_en=0; lep_en < leptons->size(); lep_en++){
+            Lepton lep = leptons->at(lep_en);
+            if(lep.cut <=1) continue; // skip loose lepton
+            if(deltaR(deltaPhi(lep.phi,boostjet.phi),deltaEta(lep.eta,boostjet.eta))<0.4){
+                ismatched = true; 
+                break; 
+            }
+        }
+        if(ismatched) continue;
+        
+        // check whether boostedjet overlaps with tau
+        for(uint tau_en=0; tau_en < taus->size(); tau_en++){
+            Tau tau = taus->at(tau_en);
+            if(deltaR(deltaPhi(tau.phi,boostjet.phi),deltaEta(tau.eta,boostjet.eta))<0.4){
+                ismatched = true; 
+                break; 
+            }
+        }
+        if(ismatched) continue;
+       
+        boostjet.Uncorr_pt= rBoostedJet_Uncorr_pt->at(boostedjet_en);
+        boostjet.pfCombinedInclusiveSecondaryVertexV2BJetTags= rBoostedJet_pfCombinedInclusiveSecondaryVertexV2BJetTags->at(boostedjet_en);
+        boostjet.pfCombinedMVAV2BJetTags= rBoostedJet_pfCombinedMVAV2BJetTags->at(boostedjet_en);
+        boostjet.JesSF= rBoostedJet_JesSF->at(boostedjet_en);
+        boostjet.JesSFup= rBoostedJet_JesSFup->at(boostedjet_en);
+        boostjet.JesSFdown= rBoostedJet_JesSFdown->at(boostedjet_en);
+        boostjet.JerSF= rBoostedJet_JerSF->at(boostedjet_en);
+        boostjet.JerSFup= rBoostedJet_JerSFup->at(boostedjet_en);
+        boostjet.JerSFdown= rBoostedJet_JerSFdown->at(boostedjet_en);
+        boostjet.tau1= rBoostedJet_tau1->at(boostedjet_en);
+        boostjet.tau2= rBoostedJet_tau2->at(boostedjet_en);
+        boostjet.tau3= rBoostedJet_tau3->at(boostedjet_en);
+        boostjet.softdrop_mass= rBoostedJet_softdrop_mass->at(boostedjet_en);
+        boostjet.pruned_mass= rBoostedJet_pruned_mass->at(boostedjet_en);
+        if (boostjet.tau1!=0) boostjet.tau21 = boostjet.tau2/boostjet.tau1;
+        if (boostjet.tau2!=0) boostjet.tau32 = boostjet.tau3/boostjet.tau2;
+
+        // select boosted Top and W
+        boostjet.set_Wp_Top(top_numSoft, top_numLoose, top_numMedium, top_numTight);
+        boostjet.set_Wp_W(w_numLoose, w_numTight);
+        
+        BoostedJet_pt->push_back(boostjet.pt);
+        BoostedJet_eta->push_back(rBoostedJet_eta->at(boostedjet_en));
+        BoostedJet_phi->push_back(rBoostedJet_phi->at(boostedjet_en));
+        BoostedJet_energy->push_back(boostjet.energy);
+        BoostedJet_Uncorr_pt->push_back(rBoostedJet_Uncorr_pt->at(boostedjet_en));
+        BoostedJet_pfCombinedInclusiveSecondaryVertexV2BJetTags->push_back(rBoostedJet_pfCombinedInclusiveSecondaryVertexV2BJetTags->at(boostedjet_en));
+        BoostedJet_pfCombinedMVAV2BJetTags->push_back(rBoostedJet_pfCombinedMVAV2BJetTags->at(boostedjet_en));
+        BoostedJet_JesSF->push_back(rBoostedJet_JesSF->at(boostedjet_en));
+        BoostedJet_JesSFup->push_back(rBoostedJet_JesSFup->at(boostedjet_en));
+        BoostedJet_JesSFdown->push_back(rBoostedJet_JesSFdown->at(boostedjet_en));
+        BoostedJet_JerSF->push_back(rBoostedJet_JerSF->at(boostedjet_en));
+        BoostedJet_JerSFup->push_back(rBoostedJet_JerSFup->at(boostedjet_en));
+        BoostedJet_JerSFdown->push_back(rBoostedJet_JerSFdown->at(boostedjet_en));
+        BoostedJet_tau1->push_back(rBoostedJet_tau1->at(boostedjet_en));
+        BoostedJet_tau2->push_back(rBoostedJet_tau2->at(boostedjet_en));
+        BoostedJet_tau3->push_back(rBoostedJet_tau3->at(boostedjet_en));
+        BoostedJet_softdrop_mass->push_back(rBoostedJet_softdrop_mass->at(boostedjet_en));
+        BoostedJet_pruned_mass->push_back(rBoostedJet_pruned_mass->at(boostedjet_en));
+        //new
+        BoostedJet_tau21->push_back(boostjet.tau21);
+        BoostedJet_tau32->push_back(boostjet.tau32);
+        BoostedJet_wCut->push_back(boostjet.wCut);
+        BoostedJet_topCut->push_back(boostjet.topCut);
+       
+        boostjets->push_back(boostjet);
+    }
+    Top_numSoft = top_numSoft;
+    Top_numLoose = top_numLoose;
+    Top_numMedium = top_numMedium;
+    Top_numTight = top_numTight;
+    W_numLoose = w_numLoose;
+    W_numTight = w_numTight;
+};
 
 void Lep_sel(){
     sort(leptons->begin(), leptons->end(), byPt); 
@@ -843,6 +936,25 @@ void rSetBranchAddress(TTree* readingtree, string sample){
     readingtree->SetBranchAddress("Jet_btag_cerr1down",&rJet_btag_cerr1down,&b_rJet_btag_cerr1down);
     readingtree->SetBranchAddress("Jet_btag_cerr2up",&rJet_btag_cerr2up,&b_rJet_btag_cerr2up);
     readingtree->SetBranchAddress("Jet_btag_cerr2down",&rJet_btag_cerr2down,&b_rJet_btag_cerr2down);
+    //BoostJet
+    readingtree->SetBranchAddress("BoostedJet_pt",&rBoostedJet_pt,&b_rBoostedJet_pt);
+    readingtree->SetBranchAddress("BoostedJet_eta",&rBoostedJet_eta,&b_rBoostedJet_eta);
+    readingtree->SetBranchAddress("BoostedJet_phi",&rBoostedJet_phi,&b_rBoostedJet_phi);
+    readingtree->SetBranchAddress("BoostedJet_energy",&rBoostedJet_energy,&b_rBoostedJet_energy);
+    readingtree->SetBranchAddress("BoostedJet_Uncorr_pt",&rBoostedJet_Uncorr_pt,&b_rBoostedJet_Uncorr_pt);
+    readingtree->SetBranchAddress("BoostedJet_pfCombinedInclusiveSecondaryVertexV2BJetTags",&rBoostedJet_pfCombinedInclusiveSecondaryVertexV2BJetTags,&b_rBoostedJet_pfCombinedInclusiveSecondaryVertexV2BJetTags);
+    readingtree->SetBranchAddress("BoostedJet_pfCombinedMVAV2BJetTags",&rBoostedJet_pfCombinedMVAV2BJetTags,&b_rBoostedJet_pfCombinedMVAV2BJetTags);
+    readingtree->SetBranchAddress("BoostedJet_JesSF",&rBoostedJet_JesSF,&b_rBoostedJet_JesSF);
+    readingtree->SetBranchAddress("BoostedJet_JesSFup",&rBoostedJet_JesSFup,&b_rBoostedJet_JesSFup);
+    readingtree->SetBranchAddress("BoostedJet_JesSFdown",&rBoostedJet_JesSFdown,&b_rBoostedJet_JesSFdown);
+    readingtree->SetBranchAddress("BoostedJet_JerSF",&rBoostedJet_JerSF,&b_rBoostedJet_JerSF);
+    readingtree->SetBranchAddress("BoostedJet_JerSFup",&rBoostedJet_JerSFup,&b_rBoostedJet_JerSFup);
+    readingtree->SetBranchAddress("BoostedJet_JerSFdown",&rBoostedJet_JerSFdown,&b_rBoostedJet_JerSFdown);
+    readingtree->SetBranchAddress("BoostedJet_tau1",&rBoostedJet_tau1,&b_rBoostedJet_tau1);
+    readingtree->SetBranchAddress("BoostedJet_tau2",&rBoostedJet_tau2,&b_rBoostedJet_tau2);
+    readingtree->SetBranchAddress("BoostedJet_tau3",&rBoostedJet_tau3,&b_rBoostedJet_tau3);
+    readingtree->SetBranchAddress("BoostedJet_softdrop_mass",&rBoostedJet_softdrop_mass,&b_rBoostedJet_softdrop_mass);
+    readingtree->SetBranchAddress("BoostedJet_pruned_mass",&rBoostedJet_pruned_mass,&b_rBoostedJet_pruned_mass);
 };
 
 
@@ -893,6 +1005,12 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("BWeightCErr1down",&BWeightCErr1down);
     newtree->Branch("BWeightCErr2up",&BWeightCErr2up);
     newtree->Branch("BWeightCErr2down",&BWeightCErr2down);
+    newtree->Branch("Top_numSoft",&Top_numSoft);
+    newtree->Branch("Top_numLoose",&Top_numLoose);
+    newtree->Branch("Top_numMedium",&Top_numMedium);
+    newtree->Branch("Top_numTight",&Top_numTight);
+    newtree->Branch("W_numLoose",&W_numLoose);
+    newtree->Branch("W_numTight",&W_numTight);
     //Lepton
     newtree->Branch("Lepton_pt",&Lepton_pt);
     newtree->Branch("Lepton_eta",&Lepton_eta);
@@ -1003,6 +1121,29 @@ void wSetBranchAddress(TTree* newtree, string sample){
     // new variables
     newtree->Branch("Jet_cut",&Jet_cut);
     newtree->Branch("Jet_bcut",&Jet_bcut);
+    //BoostJet
+    newtree->Branch("BoostedJet_pt",&BoostedJet_pt);
+    newtree->Branch("BoostedJet_eta",&BoostedJet_eta);
+    newtree->Branch("BoostedJet_phi",&BoostedJet_phi);
+    newtree->Branch("BoostedJet_energy",&BoostedJet_energy);
+    newtree->Branch("BoostedJet_Uncorr_pt",&BoostedJet_Uncorr_pt);
+    newtree->Branch("BoostedJet_pfCombinedInclusiveSecondaryVertexV2BJetTags",&BoostedJet_pfCombinedInclusiveSecondaryVertexV2BJetTags);
+    newtree->Branch("BoostedJet_pfCombinedMVAV2BJetTags",&BoostedJet_pfCombinedMVAV2BJetTags);
+    newtree->Branch("BoostedJet_JesSF",&BoostedJet_JesSF);
+    newtree->Branch("BoostedJet_JesSFup",&BoostedJet_JesSFup);
+    newtree->Branch("BoostedJet_JesSFdown",&BoostedJet_JesSFdown);
+    newtree->Branch("BoostedJet_JerSF",&BoostedJet_JerSF);
+    newtree->Branch("BoostedJet_JerSFup",&BoostedJet_JerSFup);
+    newtree->Branch("BoostedJet_JerSFdown",&BoostedJet_JerSFdown);
+    newtree->Branch("BoostedJet_tau1",&BoostedJet_tau1);
+    newtree->Branch("BoostedJet_tau2",&BoostedJet_tau2);
+    newtree->Branch("BoostedJet_tau3",&BoostedJet_tau3);
+    newtree->Branch("BoostedJet_softdrop_mass",&BoostedJet_softdrop_mass);
+    newtree->Branch("BoostedJet_pruned_mass",&BoostedJet_pruned_mass);
+    newtree->Branch("BoostedJet_tau21",&BoostedJet_tau21);
+    newtree->Branch("BoostedJet_tau32",&BoostedJet_tau32);
+    newtree->Branch("BoostedJet_wCut",&BoostedJet_wCut);
+    newtree->Branch("BoostedJet_topCut",&BoostedJet_topCut);
 };
 
 
@@ -1053,6 +1194,12 @@ void wClearInitialization(string sample){
     BWeightCErr1down= -999;
     BWeightCErr2up= -999;
     BWeightCErr2down= -999;
+    Top_numSoft= -999;
+    Top_numLoose= -999;
+    Top_numMedium= -999;
+    Top_numTight= -999;
+    W_numLoose= -999;
+    W_numTight= -999;
     // Lepton
     leptons->clear();
     Lepton_pt->clear();
@@ -1165,6 +1312,30 @@ void wClearInitialization(string sample){
     Jet_genenergy->clear();
     Jet_cut->clear();
     Jet_bcut->clear();
+    // BoostJet
+    boostjets->clear();
+    BoostedJet_pt->clear();
+    BoostedJet_eta->clear();
+    BoostedJet_phi->clear();
+    BoostedJet_energy->clear();
+    BoostedJet_Uncorr_pt->clear();
+    BoostedJet_pfCombinedInclusiveSecondaryVertexV2BJetTags->clear();
+    BoostedJet_pfCombinedMVAV2BJetTags->clear();
+    BoostedJet_JesSF->clear();
+    BoostedJet_JesSFup->clear();
+    BoostedJet_JesSFdown->clear();
+    BoostedJet_JerSF->clear();
+    BoostedJet_JerSFup->clear();
+    BoostedJet_JerSFdown->clear();
+    BoostedJet_tau1->clear();
+    BoostedJet_tau2->clear();
+    BoostedJet_tau3->clear();
+    BoostedJet_softdrop_mass->clear();
+    BoostedJet_pruned_mass->clear();
+    BoostedJet_tau21->clear();
+    BoostedJet_tau32->clear();
+    BoostedJet_wCut->clear();
+    BoostedJet_topCut->clear();
 };
 
 
@@ -1351,4 +1522,23 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rJet_btag_cerr1down->GetEntry(tentry);
     b_rJet_btag_cerr2up->GetEntry(tentry);
     b_rJet_btag_cerr2down->GetEntry(tentry);
+    //BoostJet
+    b_rBoostedJet_pt->GetEntry(tentry);
+    b_rBoostedJet_eta->GetEntry(tentry);
+    b_rBoostedJet_phi->GetEntry(tentry);
+    b_rBoostedJet_energy->GetEntry(tentry);
+    b_rBoostedJet_Uncorr_pt->GetEntry(tentry);
+    b_rBoostedJet_pfCombinedInclusiveSecondaryVertexV2BJetTags->GetEntry(tentry);
+    b_rBoostedJet_pfCombinedMVAV2BJetTags->GetEntry(tentry);
+    b_rBoostedJet_JesSF->GetEntry(tentry);
+    b_rBoostedJet_JesSFup->GetEntry(tentry);
+    b_rBoostedJet_JesSFdown->GetEntry(tentry);
+    b_rBoostedJet_JerSF->GetEntry(tentry);
+    b_rBoostedJet_JerSFup->GetEntry(tentry);
+    b_rBoostedJet_JerSFdown->GetEntry(tentry);
+    b_rBoostedJet_tau1->GetEntry(tentry);
+    b_rBoostedJet_tau2->GetEntry(tentry);
+    b_rBoostedJet_tau3->GetEntry(tentry);
+    b_rBoostedJet_softdrop_mass->GetEntry(tentry);
+    b_rBoostedJet_pruned_mass->GetEntry(tentry);
 };

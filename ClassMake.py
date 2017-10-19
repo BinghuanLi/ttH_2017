@@ -16,18 +16,17 @@ workpath = "/publicfs/cms/user/libh/Test/Rootplizer/analyzer"
 #  CaseC   No       Yes     Jet_LooseID: you can not read it from ntuplas if there is not, but you want to save in rootplas 
 
 # Variable Case
-#Case = "CaseA"
-Case = "CaseB"
+Case = "CaseA"
+#Case = "CaseB"
 #Case = "CaseC"
 # Variable Definition
 
-rObject = "Jet"
-wObject = "Jet"
+rObject = "BoostedJet"
+wObject = "BoostedJet"
 
 VariableType  = "double"
 VariableNames = [
 # CaseA Variables
-"pt","eta","phi","energy",
 "pt","eta","phi","energy",
 #"charge",
 #"IP3Dsig","miniIsoRel","pdgId","gsfTrack_dxy_pv","gsfTrack_dz_pv",
@@ -35,10 +34,10 @@ VariableNames = [
 
 #"jetptratio","jetcsv","lepjetchtrks","miniIsoCh","miniIsoPUsub","ptrel",
 #"px","py","pz","jetdr",
-"gen_pt","gen_eta","gen_phi","gen_en","gen_pdgId",
-"genMother_pt","genMother_eta","genMother_phi","genMother_en","genMother_pdgId",
-"genGrandMother_pt","genGrandMother_eta","genGrandMother_phi","genGrandMother_en","genGrandMother_pdgId",
-"gen_isPromptFinalState","gen_isDirectPromptTauDecayProductFinalState",
+#"gen_pt","gen_eta","gen_phi","gen_en","gen_pdgId",
+#"genMother_pt","genMother_eta","genMother_phi","genMother_en","genMother_pdgId",
+#"genGrandMother_pt","genGrandMother_eta","genGrandMother_phi","genGrandMother_en","genGrandMother_pdgId",
+#"gen_isPromptFinalState","gen_isDirectPromptTauDecayProductFinalState",
 
 # Electron only
 #"SCeta","expectedMissingInnerHits","full5x5_sigmaIetaIeta","hOverE","dEtaIn","dPhiIn","ooEmooP", 
@@ -54,10 +53,11 @@ VariableNames = [
 "Uncorr_pt",
 "pfCombinedInclusiveSecondaryVertexV2BJetTags","pfCombinedMVAV2BJetTags",
 #"px","py","pz","mass",
-"qg","axis2","ptD","mult",
-"partonFlavour","hadronFlavour","genpt","geneta","genphi","genenergy",
+#"qg","axis2","ptD","mult",
+#"partonFlavour","hadronFlavour","genpt","geneta","genphi","genenergy",
 
-#"JesSF","JesSFup","JesSFdown","JerSF","JerSFup","JerSFdown",
+
+"JesSF","JesSFup","JesSFdown","JerSF","JerSFup","JerSFdown",
 #"neutralHadEnergyFraction","neutralEmEnergyFraction","chargedMultiplicity","numberOfConstituents","chargedHadronEnergyFraction", "chargedEmEnergyFraction",
 #"btag_sf",
 #"btag_jesup","btag_jesdown",
@@ -69,6 +69,13 @@ VariableNames = [
 #"btag_lfstat2up","btag_lfstat2down",
 #"btag_cerr1up","btag_cerr1down",
 #"btag_cerr2up","btag_cerr2down",
+
+#BoostedJet
+"tau1","tau2","tau3",
+"softdrop_mass","pruned_mass",
+#"SDsubjet1_pt","SDsubjet1_eta","SDsubjet1_phi","SDsubjet1_energy","SDsubjet1_pfCSV2Bdisc",
+#"SDsubjet2_pt","SDsubjet2_eta","SDsubjet2_phi","SDsubjet2_energy","SDsubjet2_pfCSV2Bdisc",
+#"tau21","tau32",
 
 #Case B
 
@@ -105,8 +112,8 @@ WTreeptr = "newtree"
 #Name of Current Entry
 ParEntry = "tentry"
 #Name of index in Push_back
-ParSel = "tau_en"
-ParWrite = "tau_en"
+ParSel = "boostedjet_en"
+ParWrite = "boostjet_en"
 
 ###################
 ### Script itself
@@ -145,11 +152,15 @@ if Case == "CaseA":
  
  print >> vector, "   //Intialize variables"
  for Variable in VariableNames:
-     print >> vector, "        jet."+Variable+"= r"+rObject+"_"+Variable+"->at("+ParSel+");"
+     print >> vector, "        boostjet."+Variable+"= r"+rObject+"_"+Variable+"->at("+ParSel+");"
 
  print >> vector, "   //Write variables"
  for Variable in VariableNames:
      print >> vector, "        "+wObject+"_"+Variable+"->push_back(jets->at("+ParWrite+")."+Variable+");"
+
+ print >> vector, "   //Write variables"
+ for Variable in VariableNames:
+     print >> vector, "        "+wObject+"_"+Variable+"->push_back(r"+rObject+"_"+Variable+"->at("+ParSel+"));"
 
 elif Case == "CaseB":
  print >> vector, "//This is CaseB"

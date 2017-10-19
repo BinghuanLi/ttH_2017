@@ -7,6 +7,7 @@
 #include "Lepton.cc"
 #include "Tau.cc"
 #include "Jet.cc"
+#include "BoostJet.cc"
 
 using namespace std;
 ////
@@ -31,6 +32,7 @@ void Muon_sel(string sample);
 void patElectron_sel(string sample);
 void Tau_sel();
 void Jet_sel(string sample); 
+void BoostedJet_sel();
 void Event_sel();
 void Lep_sel();
 
@@ -259,6 +261,26 @@ vector<double>* rJet_btag_cerr1down; TBranch* b_rJet_btag_cerr1down =0;
 vector<double>* rJet_btag_cerr2up; TBranch* b_rJet_btag_cerr2up =0;
 vector<double>* rJet_btag_cerr2down; TBranch* b_rJet_btag_cerr2down =0;
 
+//BoostJet
+vector<double>* rBoostedJet_pt; TBranch* b_rBoostedJet_pt =0;
+vector<double>* rBoostedJet_eta; TBranch* b_rBoostedJet_eta =0;
+vector<double>* rBoostedJet_phi; TBranch* b_rBoostedJet_phi =0;
+vector<double>* rBoostedJet_energy; TBranch* b_rBoostedJet_energy =0;
+vector<double>* rBoostedJet_Uncorr_pt; TBranch* b_rBoostedJet_Uncorr_pt =0;
+vector<double>* rBoostedJet_pfCombinedInclusiveSecondaryVertexV2BJetTags; TBranch* b_rBoostedJet_pfCombinedInclusiveSecondaryVertexV2BJetTags =0;
+vector<double>* rBoostedJet_pfCombinedMVAV2BJetTags; TBranch* b_rBoostedJet_pfCombinedMVAV2BJetTags =0;
+vector<double>* rBoostedJet_JesSF; TBranch* b_rBoostedJet_JesSF =0;
+vector<double>* rBoostedJet_JesSFup; TBranch* b_rBoostedJet_JesSFup =0;
+vector<double>* rBoostedJet_JesSFdown; TBranch* b_rBoostedJet_JesSFdown =0;
+vector<double>* rBoostedJet_JerSF; TBranch* b_rBoostedJet_JerSF =0;
+vector<double>* rBoostedJet_JerSFup; TBranch* b_rBoostedJet_JerSFup =0;
+vector<double>* rBoostedJet_JerSFdown; TBranch* b_rBoostedJet_JerSFdown =0;
+vector<double>* rBoostedJet_tau1; TBranch* b_rBoostedJet_tau1 =0;
+vector<double>* rBoostedJet_tau2; TBranch* b_rBoostedJet_tau2 =0;
+vector<double>* rBoostedJet_tau3; TBranch* b_rBoostedJet_tau3 =0;
+vector<double>* rBoostedJet_softdrop_mass; TBranch* b_rBoostedJet_softdrop_mass =0;
+vector<double>* rBoostedJet_pruned_mass; TBranch* b_rBoostedJet_pruned_mass =0;
+
 //variables to be written
 
 // Event level variables
@@ -304,6 +326,12 @@ double BWeightCErr1up;
 double BWeightCErr1down;
 double BWeightCErr2up;
 double BWeightCErr2down;
+double Top_numSoft;
+double Top_numLoose;
+double Top_numMedium;
+double Top_numTight;
+double W_numLoose;
+double W_numTight;
 
 
 //Lepton
@@ -423,3 +451,29 @@ vector<double>* Jet_genpt = new std::vector<double>;
 vector<double>* Jet_geneta = new std::vector<double>;
 vector<double>* Jet_genphi = new std::vector<double>;
 vector<double>* Jet_genenergy = new std::vector<double>;
+
+//BoostJet
+vector<BoostJet>* boostjets = new std::vector<BoostJet>;
+
+vector<double>* BoostedJet_pt = new std::vector<double>;
+vector<double>* BoostedJet_eta = new std::vector<double>;
+vector<double>* BoostedJet_phi = new std::vector<double>;
+vector<double>* BoostedJet_energy = new std::vector<double>;
+vector<double>* BoostedJet_Uncorr_pt = new std::vector<double>;
+vector<double>* BoostedJet_pfCombinedInclusiveSecondaryVertexV2BJetTags = new std::vector<double>;
+vector<double>* BoostedJet_pfCombinedMVAV2BJetTags = new std::vector<double>;
+vector<double>* BoostedJet_JesSF = new std::vector<double>;
+vector<double>* BoostedJet_JesSFup = new std::vector<double>;
+vector<double>* BoostedJet_JesSFdown = new std::vector<double>;
+vector<double>* BoostedJet_JerSF = new std::vector<double>;
+vector<double>* BoostedJet_JerSFup = new std::vector<double>;
+vector<double>* BoostedJet_JerSFdown = new std::vector<double>;
+vector<double>* BoostedJet_tau1 = new std::vector<double>;
+vector<double>* BoostedJet_tau2 = new std::vector<double>;
+vector<double>* BoostedJet_tau3 = new std::vector<double>;
+vector<double>* BoostedJet_softdrop_mass = new std::vector<double>;
+vector<double>* BoostedJet_pruned_mass = new std::vector<double>;
+vector<double>* BoostedJet_tau21 = new std::vector<double>;
+vector<double>* BoostedJet_tau32 = new std::vector<double>;
+vector<double>* BoostedJet_wCut = new std::vector<double>;
+vector<double>* BoostedJet_topCut = new std::vector<double>;
