@@ -83,6 +83,14 @@ TH2F* hist_el_fr = (TH2F*) FRfile->Get("FR_mva090_el_data_comb_NC");
 ULong64_t rEVENT_event; TBranch* b_rEVENT_event =0;
 double rEVENT_genWeight; TBranch* b_rEVENT_genWeight =0;
 int rHiggsDecay; TBranch* b_rHiggsDecay =0;
+double rPUWeight; TBranch* b_rPUWeight =0;
+double rGen_type1PF_Met; TBranch* b_rGen_type1PF_Met =0;
+double rGen_type1PF_Metpx; TBranch* b_rGen_type1PF_Metpx =0;
+double rGen_type1PF_Metpy; TBranch* b_rGen_type1PF_Metpy =0;
+double rGen_type1PF_Metpz; TBranch* b_rGen_type1PF_Metpz =0;
+double rGen_type1PF_Meteta; TBranch* b_rGen_type1PF_Meteta =0;
+double rGen_type1PF_Metphi; TBranch* b_rGen_type1PF_Metphi =0;
+double rGen_type1PF_Meten; TBranch* b_rGen_type1PF_Meten =0;
 double rMet_type1PF_pt; TBranch* b_rMet_type1PF_pt =0;
 double rMet_type1PF_px; TBranch* b_rMet_type1PF_px =0;
 double rMet_type1PF_py; TBranch* b_rMet_type1PF_py =0;
@@ -91,6 +99,27 @@ double rMet_type1PF_phi; TBranch* b_rMet_type1PF_phi =0;
 double rMet_type1PF_sumEt; TBranch* b_rMet_type1PF_sumEt =0;
 double rMet_type1PF_shiftedPtUp; TBranch* b_rMet_type1PF_shiftedPtUp =0;
 double rMet_type1PF_shiftedPtDown; TBranch* b_rMet_type1PF_shiftedPtDown =0;
+int rHLT_DiMu9_Ele9_CaloIdL_TrackIdL; TBranch* b_rHLT_DiMu9_Ele9_CaloIdL_TrackIdL =0;
+int rHLT_Mu8_DiEle12_CaloIdL_TrackIdL; TBranch* b_rHLT_Mu8_DiEle12_CaloIdL_TrackIdL =0;
+int rHLT_TripleMu_12_10_5; TBranch* b_rHLT_TripleMu_12_10_5 =0;
+int rHLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL; TBranch* b_rHLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL =0;
+int rHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL; TBranch* b_rHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL =0;
+int rHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ; TBranch* b_rHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ =0;
+int rHLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL; TBranch* b_rHLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL =0;
+int rHLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ; TBranch* b_rHLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ =0;
+int rHLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ; TBranch* b_rHLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ =0;
+int rHLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ; TBranch* b_rHLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ =0;
+int rHLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ; TBranch* b_rHLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ =0;
+int rHLT_IsoMu22; TBranch* b_rHLT_IsoMu22 =0;
+int rHLT_IsoTkMu22; TBranch* b_rHLT_IsoTkMu22 =0;
+int rHLT_IsoMu22_eta2p1; TBranch* b_rHLT_IsoMu22_eta2p1 =0;
+int rHLT_IsoTkMu22_eta2p1; TBranch* b_rHLT_IsoTkMu22_eta2p1 =0;
+int rHLT_IsoMu24; TBranch* b_rHLT_IsoMu24 =0;
+int rHLT_IsoTkMu24; TBranch* b_rHLT_IsoTkMu24 =0;
+int rHLT_Ele27_WPTight_Gsf; TBranch* b_rHLT_Ele27_WPTight_Gsf =0;
+int rHLT_Ele25_eta2p1_WPTight_Gsf; TBranch* b_rHLT_Ele25_eta2p1_WPTight_Gsf =0;
+int rHLT_Ele27_eta2p1_WPLoose_Gsf; TBranch* b_rHLT_Ele27_eta2p1_WPLoose_Gsf =0;
+
 //Muon
 vector<double>* rMuon_pt; TBranch* b_rMuon_pt =0;
 vector<double>* rMuon_eta; TBranch* b_rMuon_eta =0;
@@ -281,12 +310,31 @@ vector<double>* rBoostedJet_tau3; TBranch* b_rBoostedJet_tau3 =0;
 vector<double>* rBoostedJet_softdrop_mass; TBranch* b_rBoostedJet_softdrop_mass =0;
 vector<double>* rBoostedJet_pruned_mass; TBranch* b_rBoostedJet_pruned_mass =0;
 
+//Gen
+vector<double>* rGen_pdg_id; TBranch* b_rGen_pdg_id =0;
+vector<double>* rGen_pt; TBranch* b_rGen_pt =0;
+vector<double>* rGen_eta; TBranch* b_rGen_eta =0;
+vector<double>* rGen_phi; TBranch* b_rGen_phi =0;
+vector<double>* rGen_energy; TBranch* b_rGen_energy =0;
+vector<double>* rGen_motherpdg_id; TBranch* b_rGen_motherpdg_id =0;
+vector<double>* rGen_BmotherIndex; TBranch* b_rGen_BmotherIndex =0;
+vector<double>* rGen_numMother; TBranch* b_rGen_numMother =0;
+vector<double>* rGen_status; TBranch* b_rGen_status =0;
+
 //variables to be written
 
 // Event level variables
 double EVENT_event;
 double EVENT_genWeight;
 double HiggsDecay;
+double PUWeight;
+double Gen_type1PF_Met;
+double Gen_type1PF_Metpx;
+double Gen_type1PF_Metpy;
+double Gen_type1PF_Metpz;
+double Gen_type1PF_Meteta;
+double Gen_type1PF_Metphi;
+double Gen_type1PF_Meten;
 double Met_type1PF_pt;
 double Met_type1PF_px;
 double Met_type1PF_py;
@@ -332,6 +380,15 @@ double Top_numMedium;
 double Top_numTight;
 double W_numLoose;
 double W_numTight;
+double TTHLep_2Mu;
+double TTHLep_2Ele;
+double TTHLep_MuEle;
+double TTHLep_3L4L;
+double metLD;
+double mhtT_met;
+double mht_met;
+double mhtT;
+double mht;
 
 
 //Lepton
@@ -477,3 +534,14 @@ vector<double>* BoostedJet_tau21 = new std::vector<double>;
 vector<double>* BoostedJet_tau32 = new std::vector<double>;
 vector<double>* BoostedJet_wCut = new std::vector<double>;
 vector<double>* BoostedJet_topCut = new std::vector<double>;
+
+//Gen
+vector<double>* Gen_pdg_id = new std::vector<double>;
+vector<double>* Gen_pt = new std::vector<double>;
+vector<double>* Gen_eta = new std::vector<double>;
+vector<double>* Gen_phi = new std::vector<double>;
+vector<double>* Gen_energy = new std::vector<double>;
+vector<double>* Gen_motherpdg_id = new std::vector<double>;
+vector<double>* Gen_BmotherIndex = new std::vector<double>;
+vector<double>* Gen_numMother = new std::vector<double>;
+vector<double>* Gen_status = new std::vector<double>;

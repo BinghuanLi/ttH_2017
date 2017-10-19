@@ -738,14 +738,79 @@ void Event_sel(){
     EVENT_event = rEVENT_event;
     EVENT_genWeight = rEVENT_genWeight;
     HiggsDecay = rHiggsDecay;
-    Met_type1PF_pt = rMet_type1PF_pt;
-    Met_type1PF_px = rMet_type1PF_px;
+    PUWeight = rPUWeight;
     Met_type1PF_py = rMet_type1PF_py;
     Met_type1PF_pz = rMet_type1PF_pz;
     Met_type1PF_phi = rMet_type1PF_phi;
     Met_type1PF_sumEt = rMet_type1PF_sumEt;
     Met_type1PF_shiftedPtUp = rMet_type1PF_shiftedPtUp;
     Met_type1PF_shiftedPtDown = rMet_type1PF_shiftedPtDown;
+    for(uint gen_en=0; gen_en<rGen_pdg_id->size(); gen_en++){
+        Gen_pt->push_back(rGen_pt->at(gen_en));
+        Gen_eta->push_back(rGen_eta->at(gen_en));
+        Gen_phi->push_back(rGen_phi->at(gen_en));
+        Gen_energy->push_back(rGen_energy->at(gen_en));
+        Gen_pdg_id->push_back(rGen_pdg_id->at(gen_en));
+        Gen_motherpdg_id->push_back(rGen_motherpdg_id->at(gen_en));
+        Gen_BmotherIndex->push_back(rGen_BmotherIndex->at(gen_en));
+        Gen_numMother->push_back(rGen_numMother->at(gen_en));
+        Gen_status->push_back(rGen_status->at(gen_en));
+    }
+    Gen_type1PF_Met = rGen_type1PF_Met;
+    Gen_type1PF_Metpx = rGen_type1PF_Metpx;
+    Gen_type1PF_Metpy = rGen_type1PF_Metpy;
+    Gen_type1PF_Metpz = rGen_type1PF_Metpz;
+    Gen_type1PF_Meteta = rGen_type1PF_Meteta;
+    Gen_type1PF_Metphi = rGen_type1PF_Metphi;
+    Gen_type1PF_Meten = rGen_type1PF_Meten;
+    Met_type1PF_pt = rMet_type1PF_pt;
+    Met_type1PF_px = rMet_type1PF_px;
+    // Event new info
+    //Triggers
+    if( rHLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ==1 || rHLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ==1 ||rHLT_IsoMu22==1 || rHLT_IsoTkMu22==1 || rHLT_IsoMu22_eta2p1==1 || rHLT_IsoTkMu22_eta2p1 ==1||rHLT_IsoMu24 ==1 || rHLT_IsoTkMu24==1)TTHLep_2Mu=1;
+    else TTHLep_2Mu=0;
+    if( rHLT_Ele27_WPTight_Gsf==1 || rHLT_Ele25_eta2p1_WPTight_Gsf==1 || rHLT_Ele27_eta2p1_WPLoose_Gsf==1 || rHLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ ==1 )TTHLep_2Ele=1;
+    else TTHLep_2Ele=0;
+    if( rHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL ==1 || rHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ==1 || rHLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL ==1 || rHLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ ==1 
+    || rHLT_IsoMu22==1 || rHLT_IsoTkMu22==1 || rHLT_IsoMu22_eta2p1==1 || rHLT_IsoTkMu22_eta2p1 ==1||rHLT_IsoMu24 ==1 || rHLT_IsoTkMu24==1 
+    || rHLT_Ele27_WPTight_Gsf==1 || rHLT_Ele25_eta2p1_WPTight_Gsf==1 || rHLT_Ele27_eta2p1_WPLoose_Gsf==1
+    ) TTHLep_MuEle=1;
+    else TTHLep_MuEle=0;
+    if(rHLT_DiMu9_Ele9_CaloIdL_TrackIdL==1 || rHLT_Mu8_DiEle12_CaloIdL_TrackIdL ==1 || rHLT_TripleMu_12_10_5==1 || rHLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL==1 
+    || rHLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ==1 || rHLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ==1 || rHLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ ==1 || rHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL ==1 || rHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ==1 || rHLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL ==1 || rHLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ ==1
+    || rHLT_IsoMu22==1 || rHLT_IsoTkMu22==1 || rHLT_IsoMu22_eta2p1==1 || rHLT_IsoTkMu22_eta2p1 ==1||rHLT_IsoMu24 ==1 || rHLT_IsoTkMu24==1 || rHLT_Ele27_WPTight_Gsf==1 || rHLT_Ele25_eta2p1_WPTight_Gsf==1 || rHLT_Ele27_eta2p1_WPLoose_Gsf==1
+    ) TTHLep_3L4L=1;
+    else TTHLep_3L4L=0;
+    // ht and St
+    TLorentzVector mht_lv(0,0,0,0);
+    TLorentzVector mhtT_lv(0,0,0,0);
+    for(uint lv_en = 0; lv_en<leptons->size(); lv_en++){
+        TLorentzVector lv(0.,0.,0.,0.);
+        lv.SetPtEtaPhiE(leptons->at(lv_en).pt,leptons->at(lv_en).eta,leptons->at(lv_en).phi,leptons->at(lv_en).energy);
+        mht_lv = mht_lv + lv;
+        if(leptons->at(lv_en).cut==3){
+            mhtT_lv = mhtT_lv + lv;
+        }
+    }
+    for(uint lv_en = 0; lv_en<taus->size(); lv_en++){
+        TLorentzVector lv(0.,0.,0.,0.);
+        lv.SetPtEtaPhiE(taus->at(lv_en).pt,taus->at(lv_en).eta,taus->at(lv_en).phi,taus->at(lv_en).energy);
+        mht_lv = mht_lv + lv;
+        if(taus->at(lv_en).cut==2){
+            mhtT_lv = mhtT_lv + lv;
+        }
+    }
+    for(uint lv_en = 0; lv_en<jets->size(); lv_en++){
+        TLorentzVector lv(0.,0.,0.,0.);
+        lv.SetPtEtaPhiE(jets->at(lv_en).pt,jets->at(lv_en).eta,jets->at(lv_en).phi,jets->at(lv_en).energy);
+        mht_lv = mht_lv + lv;
+        mhtT_lv = mhtT_lv + lv;
+    }
+    mht = mht_lv.Pt();
+    mhtT = mhtT_lv.Pt();
+    mht_met = mht + Met_type1PF_pt;
+    mhtT_met = mhtT + Met_type1PF_pt;
+    metLD =  0.00397*Met_type1PF_pt+0.00265*mht;  
 }
 
 
@@ -761,6 +826,14 @@ void rSetBranchAddress(TTree* readingtree, string sample){
     readingtree->SetBranchAddress("EVENT_event",&rEVENT_event,&b_rEVENT_event);
     readingtree->SetBranchAddress("EVENT_genWeight",&rEVENT_genWeight,&b_rEVENT_genWeight);
     readingtree->SetBranchAddress("HiggsDecay",&rHiggsDecay,&b_rHiggsDecay);
+    readingtree->SetBranchAddress("PUWeight",&rPUWeight,&b_rPUWeight);
+    readingtree->SetBranchAddress("Gen_type1PF_Met",&rGen_type1PF_Met,&b_rGen_type1PF_Met);
+    readingtree->SetBranchAddress("Gen_type1PF_Metpx",&rGen_type1PF_Metpx,&b_rGen_type1PF_Metpx);
+    readingtree->SetBranchAddress("Gen_type1PF_Metpy",&rGen_type1PF_Metpy,&b_rGen_type1PF_Metpy);
+    readingtree->SetBranchAddress("Gen_type1PF_Metpz",&rGen_type1PF_Metpz,&b_rGen_type1PF_Metpz);
+    readingtree->SetBranchAddress("Gen_type1PF_Meteta",&rGen_type1PF_Meteta,&b_rGen_type1PF_Meteta);
+    readingtree->SetBranchAddress("Gen_type1PF_Metphi",&rGen_type1PF_Metphi,&b_rGen_type1PF_Metphi);
+    readingtree->SetBranchAddress("Gen_type1PF_Meten",&rGen_type1PF_Meten,&b_rGen_type1PF_Meten);
     readingtree->SetBranchAddress("Met_type1PF_pt",&rMet_type1PF_pt,&b_rMet_type1PF_pt);
     readingtree->SetBranchAddress("Met_type1PF_px",&rMet_type1PF_px,&b_rMet_type1PF_px);
     readingtree->SetBranchAddress("Met_type1PF_py",&rMet_type1PF_py,&b_rMet_type1PF_py);
@@ -769,6 +842,26 @@ void rSetBranchAddress(TTree* readingtree, string sample){
     readingtree->SetBranchAddress("Met_type1PF_sumEt",&rMet_type1PF_sumEt,&b_rMet_type1PF_sumEt);
     readingtree->SetBranchAddress("Met_type1PF_shiftedPtUp",&rMet_type1PF_shiftedPtUp,&b_rMet_type1PF_shiftedPtUp);
     readingtree->SetBranchAddress("Met_type1PF_shiftedPtDown",&rMet_type1PF_shiftedPtDown,&b_rMet_type1PF_shiftedPtDown);
+    readingtree->SetBranchAddress("HLT_DiMu9_Ele9_CaloIdL_TrackIdL",&rHLT_DiMu9_Ele9_CaloIdL_TrackIdL,&b_rHLT_DiMu9_Ele9_CaloIdL_TrackIdL);
+    readingtree->SetBranchAddress("HLT_Mu8_DiEle12_CaloIdL_TrackIdL",&rHLT_Mu8_DiEle12_CaloIdL_TrackIdL,&b_rHLT_Mu8_DiEle12_CaloIdL_TrackIdL);
+    readingtree->SetBranchAddress("HLT_TripleMu_12_10_5",&rHLT_TripleMu_12_10_5,&b_rHLT_TripleMu_12_10_5);
+    readingtree->SetBranchAddress("HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL",&rHLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL,&b_rHLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL);
+    readingtree->SetBranchAddress("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL",&rHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL,&b_rHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL);
+    readingtree->SetBranchAddress("HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ",&rHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ,&b_rHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ);
+    readingtree->SetBranchAddress("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL",&rHLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL,&b_rHLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL);
+    readingtree->SetBranchAddress("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ",&rHLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ,&b_rHLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ);
+    readingtree->SetBranchAddress("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ",&rHLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ,&b_rHLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ);
+    readingtree->SetBranchAddress("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ",&rHLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ,&b_rHLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ);
+    readingtree->SetBranchAddress("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ",&rHLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ,&b_rHLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ);
+    readingtree->SetBranchAddress("HLT_IsoMu22",&rHLT_IsoMu22,&b_rHLT_IsoMu22);
+    readingtree->SetBranchAddress("HLT_IsoTkMu22",&rHLT_IsoTkMu22,&b_rHLT_IsoTkMu22);
+    readingtree->SetBranchAddress("HLT_IsoMu22_eta2p1",&rHLT_IsoMu22_eta2p1,&b_rHLT_IsoMu22_eta2p1);
+    readingtree->SetBranchAddress("HLT_IsoTkMu22_eta2p1",&rHLT_IsoTkMu22_eta2p1,&b_rHLT_IsoTkMu22_eta2p1);
+    readingtree->SetBranchAddress("HLT_IsoMu24",&rHLT_IsoMu24,&b_rHLT_IsoMu24);
+    readingtree->SetBranchAddress("HLT_IsoTkMu24",&rHLT_IsoTkMu24,&b_rHLT_IsoTkMu24);
+    readingtree->SetBranchAddress("HLT_Ele27_WPTight_Gsf",&rHLT_Ele27_WPTight_Gsf,&b_rHLT_Ele27_WPTight_Gsf);
+    readingtree->SetBranchAddress("HLT_Ele25_eta2p1_WPTight_Gsf",&rHLT_Ele25_eta2p1_WPTight_Gsf,&b_rHLT_Ele25_eta2p1_WPTight_Gsf);
+    readingtree->SetBranchAddress("HLT_Ele27_eta2p1_WPLoose_Gsf",&rHLT_Ele27_eta2p1_WPLoose_Gsf,&b_rHLT_Ele27_eta2p1_WPLoose_Gsf);
     //Muon
     readingtree->SetBranchAddress("Muon_pt",&rMuon_pt,&b_rMuon_pt);
     readingtree->SetBranchAddress("Muon_eta",&rMuon_eta,&b_rMuon_eta);
@@ -955,6 +1048,16 @@ void rSetBranchAddress(TTree* readingtree, string sample){
     readingtree->SetBranchAddress("BoostedJet_tau3",&rBoostedJet_tau3,&b_rBoostedJet_tau3);
     readingtree->SetBranchAddress("BoostedJet_softdrop_mass",&rBoostedJet_softdrop_mass,&b_rBoostedJet_softdrop_mass);
     readingtree->SetBranchAddress("BoostedJet_pruned_mass",&rBoostedJet_pruned_mass,&b_rBoostedJet_pruned_mass);
+    //Gen
+    readingtree->SetBranchAddress("Gen_pdg_id",&rGen_pdg_id,&b_rGen_pdg_id);
+    readingtree->SetBranchAddress("Gen_pt",&rGen_pt,&b_rGen_pt);
+    readingtree->SetBranchAddress("Gen_eta",&rGen_eta,&b_rGen_eta);
+    readingtree->SetBranchAddress("Gen_phi",&rGen_phi,&b_rGen_phi);
+    readingtree->SetBranchAddress("Gen_energy",&rGen_energy,&b_rGen_energy);
+    readingtree->SetBranchAddress("Gen_motherpdg_id",&rGen_motherpdg_id,&b_rGen_motherpdg_id);
+    readingtree->SetBranchAddress("Gen_BmotherIndex",&rGen_BmotherIndex,&b_rGen_BmotherIndex);
+    readingtree->SetBranchAddress("Gen_numMother",&rGen_numMother,&b_rGen_numMother);
+    readingtree->SetBranchAddress("Gen_status",&rGen_status,&b_rGen_status);
 };
 
 
@@ -966,6 +1069,14 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("EVENT_event",&EVENT_event);
     newtree->Branch("EVENT_genWeight",&EVENT_genWeight);
     newtree->Branch("HiggsDecay",&HiggsDecay);
+    newtree->Branch("PUWeight",&PUWeight);
+    newtree->Branch("Gen_type1PF_Met",&Gen_type1PF_Met);
+    newtree->Branch("Gen_type1PF_Metpx",&Gen_type1PF_Metpx);
+    newtree->Branch("Gen_type1PF_Metpy",&Gen_type1PF_Metpy);
+    newtree->Branch("Gen_type1PF_Metpz",&Gen_type1PF_Metpz);
+    newtree->Branch("Gen_type1PF_Meteta",&Gen_type1PF_Meteta);
+    newtree->Branch("Gen_type1PF_Metphi",&Gen_type1PF_Metphi);
+    newtree->Branch("Gen_type1PF_Meten",&Gen_type1PF_Meten);
     newtree->Branch("Met_type1PF_pt",&Met_type1PF_pt);
     newtree->Branch("Met_type1PF_px",&Met_type1PF_px);
     newtree->Branch("Met_type1PF_py",&Met_type1PF_py);
@@ -1011,6 +1122,15 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("Top_numTight",&Top_numTight);
     newtree->Branch("W_numLoose",&W_numLoose);
     newtree->Branch("W_numTight",&W_numTight);
+    newtree->Branch("TTHLep_2Mu",&TTHLep_2Mu);
+    newtree->Branch("TTHLep_2Ele",&TTHLep_2Ele);
+    newtree->Branch("TTHLep_MuEle",&TTHLep_MuEle);
+    newtree->Branch("TTHLep_3L4L",&TTHLep_3L4L);
+    newtree->Branch("metLD",&metLD);
+    newtree->Branch("mhtT_met",&mhtT_met);
+    newtree->Branch("mht_met",&mht_met);
+    newtree->Branch("mhtT",&mhtT);
+    newtree->Branch("mht",&mht);
     //Lepton
     newtree->Branch("Lepton_pt",&Lepton_pt);
     newtree->Branch("Lepton_eta",&Lepton_eta);
@@ -1144,6 +1264,16 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("BoostedJet_tau32",&BoostedJet_tau32);
     newtree->Branch("BoostedJet_wCut",&BoostedJet_wCut);
     newtree->Branch("BoostedJet_topCut",&BoostedJet_topCut);
+    //Gen
+    newtree->Branch("Gen_pdg_id",&Gen_pdg_id);
+    newtree->Branch("Gen_pt",&Gen_pt);
+    newtree->Branch("Gen_eta",&Gen_eta);
+    newtree->Branch("Gen_phi",&Gen_phi);
+    newtree->Branch("Gen_energy",&Gen_energy);
+    newtree->Branch("Gen_motherpdg_id",&Gen_motherpdg_id);
+    newtree->Branch("Gen_BmotherIndex",&Gen_BmotherIndex);
+    newtree->Branch("Gen_numMother",&Gen_numMother);
+    newtree->Branch("Gen_status",&Gen_status);
 };
 
 
@@ -1155,6 +1285,14 @@ void wClearInitialization(string sample){
     EVENT_event= -999;
     EVENT_genWeight= -999;
     HiggsDecay= -999;
+    PUWeight= -999;
+    Gen_type1PF_Met= -999;
+    Gen_type1PF_Metpx= -999;
+    Gen_type1PF_Metpy= -999;
+    Gen_type1PF_Metpz= -999;
+    Gen_type1PF_Meteta= -999;
+    Gen_type1PF_Metphi= -999;
+    Gen_type1PF_Meten= -999;
     Met_type1PF_pt= -999;
     Met_type1PF_px= -999;
     Met_type1PF_py= -999;
@@ -1200,6 +1338,15 @@ void wClearInitialization(string sample){
     Top_numTight= -999;
     W_numLoose= -999;
     W_numTight= -999;
+    TTHLep_2Mu= -999;
+    TTHLep_2Ele= -999;
+    TTHLep_MuEle= -999;
+    TTHLep_3L4L= -999;
+    metLD= -999;
+    mhtT_met= -999;
+    mht_met= -999;
+    mhtT= -999;
+    mht= -999;
     // Lepton
     leptons->clear();
     Lepton_pt->clear();
@@ -1336,6 +1483,16 @@ void wClearInitialization(string sample){
     BoostedJet_tau32->clear();
     BoostedJet_wCut->clear();
     BoostedJet_topCut->clear();
+    // Gen
+    Gen_pdg_id->clear();
+    Gen_pt->clear();
+    Gen_eta->clear();
+    Gen_phi->clear();
+    Gen_energy->clear();
+    Gen_motherpdg_id->clear();
+    Gen_BmotherIndex->clear();
+    Gen_numMother->clear();
+    Gen_status->clear();
 };
 
 
@@ -1347,6 +1504,14 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rEVENT_event->GetEntry(tentry);
     b_rEVENT_genWeight->GetEntry(tentry);
     b_rHiggsDecay->GetEntry(tentry);
+    b_rPUWeight->GetEntry(tentry);
+    b_rGen_type1PF_Met->GetEntry(tentry);
+    b_rGen_type1PF_Metpx->GetEntry(tentry);
+    b_rGen_type1PF_Metpy->GetEntry(tentry);
+    b_rGen_type1PF_Metpz->GetEntry(tentry);
+    b_rGen_type1PF_Meteta->GetEntry(tentry);
+    b_rGen_type1PF_Metphi->GetEntry(tentry);
+    b_rGen_type1PF_Meten->GetEntry(tentry);
     b_rMet_type1PF_pt->GetEntry(tentry);
     b_rMet_type1PF_px->GetEntry(tentry);
     b_rMet_type1PF_py->GetEntry(tentry);
@@ -1355,6 +1520,26 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rMet_type1PF_sumEt->GetEntry(tentry);
     b_rMet_type1PF_shiftedPtUp->GetEntry(tentry);
     b_rMet_type1PF_shiftedPtDown->GetEntry(tentry);
+    b_rHLT_DiMu9_Ele9_CaloIdL_TrackIdL->GetEntry(tentry);
+    b_rHLT_Mu8_DiEle12_CaloIdL_TrackIdL->GetEntry(tentry);
+    b_rHLT_TripleMu_12_10_5->GetEntry(tentry);
+    b_rHLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL->GetEntry(tentry);
+    b_rHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL->GetEntry(tentry);
+    b_rHLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_DZ->GetEntry(tentry);
+    b_rHLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL->GetEntry(tentry);
+    b_rHLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ->GetEntry(tentry);
+    b_rHLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ->GetEntry(tentry);
+    b_rHLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ->GetEntry(tentry);
+    b_rHLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ->GetEntry(tentry);
+    b_rHLT_IsoMu22->GetEntry(tentry);
+    b_rHLT_IsoTkMu22->GetEntry(tentry);
+    b_rHLT_IsoMu22_eta2p1->GetEntry(tentry);
+    b_rHLT_IsoTkMu22_eta2p1->GetEntry(tentry);
+    b_rHLT_IsoMu24->GetEntry(tentry);
+    b_rHLT_IsoTkMu24->GetEntry(tentry);
+    b_rHLT_Ele27_WPTight_Gsf->GetEntry(tentry);
+    b_rHLT_Ele25_eta2p1_WPTight_Gsf->GetEntry(tentry);
+    b_rHLT_Ele27_eta2p1_WPLoose_Gsf->GetEntry(tentry);
     // Muon
     b_rMuon_pt->GetEntry(tentry);
     b_rMuon_eta->GetEntry(tentry);
@@ -1541,4 +1726,14 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rBoostedJet_tau3->GetEntry(tentry);
     b_rBoostedJet_softdrop_mass->GetEntry(tentry);
     b_rBoostedJet_pruned_mass->GetEntry(tentry);
+    //Gen
+    b_rGen_pdg_id->GetEntry(tentry);
+    b_rGen_pt->GetEntry(tentry);
+    b_rGen_eta->GetEntry(tentry);
+    b_rGen_phi->GetEntry(tentry);
+    b_rGen_energy->GetEntry(tentry);
+    b_rGen_motherpdg_id->GetEntry(tentry);
+    b_rGen_BmotherIndex->GetEntry(tentry);
+    b_rGen_numMother->GetEntry(tentry);
+    b_rGen_status->GetEntry(tentry);
 };
