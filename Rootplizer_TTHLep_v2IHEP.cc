@@ -44,6 +44,7 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
         Jet_sel(sample);
         //BoostJet
         BoostedJet_sel();
+        GenParticle_sel();
         Lep_sel();
         //Event
         Event_sel(Output);
@@ -813,18 +814,8 @@ void Lep_sel(){
 };
 
 
-void Event_sel( string OutputName){
-    //Write_variables
-    EVENT_event = rEVENT_event;
-    EVENT_genWeight = rEVENT_genWeight;
-    HiggsDecay = rHiggsDecay;
-    PUWeight = rPUWeight;
-    Met_type1PF_py = rMet_type1PF_py;
-    Met_type1PF_pz = rMet_type1PF_pz;
-    Met_type1PF_phi = rMet_type1PF_phi;
-    Met_type1PF_sumEt = rMet_type1PF_sumEt;
-    Met_type1PF_shiftedPtUp = rMet_type1PF_shiftedPtUp;
-    Met_type1PF_shiftedPtDown = rMet_type1PF_shiftedPtDown;
+void GenParticle_sel(){
+    // write variables
     for(uint gen_en=0; gen_en<rGen_pdg_id->size(); gen_en++){
         Gen_pt->push_back(rGen_pt->at(gen_en));
         Gen_eta->push_back(rGen_eta->at(gen_en));
@@ -843,6 +834,63 @@ void Event_sel( string OutputName){
     Gen_type1PF_Meteta = rGen_type1PF_Meteta;
     Gen_type1PF_Metphi = rGen_type1PF_Metphi;
     Gen_type1PF_Meten = rGen_type1PF_Meten;
+    // find hadronic W boson
+    vector<uint> lep_W_Index;
+    for(uint gp=0; gp<Gen_pdg_id->size(); gp++){
+        // save the index of a leptonically decay W boson
+        if(!((fabs(Gen_pdg_id->at(gp))==12||fabs(Gen_pdg_id->at(gp))==14||fabs(Gen_pdg_id->at(gp)==16)) 
+            && (fabs(Gen_motherpdg_id->at(gp))==24))) continue;
+        lep_W_Index.push_back(Gen_BmotherIndex->at(gp));
+    }
+    for(uint gp=0; gp<Gen_pdg_id->size(); gp++){
+        // find the hadronically decay W boson
+        if(!((fabs(Gen_pdg_id->at(gp))==24) 
+            && (std::find(lep_W_Index.begin(), lep_W_Index.end(), gp) == lep_W_Index.end())
+            )) continue;
+
+        //Look for a mother which is not a W
+        uint currIndex = gp;
+        uint curr_pdgId;
+        do{
+            curr_pdgId = Gen_pdg_id->at(currIndex);
+            // set currIndex pointing to mother Index
+            currIndex = Gen_BmotherIndex->at(currIndex);
+        }
+        while(Gen_pdg_id->at(currIndex) == curr_pdgId);
+        if(fabs(Gen_pdg_id->at(currIndex)==6)
+            && std::find(hadTop_Gen_Index->begin(), hadTop_Gen_Index->end(), currIndex) == hadTop_Gen_Index->end()){
+            // find a hadronic Top
+            hadTop_Gen_pt->push_back(Gen_pt->at(currIndex));
+            hadTop_Gen_eta->push_back(Gen_eta->at(currIndex));
+            hadTop_Gen_phi->push_back(Gen_phi->at(currIndex));
+            hadTop_Gen_energy->push_back(Gen_energy->at(currIndex));
+            hadTop_Gen_pdgId->push_back(Gen_pdg_id->at(currIndex));
+            hadTop_Gen_Index->push_back(currIndex);
+        }else if(fabs(Gen_pdg_id->at(currIndex))!=24){
+            // find a hadronic W which is not from hadronic Top
+            hadW_Gen_pt->push_back(Gen_pt->at(gp));
+            hadW_Gen_eta->push_back(Gen_eta->at(gp));
+            hadW_Gen_phi->push_back(Gen_phi->at(gp));
+            hadW_Gen_energy->push_back(Gen_energy->at(gp));
+            hadW_Gen_pdgId->push_back(Gen_pdg_id->at(gp));
+            hadW_Gen_Index->push_back(gp);
+        }
+    }
+};
+
+
+void Event_sel( string OutputName){
+    //Write_variables
+    EVENT_event = rEVENT_event;
+    EVENT_genWeight = rEVENT_genWeight;
+    HiggsDecay = rHiggsDecay;
+    PUWeight = rPUWeight;
+    Met_type1PF_py = rMet_type1PF_py;
+    Met_type1PF_pz = rMet_type1PF_pz;
+    Met_type1PF_phi = rMet_type1PF_phi;
+    Met_type1PF_sumEt = rMet_type1PF_sumEt;
+    Met_type1PF_shiftedPtUp = rMet_type1PF_shiftedPtUp;
+    Met_type1PF_shiftedPtDown = rMet_type1PF_shiftedPtDown;
     Met_type1PF_pt = rMet_type1PF_pt;
     Met_type1PF_px = rMet_type1PF_px;
     // Event new info
@@ -1476,11 +1524,13 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("hadTop_Gen_phi",&hadTop_Gen_phi);
     newtree->Branch("hadTop_Gen_energy",&hadTop_Gen_energy);
     newtree->Branch("hadTop_Gen_pdgId",&hadTop_Gen_pdgId);
+    newtree->Branch("hadTop_Gen_Index",&hadTop_Gen_Index);
     newtree->Branch("hadW_Gen_pt",&hadW_Gen_pt);
     newtree->Branch("hadW_Gen_eta",&hadW_Gen_eta);
     newtree->Branch("hadW_Gen_phi",&hadW_Gen_phi);
     newtree->Branch("hadW_Gen_energy",&hadW_Gen_energy);
     newtree->Branch("hadW_Gen_pdgId",&hadW_Gen_pdgId);
+    newtree->Branch("hadW_Gen_Index",&hadW_Gen_Index);
 };
 
 
@@ -1774,11 +1824,13 @@ void wClearInitialization(string sample){
     hadTop_Gen_phi->clear();
     hadTop_Gen_energy->clear();
     hadTop_Gen_pdgId->clear();
+    hadTop_Gen_Index->clear();
     hadW_Gen_pt->clear();
     hadW_Gen_eta->clear();
     hadW_Gen_phi->clear();
     hadW_Gen_energy->clear();
     hadW_Gen_pdgId->clear();
+    hadW_Gen_Index->clear();
 };
 
 
