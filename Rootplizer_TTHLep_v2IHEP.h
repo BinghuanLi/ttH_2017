@@ -13,7 +13,7 @@ using namespace std;
 ////
 //   Declare constants
 /////
-const int nentries = 1000;//-1 is all entries  51 for first DiMuSR
+const int nentries = -1;//-1 is all entries  51 for first DiMuSR
 const bool debug =false;
 string synchro = "";
 const double evt = 653077.;
@@ -36,7 +36,15 @@ void BoostedJet_sel();
 void Event_sel( string OutputName);
 void Lep_sel();
 void GenParticle_sel();
+void Find_Gen_HadTop_HadW();
+void Cal_dilep_mass();
 
+//tth event selections
+void DiMuSR_sel();
+void DiEleSR_sel();
+void EleMuSR_sel();
+void TriLepSR_sel();
+void QuaLepSR_sel();
 
 /////
 //utils
@@ -397,6 +405,15 @@ double mhtT_met;
 double mht_met;
 double mhtT;
 double mht;
+double massL_dipairSFOS;
+double massL_SFOS;
+double mass_diele;
+double massL;
+double isDiMuSR;
+double isDiEleSR;
+double isEleMuSR;
+double isTriLepSR;
+double isQuaLepSR;
 
 
 //Lepton

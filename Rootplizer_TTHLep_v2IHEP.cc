@@ -48,6 +48,18 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
         Lep_sel();
         //Event
         Event_sel(Output);
+        //tth event selection
+        DiMuSR_sel(); 
+        DiEleSR_sel();
+        EleMuSR_sel();
+        TriLepSR_sel();
+        QuaLepSR_sel();
+        /*
+        if(!(
+            isDiEleSR==1 || isDiMuSR==1 || isEleMuSR ==1|| isTriLepSR ==1 || isQuaLepSR == 1
+            )) continue;
+            */
+        // Fill Tree
         newtree->Fill();
     }
  
@@ -835,9 +847,16 @@ void GenParticle_sel(){
     Gen_type1PF_Metphi = rGen_type1PF_Metphi;
     Gen_type1PF_Meten = rGen_type1PF_Meten;
     // find hadronic W and Top
+    Find_Gen_HadTop_HadW();
+    hadTop_numGen = hadTop_Gen_pt->size();
+    hadW_numGen = hadW_Gen_pt->size();
+};
+
+
+void Find_Gen_HadTop_HadW(){
+    // find hadronic W and Top
     vector<uint> lep_W_Index;
     vector<uint> hadW_Cand_Index;
-    //cout << rEVENT_event << endl;
     for(uint gp=0; gp<Gen_pdg_id->size(); gp++){
         // save the index of a leptonically decay W boson
         if(!((fabs(Gen_pdg_id->at(gp))==11||fabs(Gen_pdg_id->at(gp))==13||fabs(Gen_pdg_id->at(gp)==15)) 
@@ -850,18 +869,15 @@ void GenParticle_sel(){
             && std::find(lep_W_Index.begin(), lep_W_Index.end(), gp) == lep_W_Index.end()
             && std::find(hadW_Cand_Index.begin(), hadW_Cand_Index.end(), gp) == hadW_Cand_Index.end()
             )) continue;
-        //cout << " gp " << gp << endl;
         //Look for a mother which is not a W
         uint currIndex = gp;
         int curr_pdgId =0 ;
         do{
             curr_pdgId = Gen_pdg_id->at(currIndex);
             hadW_Cand_Index.push_back(currIndex);
-            //cout << " currIndex in loop " << currIndex << " curr_pdgId " << curr_pdgId << endl;
             // set currIndex pointing to mother Index
             currIndex = Gen_BmotherIndex->at(currIndex);
         }while(Gen_pdg_id->at(currIndex) == curr_pdgId);
-        //cout << " currIndex end loop " << currIndex << " Gen_pdg_id " << Gen_pdg_id->at(currIndex) <<endl;
         if(fabs(Gen_pdg_id->at(currIndex))==6
             && std::find(hadTop_Gen_Index->begin(), hadTop_Gen_Index->end(), currIndex) == hadTop_Gen_Index->end()){
             // find a hadronic Top
@@ -881,8 +897,6 @@ void GenParticle_sel(){
             hadW_Gen_Index->push_back(gp);
         }
     }
-    hadTop_numGen = hadTop_Gen_pt->size();
-    hadW_numGen = hadW_Gen_pt->size();
 };
 
 
@@ -948,9 +962,192 @@ void Event_sel( string OutputName){
     metLD =  0.00397*Met_type1PF_pt+0.00265*mht;  
     //lumi_wgt
     lumi_wgt = get_wgtlumi(OutputName);
+    // calculate different dilep mass
+    Cal_dilep_mass();
+}
+
+// tth event selections
+void Cal_dilep_mass(){
+    double diloosemass = 999;
+    double lSFOSmass = 999;
+    double dielemass = 999;
+    if (Lep_pt->size()<2)return;
+    TLorentzVector Lep0(0,0,0,0); 
+    TLorentzVector Lep1(0,0,0,0);
+    TLorentzVector FakeLep0(0,0,0,0); 
+    TLorentzVector FakeLep1(0,0,0,0);
+    // dilep mass
+    for(uint lep_en =0; lep_en < Lep_pt->size(); lep_en++){
+        Lep0.SetPtEtaPhiE(Lep_pt->at(lep_en), Lep_eta->at(lep_en), Lep_phi->at(lep_en), Lep_energy->at(lep_en));
+        for(uint l_en =lep_en+1; l_en < Lep_pt->size(); l_en++){
+            Lep1.SetPtEtaPhiE(Lep_pt->at(l_en), Lep_eta->at(l_en), Lep_phi->at(l_en), Lep_energy->at(l_en));
+            if(diloosemass > (Lep0+Lep1).M()) 
+                diloosemass = (Lep0+Lep1).M();
+            if(fabs(lSFOSmass-91.2)>fabs((Lep0+Lep1).M()-91.2)
+                && (Lep_pdgId->at(lep_en)+Lep_pdgId->at(l_en))==0)
+                lSFOSmass = (Lep0+Lep1).M(); 
+        }
+    }
+    massL = diloosemass;
+    massL_SFOS = lSFOSmass;
+    if (FakeLep_pt->size()>=2){
+        if(FakeLep_cut->at(0)>=2) FakeLep0.SetPtEtaPhiE(FakeLep_corrpt->at(0), FakeLep_eta->at(0), FakeLep_phi->at(0), FakeLep_energy->at(0));
+        if(FakeLep_cut->at(1)>=2) FakeLep1.SetPtEtaPhiE(FakeLep_corrpt->at(1), FakeLep_eta->at(1), FakeLep_phi->at(1), FakeLep_energy->at(1));
+        if(fabs(FakeLep_pdgId->at(0))==11 && fabs(FakeLep_pdgId->at(1))==11)
+            dielemass = (FakeLep0+FakeLep1).M();
+        mass_diele = dielemass;
+    }
+    if(Lep_pt->size()<4)return;
+    //dipair mass
+    if(
+        ((Lep_pdgId->at(0)+Lep_pdgId->at(1))==0 && (Lep_pdgId->at(2)+Lep_pdgId->at(3))==0)
+        ||((Lep_pdgId->at(0)+Lep_pdgId->at(2))==0 && (Lep_pdgId->at(1)+Lep_pdgId->at(3))==0)
+        ||((Lep_pdgId->at(0)+Lep_pdgId->at(3))==0 && (Lep_pdgId->at(1)+Lep_pdgId->at(2))==0)
+      ){
+        TLorentzVector Lep0(0,0,0,0); 
+        TLorentzVector Lep1(0,0,0,0);
+        TLorentzVector Lep2(0,0,0,0); 
+        TLorentzVector Lep3(0,0,0,0);
+        Lep0.SetPtEtaPhiE(Lep_pt->at(0),  Lep_eta->at(0),  Lep_phi->at(0),  Lep_energy->at(0));
+        Lep1.SetPtEtaPhiE(Lep_pt->at(1),  Lep_eta->at(1),  Lep_phi->at(1),  Lep_energy->at(1));
+        Lep2.SetPtEtaPhiE(Lep_pt->at(2),  Lep_eta->at(2),  Lep_phi->at(2),  Lep_energy->at(2));
+        Lep3.SetPtEtaPhiE(Lep_pt->at(3),  Lep_eta->at(3),  Lep_phi->at(3),  Lep_energy->at(3));
+        massL_dipairSFOS = (Lep0+Lep1+Lep2+Lep3).M();
+    }
+};
+
+
+void DiMuSR_sel(){
+    if(
+        Muon_numTight==2 && patElectron_numTight ==0&& Tau_numMedium==0 
+        && TTHLep_2Mu==1
+        && fabs(FakeLep_pdgId->at(0))==13
+        && fabs(FakeLep_pdgId->at(1))==13
+        && FakeLep_passMuTightCharge->at(0)==1&&FakeLep_passMuTightCharge->at(1)==1
+        && FakeLep_cut->at(0)==3 && FakeLep_cut->at(1) ==3
+        && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
+        && FakeLep_charge->at(0)*FakeLep_charge->at(1)==1
+        && Jet_numLoose>=4 
+        && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
+        && !(massL < 12 && massL > 0)
+        && fabs(mass_diele - 91.2)>10
+    ) isDiMuSR = 1;
 }
 
 
+void DiEleSR_sel(){
+    if( Muon_numTight==0 && patElectron_numTight ==2 
+        && TTHLep_2Ele==1
+        && Tau_numMedium ==0
+        && fabs(FakeLep_pdgId->at(0))==11
+        && fabs(FakeLep_pdgId->at(1))==11
+        && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
+        && FakeLep_charge->at(0)*FakeLep_charge->at(1)==1
+        && FakeLep_cut->at(0)==3 && FakeLep_cut->at(1) ==3
+        && FakeLep_passMuTightCharge->at(0)==1&&FakeLep_passMuTightCharge->at(1)==1
+        && FakeLep_passEleTightCharge->at(0)==1&&FakeLep_passEleTightCharge->at(1)==1
+        && FakeLep_passConversion->at(0)==1&&FakeLep_passConversion->at(1)==1
+        && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
+        && Jet_numLoose>=4 
+        && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
+        && metLD > 0.2
+        && !(massL < 12 && massL > 0)
+        && fabs(mass_diele - 91.2)>10
+    ) isDiEleSR = 1;
+};
+
+
+void EleMuSR_sel(){
+    if( Muon_numTight==1 && patElectron_numTight ==1 
+        && TTHLep_MuEle==1
+        && Tau_numMedium ==0
+        && FakeLep_cut->at(0)==3 && FakeLep_cut->at(1) ==3
+        && FakeLep_passMuTightCharge->at(0)==1&&FakeLep_passMuTightCharge->at(1)==1
+        && FakeLep_passEleTightCharge->at(0)==1&&FakeLep_passEleTightCharge->at(1)==1
+        && FakeLep_passConversion->at(0)==1&&FakeLep_passConversion->at(1)==1
+        && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
+        && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
+        && fabs(FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))==24
+        && Jet_numLoose>=4 
+        && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
+        && !(massL < 12 && massL > 0)
+        && fabs(mass_diele - 91.2)>10
+    ) isEleMuSR = 1;
+};
+
+
+void TriLepSR_sel(){
+    bool SFOS = false;
+    double lep0 = 0;
+    double lep1 = 0;
+    if(Lep_pt->size()>=2){
+        for(uint  lep_en=0;lep_en<Lep_pt->size()-1; lep_en++){
+            lep0 = lep_en;
+            for(uint n=1; lep_en+n < Lep_pt->size(); n++){
+                lep1 = lep_en+n;
+                if((Lep_pdgId->at(lep0)+Lep_pdgId->at(lep1))==0){ 
+                    SFOS = true;
+                    break;
+                }
+            }
+        if(SFOS == true) break;
+        }
+    } 
+    bool passMET = false;
+    if((SFOS && metLD >0.3) || ((!SFOS) &&metLD > 0.2) || Jet_numLoose >=4)passMET=true;
+    if( FakeLep_pt->size()>=3  
+        && (Muon_numTight+patElectron_numTight) ==3
+        && Tau_numMedium ==0
+        && TTHLep_3L4L==1
+        && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1)>15 && FakeLep_corrpt->at(2) >15 
+        && FakeLep_cut->at(0)==3 && FakeLep_cut->at(1)==3 && FakeLep_cut->at(2) ==3
+        && Jet_numLoose>=2 
+        && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
+        && FakeLep_passConversion->at(0)==1&&FakeLep_passConversion->at(1)==1&&FakeLep_passConversion->at(2)==1
+        && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1&&FakeLep_passMissHit->at(2)==1
+        && passMET
+        && fabs(FakeLep_charge->at(0) + FakeLep_charge->at(1) + FakeLep_charge->at(2))==1
+        && !(massL < 12 && massL > 0)
+        && fabs(massL_SFOS - 91.2)> 10
+        && !(massL_dipairSFOS < 140 && massL_dipairSFOS > 0)
+    ) isTriLepSR =1;
+}
+
+
+void QuaLepSR_sel(){
+    bool SFOS = false;
+    double lep0 = 0;
+    double lep1 = 0;
+    if(Lep_pt->size()>=2){
+        for(uint  lep_en=0;lep_en<Lep_pt->size()-1; lep_en++){
+            lep0 = lep_en;
+            for(uint n=1; lep_en+n < Lep_pt->size(); n++){
+                lep1 = lep_en+n;
+                if((Lep_pdgId->at(lep0)+Lep_pdgId->at(lep1))==0){ 
+                    SFOS = true;
+                    break;
+                }
+            }
+            if(SFOS == true) break;
+        }
+    } 
+    bool passMET = false;
+    if((SFOS && metLD >0.3) || ((!SFOS) &&metLD > 0.2) || Jet_numLoose >=4)passMET=true;
+    if( FakeLep_pt->size()>=4  
+        && (Muon_numTight+patElectron_numTight) >=4
+        && Tau_numMedium ==0
+        && TTHLep_3L4L==1
+        && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1)>15 && FakeLep_corrpt->at(2) >15 && FakeLep_corrpt->at(3) > 10 
+        && FakeLep_cut->at(0)==3 && FakeLep_cut->at(1)==3 && FakeLep_cut->at(2) ==3 && FakeLep_cut->at(3) ==3
+        && Jet_numLoose>=2 
+        && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
+        && FakeLep_passConversion->at(0)==1&&FakeLep_passConversion->at(1)==1&&FakeLep_passConversion->at(2)==1 && FakeLep_passConversion->at(3) ==1
+        && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1&&FakeLep_passMissHit->at(2)==1 && FakeLep_passMissHit->at(3)==1
+        && !(massL < 12 && massL > 0)
+        && fabs(massL_SFOS - 91.2)> 10
+        && !(massL_dipairSFOS < 140 && massL_dipairSFOS > 0)
+    ) isQuaLepSR =1;
+}
 ////
 // event weights
 ///
@@ -1540,6 +1737,16 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("hadW_Gen_Index",&hadW_Gen_Index);
     newtree->Branch("hadTop_numGen",&hadTop_numGen);
     newtree->Branch("hadW_numGen",&hadW_numGen);
+    // tthlep event selections
+    newtree->Branch("massL_dipairSFOS",&massL_dipairSFOS);
+    newtree->Branch("massL_SFOS",&massL_SFOS);
+    newtree->Branch("mass_diele",&mass_diele);
+    newtree->Branch("massL",&massL);
+    newtree->Branch("isDiMuSR",&isDiMuSR);
+    newtree->Branch("isDiEleSR",&isDiEleSR);
+    newtree->Branch("isEleMuSR",&isEleMuSR);
+    newtree->Branch("isTriLepSR",&isTriLepSR);
+    newtree->Branch("isQuaLepSR",&isQuaLepSR);
 };
 
 
@@ -1842,6 +2049,16 @@ void wClearInitialization(string sample){
     hadW_Gen_Index->clear();
     hadTop_numGen= -999;
     hadW_numGen= -999;
+    // tthlep event selections
+    massL_dipairSFOS= -999;
+    massL_SFOS= -999;
+    mass_diele= -999;
+    massL= -999;
+    isDiMuSR= -999;
+    isDiEleSR= -999;
+    isEleMuSR= -999;
+    isTriLepSR= -999;
+    isQuaLepSR= -999;
 };
 
 
