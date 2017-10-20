@@ -46,7 +46,7 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
         BoostedJet_sel();
         Lep_sel();
         //Event
-        Event_sel();
+        Event_sel(Output);
         newtree->Fill();
     }
  
@@ -119,14 +119,25 @@ double deltaPhi(double phi1, double phi2){
     while (result <= -M_PI) result += 2*M_PI;
     return result;
 }
+
+
 double deltaEta(double eta1, double eta2){
     return (eta1-eta2);
 };
+
+
 double deltaR(double dphi, double deta){
     return sqrt(pow(dphi,2)+pow(deta,2));
 };
+
+
 bool byPt(const Lepton& LeptonA, const Lepton& LeptonB){
     return LeptonA.pt > LeptonB.pt;
+};
+
+
+bool byConePt(const Lepton& LeptonA, const Lepton& LeptonB){
+    return LeptonA.corrpt > LeptonB.corrpt;
 };
 
 
@@ -665,75 +676,144 @@ void BoostedJet_sel(){
 void Lep_sel(){
     sort(leptons->begin(), leptons->end(), byPt); 
     for(uint lep_en=0; lep_en < leptons->size(); lep_en++){
-        Lepton_pt->push_back(leptons->at(lep_en).pt);
-        Lepton_eta->push_back(leptons->at(lep_en).eta);
-        Lepton_phi->push_back(leptons->at(lep_en).phi);
-        Lepton_energy->push_back(leptons->at(lep_en).energy);
-        Lepton_dxy_pv->push_back(leptons->at(lep_en).dxy_pv);
-        Lepton_dz_pv->push_back(leptons->at(lep_en).dz_pv);
-        Lepton_IP3Dsig->push_back(leptons->at(lep_en).IP3Dsig);
-        Lepton_loose->push_back(leptons->at(lep_en).loose);
-        Lepton_miniIsoRel->push_back(leptons->at(lep_en).loose);
-        Lepton_charge->push_back(leptons->at(lep_en).charge);
-        Lepton_pdgId->push_back(leptons->at(lep_en).pdgId);
-        Lepton_cut->push_back(leptons->at(lep_en).cut);
-        Lepton_BDT->push_back(leptons->at(lep_en).BDT);
-        Lepton_corrpt->push_back(leptons->at(lep_en).corrpt);
-        Lepton_FR->push_back(leptons->at(lep_en).FR);
-        Lepton_CF->push_back(leptons->at(lep_en).CF);
-        Lepton_passConversion->push_back(leptons->at(lep_en).passConversion);
-        Lepton_passMuTightCharge->push_back(leptons->at(lep_en).passMuTightCharge);
-        Lepton_passEleTightCharge->push_back(leptons->at(lep_en).passEleTightCharge);
-        Lepton_passMissHit->push_back(leptons->at(lep_en).passMissHit);
-        Lepton_isMatchRightCharge->push_back(leptons->at(lep_en).isMatchRightCharge);
-        Lepton_isGlobal->push_back(leptons->at(lep_en).isGlobal);
-        Lepton_chi2->push_back(leptons->at(lep_en).chi2);
-        Lepton_chi2LocalPosition->push_back(leptons->at(lep_en).chi2LocalPosition);
-        Lepton_trkKink->push_back(leptons->at(lep_en).trkKink);
-        Lepton_validFraction->push_back(leptons->at(lep_en).validFraction);
-        Lepton_segmentCompatibility->push_back(leptons->at(lep_en).segmentCompatibility);
-        Lepton_jetptratio->push_back(leptons->at(lep_en).jetptratio);
-        Lepton_jetcsv->push_back(leptons->at(lep_en).jetcsv);
-        Lepton_jetpt->push_back(leptons->at(lep_en).jetpt);
-        Lepton_lepjetchtrks->push_back(leptons->at(lep_en).lepjetchtrks);
-        Lepton_miniIsoCh->push_back(leptons->at(lep_en).miniIsoCh);
-        Lepton_miniIsoPUsub->push_back(leptons->at(lep_en).miniIsoPUsub);
-        Lepton_ptrel->push_back(leptons->at(lep_en).ptrel);
-        Lepton_pTErrOVpT_it->push_back(leptons->at(lep_en).pTErrOVpT_it);
-        Lepton_px->push_back(leptons->at(lep_en).px);
-        Lepton_py->push_back(leptons->at(lep_en).py);
-        Lepton_pz->push_back(leptons->at(lep_en).pz);
-        Lepton_jetdr->push_back(leptons->at(lep_en).jetdr);
-        Lepton_gen_pt->push_back(leptons->at(lep_en).gen_pt);
-        Lepton_gen_eta->push_back(leptons->at(lep_en).gen_eta);
-        Lepton_gen_phi->push_back(leptons->at(lep_en).gen_phi);
-        Lepton_gen_en->push_back(leptons->at(lep_en).gen_en);
-        Lepton_gen_pdgId->push_back(leptons->at(lep_en).gen_pdgId);
-        Lepton_genMother_pt->push_back(leptons->at(lep_en).genMother_pt);
-        Lepton_genMother_eta->push_back(leptons->at(lep_en).genMother_eta);
-        Lepton_genMother_phi->push_back(leptons->at(lep_en).genMother_phi);
-        Lepton_genMother_en->push_back(leptons->at(lep_en).genMother_en);
-        Lepton_genMother_pdgId->push_back(leptons->at(lep_en).genMother_pdgId);
-        Lepton_genGrandMother_pt->push_back(leptons->at(lep_en).genGrandMother_pt);
-        Lepton_genGrandMother_eta->push_back(leptons->at(lep_en).genGrandMother_eta);
-        Lepton_genGrandMother_phi->push_back(leptons->at(lep_en).genGrandMother_phi);
-        Lepton_genGrandMother_en->push_back(leptons->at(lep_en).genGrandMother_en);
-        Lepton_genGrandMother_pdgId->push_back(leptons->at(lep_en).genGrandMother_pdgId);
-        Lepton_gen_isPromptFinalState->push_back(leptons->at(lep_en).gen_isPromptFinalState);
-        Lepton_gen_isDirectPromptTauDecayProductFinalState->push_back(leptons->at(lep_en).gen_isDirectPromptTauDecayProductFinalState);
-        Lepton_SCeta->push_back(leptons->at(lep_en).SCeta);
-        Lepton_mvaValue_HZZ->push_back(leptons->at(lep_en).mvaValue_HZZ);
-        Lepton_expectedMissingInnerHits->push_back(leptons->at(lep_en).expectedMissingInnerHits);
-        Lepton_full5x5_sigmaIetaIeta->push_back(leptons->at(lep_en).full5x5_sigmaIetaIeta);
-        Lepton_hOverE->push_back(leptons->at(lep_en).hOverE);
-        Lepton_dEtaIn->push_back(leptons->at(lep_en).dEtaIn);
-        Lepton_dPhiIn->push_back(leptons->at(lep_en).dPhiIn);
-        Lepton_ooEmooP->push_back(leptons->at(lep_en).ooEmooP);
+        Lep_pt->push_back(leptons->at(lep_en).pt);
+        Lep_eta->push_back(leptons->at(lep_en).eta);
+        Lep_phi->push_back(leptons->at(lep_en).phi);
+        Lep_energy->push_back(leptons->at(lep_en).energy);
+        Lep_dxy_pv->push_back(leptons->at(lep_en).dxy_pv);
+        Lep_dz_pv->push_back(leptons->at(lep_en).dz_pv);
+        Lep_IP3Dsig->push_back(leptons->at(lep_en).IP3Dsig);
+        Lep_loose->push_back(leptons->at(lep_en).loose);
+        Lep_miniIsoRel->push_back(leptons->at(lep_en).loose);
+        Lep_charge->push_back(leptons->at(lep_en).charge);
+        Lep_pdgId->push_back(leptons->at(lep_en).pdgId);
+        Lep_cut->push_back(leptons->at(lep_en).cut);
+        Lep_BDT->push_back(leptons->at(lep_en).BDT);
+        Lep_corrpt->push_back(leptons->at(lep_en).corrpt);
+        Lep_FR->push_back(leptons->at(lep_en).FR);
+        Lep_CF->push_back(leptons->at(lep_en).CF);
+        Lep_passConversion->push_back(leptons->at(lep_en).passConversion);
+        Lep_passMuTightCharge->push_back(leptons->at(lep_en).passMuTightCharge);
+        Lep_passEleTightCharge->push_back(leptons->at(lep_en).passEleTightCharge);
+        Lep_passMissHit->push_back(leptons->at(lep_en).passMissHit);
+        Lep_isMatchRightCharge->push_back(leptons->at(lep_en).isMatchRightCharge);
+        Lep_isGlobal->push_back(leptons->at(lep_en).isGlobal);
+        Lep_chi2->push_back(leptons->at(lep_en).chi2);
+        Lep_chi2LocalPosition->push_back(leptons->at(lep_en).chi2LocalPosition);
+        Lep_trkKink->push_back(leptons->at(lep_en).trkKink);
+        Lep_validFraction->push_back(leptons->at(lep_en).validFraction);
+        Lep_segmentCompatibility->push_back(leptons->at(lep_en).segmentCompatibility);
+        Lep_jetptratio->push_back(leptons->at(lep_en).jetptratio);
+        Lep_jetcsv->push_back(leptons->at(lep_en).jetcsv);
+        Lep_jetpt->push_back(leptons->at(lep_en).jetpt);
+        Lep_lepjetchtrks->push_back(leptons->at(lep_en).lepjetchtrks);
+        Lep_miniIsoCh->push_back(leptons->at(lep_en).miniIsoCh);
+        Lep_miniIsoPUsub->push_back(leptons->at(lep_en).miniIsoPUsub);
+        Lep_ptrel->push_back(leptons->at(lep_en).ptrel);
+        Lep_pTErrOVpT_it->push_back(leptons->at(lep_en).pTErrOVpT_it);
+        Lep_px->push_back(leptons->at(lep_en).px);
+        Lep_py->push_back(leptons->at(lep_en).py);
+        Lep_pz->push_back(leptons->at(lep_en).pz);
+        Lep_jetdr->push_back(leptons->at(lep_en).jetdr);
+        Lep_gen_pt->push_back(leptons->at(lep_en).gen_pt);
+        Lep_gen_eta->push_back(leptons->at(lep_en).gen_eta);
+        Lep_gen_phi->push_back(leptons->at(lep_en).gen_phi);
+        Lep_gen_en->push_back(leptons->at(lep_en).gen_en);
+        Lep_gen_pdgId->push_back(leptons->at(lep_en).gen_pdgId);
+        Lep_genMother_pt->push_back(leptons->at(lep_en).genMother_pt);
+        Lep_genMother_eta->push_back(leptons->at(lep_en).genMother_eta);
+        Lep_genMother_phi->push_back(leptons->at(lep_en).genMother_phi);
+        Lep_genMother_en->push_back(leptons->at(lep_en).genMother_en);
+        Lep_genMother_pdgId->push_back(leptons->at(lep_en).genMother_pdgId);
+        Lep_genGrandMother_pt->push_back(leptons->at(lep_en).genGrandMother_pt);
+        Lep_genGrandMother_eta->push_back(leptons->at(lep_en).genGrandMother_eta);
+        Lep_genGrandMother_phi->push_back(leptons->at(lep_en).genGrandMother_phi);
+        Lep_genGrandMother_en->push_back(leptons->at(lep_en).genGrandMother_en);
+        Lep_genGrandMother_pdgId->push_back(leptons->at(lep_en).genGrandMother_pdgId);
+        Lep_gen_isPromptFinalState->push_back(leptons->at(lep_en).gen_isPromptFinalState);
+        Lep_gen_isDirectPromptTauDecayProductFinalState->push_back(leptons->at(lep_en).gen_isDirectPromptTauDecayProductFinalState);
+        Lep_SCeta->push_back(leptons->at(lep_en).SCeta);
+        Lep_mvaValue_HZZ->push_back(leptons->at(lep_en).mvaValue_HZZ);
+        Lep_expectedMissingInnerHits->push_back(leptons->at(lep_en).expectedMissingInnerHits);
+        Lep_full5x5_sigmaIetaIeta->push_back(leptons->at(lep_en).full5x5_sigmaIetaIeta);
+        Lep_hOverE->push_back(leptons->at(lep_en).hOverE);
+        Lep_dEtaIn->push_back(leptons->at(lep_en).dEtaIn);
+        Lep_dPhiIn->push_back(leptons->at(lep_en).dPhiIn);
+        Lep_ooEmooP->push_back(leptons->at(lep_en).ooEmooP);
+    }
+    sort(leptons->begin(), leptons->end(), byConePt); 
+    for(uint lep_en=0; lep_en < leptons->size(); lep_en++){
+        // save only leptons pass at least Fakeable selections
+        if(!(leptons->at(lep_en).cut>=2.))continue; 
+        FakeLep_pt->push_back(leptons->at(lep_en).pt);
+        FakeLep_eta->push_back(leptons->at(lep_en).eta);
+        FakeLep_phi->push_back(leptons->at(lep_en).phi);
+        FakeLep_energy->push_back(leptons->at(lep_en).energy);
+        FakeLep_dxy_pv->push_back(leptons->at(lep_en).dxy_pv);
+        FakeLep_dz_pv->push_back(leptons->at(lep_en).dz_pv);
+        FakeLep_IP3Dsig->push_back(leptons->at(lep_en).IP3Dsig);
+        FakeLep_loose->push_back(leptons->at(lep_en).loose);
+        FakeLep_miniIsoRel->push_back(leptons->at(lep_en).loose);
+        FakeLep_charge->push_back(leptons->at(lep_en).charge);
+        FakeLep_pdgId->push_back(leptons->at(lep_en).pdgId);
+        FakeLep_cut->push_back(leptons->at(lep_en).cut);
+        FakeLep_BDT->push_back(leptons->at(lep_en).BDT);
+        FakeLep_corrpt->push_back(leptons->at(lep_en).corrpt);
+        FakeLep_FR->push_back(leptons->at(lep_en).FR);
+        FakeLep_CF->push_back(leptons->at(lep_en).CF);
+        FakeLep_passConversion->push_back(leptons->at(lep_en).passConversion);
+        FakeLep_passMuTightCharge->push_back(leptons->at(lep_en).passMuTightCharge);
+        FakeLep_passEleTightCharge->push_back(leptons->at(lep_en).passEleTightCharge);
+        FakeLep_passMissHit->push_back(leptons->at(lep_en).passMissHit);
+        FakeLep_isMatchRightCharge->push_back(leptons->at(lep_en).isMatchRightCharge);
+        FakeLep_isGlobal->push_back(leptons->at(lep_en).isGlobal);
+        FakeLep_chi2->push_back(leptons->at(lep_en).chi2);
+        FakeLep_chi2LocalPosition->push_back(leptons->at(lep_en).chi2LocalPosition);
+        FakeLep_trkKink->push_back(leptons->at(lep_en).trkKink);
+        FakeLep_validFraction->push_back(leptons->at(lep_en).validFraction);
+        FakeLep_segmentCompatibility->push_back(leptons->at(lep_en).segmentCompatibility);
+        FakeLep_jetptratio->push_back(leptons->at(lep_en).jetptratio);
+        FakeLep_jetcsv->push_back(leptons->at(lep_en).jetcsv);
+        FakeLep_jetpt->push_back(leptons->at(lep_en).jetpt);
+        FakeLep_lepjetchtrks->push_back(leptons->at(lep_en).lepjetchtrks);
+        FakeLep_miniIsoCh->push_back(leptons->at(lep_en).miniIsoCh);
+        FakeLep_miniIsoPUsub->push_back(leptons->at(lep_en).miniIsoPUsub);
+        FakeLep_ptrel->push_back(leptons->at(lep_en).ptrel);
+        FakeLep_pTErrOVpT_it->push_back(leptons->at(lep_en).pTErrOVpT_it);
+        FakeLep_px->push_back(leptons->at(lep_en).px);
+        FakeLep_py->push_back(leptons->at(lep_en).py);
+        FakeLep_pz->push_back(leptons->at(lep_en).pz);
+        FakeLep_jetdr->push_back(leptons->at(lep_en).jetdr);
+        FakeLep_gen_pt->push_back(leptons->at(lep_en).gen_pt);
+        FakeLep_gen_eta->push_back(leptons->at(lep_en).gen_eta);
+        FakeLep_gen_phi->push_back(leptons->at(lep_en).gen_phi);
+        FakeLep_gen_en->push_back(leptons->at(lep_en).gen_en);
+        FakeLep_gen_pdgId->push_back(leptons->at(lep_en).gen_pdgId);
+        FakeLep_genMother_pt->push_back(leptons->at(lep_en).genMother_pt);
+        FakeLep_genMother_eta->push_back(leptons->at(lep_en).genMother_eta);
+        FakeLep_genMother_phi->push_back(leptons->at(lep_en).genMother_phi);
+        FakeLep_genMother_en->push_back(leptons->at(lep_en).genMother_en);
+        FakeLep_genMother_pdgId->push_back(leptons->at(lep_en).genMother_pdgId);
+        FakeLep_genGrandMother_pt->push_back(leptons->at(lep_en).genGrandMother_pt);
+        FakeLep_genGrandMother_eta->push_back(leptons->at(lep_en).genGrandMother_eta);
+        FakeLep_genGrandMother_phi->push_back(leptons->at(lep_en).genGrandMother_phi);
+        FakeLep_genGrandMother_en->push_back(leptons->at(lep_en).genGrandMother_en);
+        FakeLep_genGrandMother_pdgId->push_back(leptons->at(lep_en).genGrandMother_pdgId);
+        FakeLep_gen_isPromptFinalState->push_back(leptons->at(lep_en).gen_isPromptFinalState);
+        FakeLep_gen_isDirectPromptTauDecayProductFinalState->push_back(leptons->at(lep_en).gen_isDirectPromptTauDecayProductFinalState);
+        FakeLep_SCeta->push_back(leptons->at(lep_en).SCeta);
+        FakeLep_mvaValue_HZZ->push_back(leptons->at(lep_en).mvaValue_HZZ);
+        FakeLep_expectedMissingInnerHits->push_back(leptons->at(lep_en).expectedMissingInnerHits);
+        FakeLep_full5x5_sigmaIetaIeta->push_back(leptons->at(lep_en).full5x5_sigmaIetaIeta);
+        FakeLep_hOverE->push_back(leptons->at(lep_en).hOverE);
+        FakeLep_dEtaIn->push_back(leptons->at(lep_en).dEtaIn);
+        FakeLep_dPhiIn->push_back(leptons->at(lep_en).dPhiIn);
+        FakeLep_ooEmooP->push_back(leptons->at(lep_en).ooEmooP);
     }
 };
 
 
-void Event_sel(){
+void Event_sel( string OutputName){
     //Write_variables
     EVENT_event = rEVENT_event;
     EVENT_genWeight = rEVENT_genWeight;
@@ -811,6 +891,54 @@ void Event_sel(){
     mht_met = mht + Met_type1PF_pt;
     mhtT_met = mhtT + Met_type1PF_pt;
     metLD =  0.00397*Met_type1PF_pt+0.00265*mht;  
+    //lumi_wgt
+    lumi_wgt = get_wgtlumi(OutputName);
+}
+
+
+////
+// event weights
+///
+double get_wgtlumi(string FileName){
+    double wgt=1;
+    if(FileName.find("TTHnobb") != std::string::npos) wgt=0.5085*(1-0.577)/3905631.;
+    if(FileName.find("TTWToLNuext2") != std::string::npos) wgt=0.196/2304580.;
+    if(FileName.find("TTWToLNuext1") != std::string::npos) wgt=0.196/2304580.;
+    if(FileName.find("TTZToLLNuNu") != std::string::npos) wgt=0.2728/774457; // TOP-17-005
+    if(FileName.find("TTZToLL_M1to10") != std::string::npos) wgt=0.0493/185686;
+    if(FileName.find("TTJets_sinLepTbar_v1") != std::string::npos) wgt=182.18/50375216;
+    if(FileName.find("TTJets_sinLepTbar_ext1") != std::string::npos) wgt=182.18/50375216;
+    if(FileName.find("TTJets_sinLepT_v1") != std::string::npos) wgt=182.18/48115204;
+    if(FileName.find("TTJets_sinLepT_ext1") != std::string::npos) wgt=182.18/48115204;
+    if(FileName.find("TTJets_diLep_v1") != std::string::npos) wgt=87.3/22737078;
+    if(FileName.find("TTJets_diLep_ext1") != std::string::npos) wgt=87.3/22737078;
+    if(FileName.find("powhegST") != std::string::npos) wgt=35.6/5280937;
+    if(FileName.find("powhegSaT") != std::string::npos) wgt=35.6/5403186;
+    if(FileName.find("powhegSTt") != std::string::npos) wgt=136.02/52137069;
+    if(FileName.find("powhegSTat") != std::string::npos) wgt=80.95/30684970;
+    if(FileName.find("amcSTs") != std::string::npos) wgt=3.68/398125;
+    if(FileName.find("DY_M10to50") != std::string::npos) wgt=18610./22123818;
+    if(FileName.find("DY_M50_ext1") != std::string::npos) wgt=6025.2/49143455;
+    if(FileName.find("WGToLNuG") != std::string::npos) wgt=585.8/9798114;//WG_ext1 + WG_ext2
+    if(FileName.find("ZGTo2LG") != std::string::npos) wgt=131.3/9831911;
+    if(FileName.find("TGJets_v1") != std::string::npos) wgt=2.967/366970;
+    if(FileName.find("TGJets_ext1") != std::string::npos) wgt=2.967/366970;
+    if(FileName.find("TTGJets_ext1") != std::string::npos) wgt=3.697/3199101;
+    if(FileName.find("WpWpJJ") != std::string::npos) wgt=0.03711/149677;
+    if(FileName.find("WWTo2L2Nu_DS") != std::string::npos) wgt=0.1729/999349;
+    if(FileName.find("WWW_4F") != std::string::npos) wgt=0.2086/210527;
+    if(FileName.find("WWZ") != std::string::npos) wgt=0.1651/221461;
+    if(FileName.find("WZZ") != std::string::npos) wgt=0.05565/216357;
+    if(FileName.find("ZZZ") != std::string::npos) wgt=0.01398/213192;
+    if(FileName.find("tZq") != std::string::npos) wgt=0.0758/3845965;
+    if(FileName.find("TTTT") != std::string::npos) wgt=0.009103/104632;
+    if(FileName.find("tWll") != std::string::npos) wgt=0.01123/49997;
+    if(FileName.find("amcWJets") != std::string::npos) wgt=61526.7/16370054;
+    if(FileName.find("madWJets") != std::string::npos) wgt=61526.7/29705372;
+    if(FileName.find("WZTo3LNu") != std::string::npos) wgt=4.42965/1993154;
+    if(FileName.find("WWTo2L2Nu") != std::string::npos) wgt=10.481/1998956;
+    if(FileName.find("ZZTo4L") != std::string::npos) wgt=1.256/6669854;
+    return wgt;
 }
 
 
@@ -1066,6 +1194,7 @@ void wSetBranchAddress(TTree* newtree, string sample){
         cout<<" Hi, I'm data!"<<endl;
     }
     //Write setbranchaddress
+    newtree->Branch("lumi_wgt",&lumi_wgt);
     newtree->Branch("EVENT_event",&EVENT_event);
     newtree->Branch("EVENT_genWeight",&EVENT_genWeight);
     newtree->Branch("HiggsDecay",&HiggsDecay);
@@ -1132,72 +1261,139 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("mhtT",&mhtT);
     newtree->Branch("mht",&mht);
     //Lepton
-    newtree->Branch("Lepton_pt",&Lepton_pt);
-    newtree->Branch("Lepton_eta",&Lepton_eta);
-    newtree->Branch("Lepton_phi",&Lepton_phi);
-    newtree->Branch("Lepton_energy",&Lepton_energy);
-    newtree->Branch("Lepton_dxy_pv",&Lepton_dxy_pv);
-    newtree->Branch("Lepton_dz_pv",&Lepton_dz_pv);
-    newtree->Branch("Lepton_IP3Dsig",&Lepton_IP3Dsig);
-    newtree->Branch("Lepton_loose",&Lepton_loose);
-    newtree->Branch("Lepton_miniIsoRel",&Lepton_miniIsoRel);
-    newtree->Branch("Lepton_charge",&Lepton_charge);
-    newtree->Branch("Lepton_pdgId",&Lepton_pdgId);
-    newtree->Branch("Lepton_isGlobal",&Lepton_isGlobal);
-    newtree->Branch("Lepton_chi2",&Lepton_chi2);
-    newtree->Branch("Lepton_chi2LocalPosition",&Lepton_chi2LocalPosition);
-    newtree->Branch("Lepton_trkKink",&Lepton_trkKink);
-    newtree->Branch("Lepton_validFraction",&Lepton_validFraction);
-    newtree->Branch("Lepton_segmentCompatibility",&Lepton_segmentCompatibility);
-    newtree->Branch("Lepton_jetptratio",&Lepton_jetptratio);
-    newtree->Branch("Lepton_jetcsv",&Lepton_jetcsv);
-    newtree->Branch("Lepton_jetpt",&Lepton_jetpt);
-    newtree->Branch("Lepton_lepjetchtrks",&Lepton_lepjetchtrks);
-    newtree->Branch("Lepton_miniIsoCh",&Lepton_miniIsoCh);
-    newtree->Branch("Lepton_miniIsoPUsub",&Lepton_miniIsoPUsub);
-    newtree->Branch("Lepton_ptrel",&Lepton_ptrel);
-    newtree->Branch("Lepton_pTErrOVpT_it",&Lepton_pTErrOVpT_it);
-    newtree->Branch("Lepton_px",&Lepton_px);
-    newtree->Branch("Lepton_py",&Lepton_py);
-    newtree->Branch("Lepton_pz",&Lepton_pz);
-    newtree->Branch("Lepton_jetdr",&Lepton_jetdr);
-    newtree->Branch("Lepton_SCeta",&Lepton_SCeta);
-    newtree->Branch("Lepton_mvaValue_HZZ",&Lepton_mvaValue_HZZ);
-    newtree->Branch("Lepton_expectedMissingInnerHits",&Lepton_expectedMissingInnerHits);
-    newtree->Branch("Lepton_full5x5_sigmaIetaIeta",&Lepton_full5x5_sigmaIetaIeta);
-    newtree->Branch("Lepton_hOverE",&Lepton_hOverE);
-    newtree->Branch("Lepton_dEtaIn",&Lepton_dEtaIn);
-    newtree->Branch("Lepton_dPhiIn",&Lepton_dPhiIn);
-    newtree->Branch("Lepton_ooEmooP",&Lepton_ooEmooP);
+    newtree->Branch("Lep_pt",&Lep_pt);
+    newtree->Branch("Lep_eta",&Lep_eta);
+    newtree->Branch("Lep_phi",&Lep_phi);
+    newtree->Branch("Lep_energy",&Lep_energy);
+    newtree->Branch("Lep_dxy_pv",&Lep_dxy_pv);
+    newtree->Branch("Lep_dz_pv",&Lep_dz_pv);
+    newtree->Branch("Lep_IP3Dsig",&Lep_IP3Dsig);
+    newtree->Branch("Lep_loose",&Lep_loose);
+    newtree->Branch("Lep_miniIsoRel",&Lep_miniIsoRel);
+    newtree->Branch("Lep_charge",&Lep_charge);
+    newtree->Branch("Lep_pdgId",&Lep_pdgId);
+    newtree->Branch("Lep_isGlobal",&Lep_isGlobal);
+    newtree->Branch("Lep_chi2",&Lep_chi2);
+    newtree->Branch("Lep_chi2LocalPosition",&Lep_chi2LocalPosition);
+    newtree->Branch("Lep_trkKink",&Lep_trkKink);
+    newtree->Branch("Lep_validFraction",&Lep_validFraction);
+    newtree->Branch("Lep_segmentCompatibility",&Lep_segmentCompatibility);
+    newtree->Branch("Lep_jetptratio",&Lep_jetptratio);
+    newtree->Branch("Lep_jetcsv",&Lep_jetcsv);
+    newtree->Branch("Lep_jetpt",&Lep_jetpt);
+    newtree->Branch("Lep_lepjetchtrks",&Lep_lepjetchtrks);
+    newtree->Branch("Lep_miniIsoCh",&Lep_miniIsoCh);
+    newtree->Branch("Lep_miniIsoPUsub",&Lep_miniIsoPUsub);
+    newtree->Branch("Lep_ptrel",&Lep_ptrel);
+    newtree->Branch("Lep_pTErrOVpT_it",&Lep_pTErrOVpT_it);
+    newtree->Branch("Lep_px",&Lep_px);
+    newtree->Branch("Lep_py",&Lep_py);
+    newtree->Branch("Lep_pz",&Lep_pz);
+    newtree->Branch("Lep_jetdr",&Lep_jetdr);
+    newtree->Branch("Lep_SCeta",&Lep_SCeta);
+    newtree->Branch("Lep_mvaValue_HZZ",&Lep_mvaValue_HZZ);
+    newtree->Branch("Lep_expectedMissingInnerHits",&Lep_expectedMissingInnerHits);
+    newtree->Branch("Lep_full5x5_sigmaIetaIeta",&Lep_full5x5_sigmaIetaIeta);
+    newtree->Branch("Lep_hOverE",&Lep_hOverE);
+    newtree->Branch("Lep_dEtaIn",&Lep_dEtaIn);
+    newtree->Branch("Lep_dPhiIn",&Lep_dPhiIn);
+    newtree->Branch("Lep_ooEmooP",&Lep_ooEmooP);
     // gen variables
-    newtree->Branch("Lepton_gen_pt",&Lepton_gen_pt);
-    newtree->Branch("Lepton_gen_eta",&Lepton_gen_eta);
-    newtree->Branch("Lepton_gen_phi",&Lepton_gen_phi);
-    newtree->Branch("Lepton_gen_en",&Lepton_gen_en);
-    newtree->Branch("Lepton_gen_pdgId",&Lepton_gen_pdgId);
-    newtree->Branch("Lepton_genMother_pt",&Lepton_genMother_pt);
-    newtree->Branch("Lepton_genMother_eta",&Lepton_genMother_eta);
-    newtree->Branch("Lepton_genMother_phi",&Lepton_genMother_phi);
-    newtree->Branch("Lepton_genMother_en",&Lepton_genMother_en);
-    newtree->Branch("Lepton_genMother_pdgId",&Lepton_genMother_pdgId);
-    newtree->Branch("Lepton_genGrandMother_pt",&Lepton_genGrandMother_pt);
-    newtree->Branch("Lepton_genGrandMother_eta",&Lepton_genGrandMother_eta);
-    newtree->Branch("Lepton_genGrandMother_phi",&Lepton_genGrandMother_phi);
-    newtree->Branch("Lepton_genGrandMother_en",&Lepton_genGrandMother_en);
-    newtree->Branch("Lepton_genGrandMother_pdgId",&Lepton_genGrandMother_pdgId);
-    newtree->Branch("Lepton_gen_isPromptFinalState",&Lepton_gen_isPromptFinalState);
-    newtree->Branch("Lepton_gen_isDirectPromptTauDecayProductFinalState",&Lepton_gen_isDirectPromptTauDecayProductFinalState);
+    newtree->Branch("Lep_gen_pt",&Lep_gen_pt);
+    newtree->Branch("Lep_gen_eta",&Lep_gen_eta);
+    newtree->Branch("Lep_gen_phi",&Lep_gen_phi);
+    newtree->Branch("Lep_gen_en",&Lep_gen_en);
+    newtree->Branch("Lep_gen_pdgId",&Lep_gen_pdgId);
+    newtree->Branch("Lep_genMother_pt",&Lep_genMother_pt);
+    newtree->Branch("Lep_genMother_eta",&Lep_genMother_eta);
+    newtree->Branch("Lep_genMother_phi",&Lep_genMother_phi);
+    newtree->Branch("Lep_genMother_en",&Lep_genMother_en);
+    newtree->Branch("Lep_genMother_pdgId",&Lep_genMother_pdgId);
+    newtree->Branch("Lep_genGrandMother_pt",&Lep_genGrandMother_pt);
+    newtree->Branch("Lep_genGrandMother_eta",&Lep_genGrandMother_eta);
+    newtree->Branch("Lep_genGrandMother_phi",&Lep_genGrandMother_phi);
+    newtree->Branch("Lep_genGrandMother_en",&Lep_genGrandMother_en);
+    newtree->Branch("Lep_genGrandMother_pdgId",&Lep_genGrandMother_pdgId);
+    newtree->Branch("Lep_gen_isPromptFinalState",&Lep_gen_isPromptFinalState);
+    newtree->Branch("Lep_gen_isDirectPromptTauDecayProductFinalState",&Lep_gen_isDirectPromptTauDecayProductFinalState);
     // new variables
-    newtree->Branch("Lepton_cut",&Lepton_cut);
-    newtree->Branch("Lepton_BDT",&Lepton_BDT);
-    newtree->Branch("Lepton_corrpt",&Lepton_corrpt);
-    newtree->Branch("Lepton_FR",&Lepton_FR);
-    newtree->Branch("Lepton_CF",&Lepton_CF);
-    newtree->Branch("Lepton_passConversion",&Lepton_passConversion);
-    newtree->Branch("Lepton_passMuTightCharge",&Lepton_passMuTightCharge);
-    newtree->Branch("Lepton_passEleTightCharge",&Lepton_passEleTightCharge);
-    newtree->Branch("Lepton_passMissHit",&Lepton_passMissHit);
-    newtree->Branch("Lepton_isMatchRightCharge",&Lepton_isMatchRightCharge);
+    newtree->Branch("Lep_cut",&Lep_cut);
+    newtree->Branch("Lep_BDT",&Lep_BDT);
+    newtree->Branch("Lep_corrpt",&Lep_corrpt);
+    newtree->Branch("Lep_FR",&Lep_FR);
+    newtree->Branch("Lep_CF",&Lep_CF);
+    newtree->Branch("Lep_passConversion",&Lep_passConversion);
+    newtree->Branch("Lep_passMuTightCharge",&Lep_passMuTightCharge);
+    newtree->Branch("Lep_passEleTightCharge",&Lep_passEleTightCharge);
+    newtree->Branch("Lep_passMissHit",&Lep_passMissHit);
+    newtree->Branch("Lep_isMatchRightCharge",&Lep_isMatchRightCharge);
+    //Fakeable leptons
+    newtree->Branch("FakeLep_pt",&FakeLep_pt);
+    newtree->Branch("FakeLep_eta",&FakeLep_eta);
+    newtree->Branch("FakeLep_phi",&FakeLep_phi);
+    newtree->Branch("FakeLep_energy",&FakeLep_energy);
+    newtree->Branch("FakeLep_dxy_pv",&FakeLep_dxy_pv);
+    newtree->Branch("FakeLep_dz_pv",&FakeLep_dz_pv);
+    newtree->Branch("FakeLep_IP3Dsig",&FakeLep_IP3Dsig);
+    newtree->Branch("FakeLep_loose",&FakeLep_loose);
+    newtree->Branch("FakeLep_miniIsoRel",&FakeLep_miniIsoRel);
+    newtree->Branch("FakeLep_charge",&FakeLep_charge);
+    newtree->Branch("FakeLep_pdgId",&FakeLep_pdgId);
+    newtree->Branch("FakeLep_isGlobal",&FakeLep_isGlobal);
+    newtree->Branch("FakeLep_chi2",&FakeLep_chi2);
+    newtree->Branch("FakeLep_chi2LocalPosition",&FakeLep_chi2LocalPosition);
+    newtree->Branch("FakeLep_trkKink",&FakeLep_trkKink);
+    newtree->Branch("FakeLep_validFraction",&FakeLep_validFraction);
+    newtree->Branch("FakeLep_segmentCompatibility",&FakeLep_segmentCompatibility);
+    newtree->Branch("FakeLep_jetptratio",&FakeLep_jetptratio);
+    newtree->Branch("FakeLep_jetcsv",&FakeLep_jetcsv);
+    newtree->Branch("FakeLep_jetpt",&FakeLep_jetpt);
+    newtree->Branch("FakeLep_lepjetchtrks",&FakeLep_lepjetchtrks);
+    newtree->Branch("FakeLep_miniIsoCh",&FakeLep_miniIsoCh);
+    newtree->Branch("FakeLep_miniIsoPUsub",&FakeLep_miniIsoPUsub);
+    newtree->Branch("FakeLep_ptrel",&FakeLep_ptrel);
+    newtree->Branch("FakeLep_pTErrOVpT_it",&FakeLep_pTErrOVpT_it);
+    newtree->Branch("FakeLep_px",&FakeLep_px);
+    newtree->Branch("FakeLep_py",&FakeLep_py);
+    newtree->Branch("FakeLep_pz",&FakeLep_pz);
+    newtree->Branch("FakeLep_jetdr",&FakeLep_jetdr);
+    newtree->Branch("FakeLep_SCeta",&FakeLep_SCeta);
+    newtree->Branch("FakeLep_mvaValue_HZZ",&FakeLep_mvaValue_HZZ);
+    newtree->Branch("FakeLep_expectedMissingInnerHits",&FakeLep_expectedMissingInnerHits);
+    newtree->Branch("FakeLep_full5x5_sigmaIetaIeta",&FakeLep_full5x5_sigmaIetaIeta);
+    newtree->Branch("FakeLep_hOverE",&FakeLep_hOverE);
+    newtree->Branch("FakeLep_dEtaIn",&FakeLep_dEtaIn);
+    newtree->Branch("FakeLep_dPhiIn",&FakeLep_dPhiIn);
+    newtree->Branch("FakeLep_ooEmooP",&FakeLep_ooEmooP);
+    // gen variables
+    newtree->Branch("FakeLep_gen_pt",&FakeLep_gen_pt);
+    newtree->Branch("FakeLep_gen_eta",&FakeLep_gen_eta);
+    newtree->Branch("FakeLep_gen_phi",&FakeLep_gen_phi);
+    newtree->Branch("FakeLep_gen_en",&FakeLep_gen_en);
+    newtree->Branch("FakeLep_gen_pdgId",&FakeLep_gen_pdgId);
+    newtree->Branch("FakeLep_genMother_pt",&FakeLep_genMother_pt);
+    newtree->Branch("FakeLep_genMother_eta",&FakeLep_genMother_eta);
+    newtree->Branch("FakeLep_genMother_phi",&FakeLep_genMother_phi);
+    newtree->Branch("FakeLep_genMother_en",&FakeLep_genMother_en);
+    newtree->Branch("FakeLep_genMother_pdgId",&FakeLep_genMother_pdgId);
+    newtree->Branch("FakeLep_genGrandMother_pt",&FakeLep_genGrandMother_pt);
+    newtree->Branch("FakeLep_genGrandMother_eta",&FakeLep_genGrandMother_eta);
+    newtree->Branch("FakeLep_genGrandMother_phi",&FakeLep_genGrandMother_phi);
+    newtree->Branch("FakeLep_genGrandMother_en",&FakeLep_genGrandMother_en);
+    newtree->Branch("FakeLep_genGrandMother_pdgId",&FakeLep_genGrandMother_pdgId);
+    newtree->Branch("FakeLep_gen_isPromptFinalState",&FakeLep_gen_isPromptFinalState);
+    newtree->Branch("FakeLep_gen_isDirectPromptTauDecayProductFinalState",&FakeLep_gen_isDirectPromptTauDecayProductFinalState);
+    // new variables
+    newtree->Branch("FakeLep_cut",&FakeLep_cut);
+    newtree->Branch("FakeLep_BDT",&FakeLep_BDT);
+    newtree->Branch("FakeLep_corrpt",&FakeLep_corrpt);
+    newtree->Branch("FakeLep_FR",&FakeLep_FR);
+    newtree->Branch("FakeLep_CF",&FakeLep_CF);
+    newtree->Branch("FakeLep_passConversion",&FakeLep_passConversion);
+    newtree->Branch("FakeLep_passMuTightCharge",&FakeLep_passMuTightCharge);
+    newtree->Branch("FakeLep_passEleTightCharge",&FakeLep_passEleTightCharge);
+    newtree->Branch("FakeLep_passMissHit",&FakeLep_passMissHit);
+    newtree->Branch("FakeLep_isMatchRightCharge",&FakeLep_isMatchRightCharge);
     //Tau
     newtree->Branch("Tau_pt",&Tau_pt);
     newtree->Branch("Tau_eta",&Tau_eta);
@@ -1274,6 +1470,17 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("Gen_BmotherIndex",&Gen_BmotherIndex);
     newtree->Branch("Gen_numMother",&Gen_numMother);
     newtree->Branch("Gen_status",&Gen_status);
+    // new hadronic Top and W
+    newtree->Branch("hadTop_Gen_pt",&hadTop_Gen_pt);
+    newtree->Branch("hadTop_Gen_eta",&hadTop_Gen_eta);
+    newtree->Branch("hadTop_Gen_phi",&hadTop_Gen_phi);
+    newtree->Branch("hadTop_Gen_energy",&hadTop_Gen_energy);
+    newtree->Branch("hadTop_Gen_pdgId",&hadTop_Gen_pdgId);
+    newtree->Branch("hadW_Gen_pt",&hadW_Gen_pt);
+    newtree->Branch("hadW_Gen_eta",&hadW_Gen_eta);
+    newtree->Branch("hadW_Gen_phi",&hadW_Gen_phi);
+    newtree->Branch("hadW_Gen_energy",&hadW_Gen_energy);
+    newtree->Branch("hadW_Gen_pdgId",&hadW_Gen_pdgId);
 };
 
 
@@ -1282,6 +1489,7 @@ void wClearInitialization(string sample){
         cout<<" Hi, I'm data!"<<endl;
     }
     //Initialize Number
+    lumi_wgt= -999;
     EVENT_event= -999;
     EVENT_genWeight= -999;
     HiggsDecay= -999;
@@ -1349,72 +1557,139 @@ void wClearInitialization(string sample){
     mht= -999;
     // Lepton
     leptons->clear();
-    Lepton_pt->clear();
-    Lepton_eta->clear();
-    Lepton_phi->clear();
-    Lepton_energy->clear();
-    Lepton_dxy_pv->clear();
-    Lepton_dz_pv->clear();
-    Lepton_IP3Dsig->clear();
-    Lepton_loose->clear();
-    Lepton_miniIsoRel->clear();
-    Lepton_charge->clear();
-    Lepton_pdgId->clear();
-    Lepton_isGlobal->clear();
-    Lepton_chi2->clear();
-    Lepton_chi2LocalPosition->clear();
-    Lepton_trkKink->clear();
-    Lepton_validFraction->clear();
-    Lepton_segmentCompatibility->clear();
-    Lepton_jetptratio->clear();
-    Lepton_jetcsv->clear();
-    Lepton_jetpt->clear();
-    Lepton_lepjetchtrks->clear();
-    Lepton_miniIsoCh->clear();
-    Lepton_miniIsoPUsub->clear();
-    Lepton_ptrel->clear();
-    Lepton_pTErrOVpT_it->clear();
-    Lepton_px->clear();
-    Lepton_py->clear();
-    Lepton_pz->clear();
-    Lepton_jetdr->clear();
-    Lepton_SCeta->clear();
-    Lepton_mvaValue_HZZ->clear();
-    Lepton_expectedMissingInnerHits->clear();
-    Lepton_full5x5_sigmaIetaIeta->clear();
-    Lepton_hOverE->clear();
-    Lepton_dEtaIn->clear();
-    Lepton_dPhiIn->clear();
-    Lepton_ooEmooP->clear();
+    Lep_pt->clear();
+    Lep_eta->clear();
+    Lep_phi->clear();
+    Lep_energy->clear();
+    Lep_dxy_pv->clear();
+    Lep_dz_pv->clear();
+    Lep_IP3Dsig->clear();
+    Lep_loose->clear();
+    Lep_miniIsoRel->clear();
+    Lep_charge->clear();
+    Lep_pdgId->clear();
+    Lep_isGlobal->clear();
+    Lep_chi2->clear();
+    Lep_chi2LocalPosition->clear();
+    Lep_trkKink->clear();
+    Lep_validFraction->clear();
+    Lep_segmentCompatibility->clear();
+    Lep_jetptratio->clear();
+    Lep_jetcsv->clear();
+    Lep_jetpt->clear();
+    Lep_lepjetchtrks->clear();
+    Lep_miniIsoCh->clear();
+    Lep_miniIsoPUsub->clear();
+    Lep_ptrel->clear();
+    Lep_pTErrOVpT_it->clear();
+    Lep_px->clear();
+    Lep_py->clear();
+    Lep_pz->clear();
+    Lep_jetdr->clear();
+    Lep_SCeta->clear();
+    Lep_mvaValue_HZZ->clear();
+    Lep_expectedMissingInnerHits->clear();
+    Lep_full5x5_sigmaIetaIeta->clear();
+    Lep_hOverE->clear();
+    Lep_dEtaIn->clear();
+    Lep_dPhiIn->clear();
+    Lep_ooEmooP->clear();
     // gen
-    Lepton_gen_pt->clear();
-    Lepton_gen_eta->clear();
-    Lepton_gen_phi->clear();
-    Lepton_gen_en->clear();
-    Lepton_gen_pdgId->clear();
-    Lepton_genMother_pt->clear();
-    Lepton_genMother_eta->clear();
-    Lepton_genMother_phi->clear();
-    Lepton_genMother_en->clear();
-    Lepton_genMother_pdgId->clear();
-    Lepton_genGrandMother_pt->clear();
-    Lepton_genGrandMother_eta->clear();
-    Lepton_genGrandMother_phi->clear();
-    Lepton_genGrandMother_en->clear();
-    Lepton_genGrandMother_pdgId->clear();
-    Lepton_gen_isPromptFinalState->clear();
-    Lepton_gen_isDirectPromptTauDecayProductFinalState->clear();
+    Lep_gen_pt->clear();
+    Lep_gen_eta->clear();
+    Lep_gen_phi->clear();
+    Lep_gen_en->clear();
+    Lep_gen_pdgId->clear();
+    Lep_genMother_pt->clear();
+    Lep_genMother_eta->clear();
+    Lep_genMother_phi->clear();
+    Lep_genMother_en->clear();
+    Lep_genMother_pdgId->clear();
+    Lep_genGrandMother_pt->clear();
+    Lep_genGrandMother_eta->clear();
+    Lep_genGrandMother_phi->clear();
+    Lep_genGrandMother_en->clear();
+    Lep_genGrandMother_pdgId->clear();
+    Lep_gen_isPromptFinalState->clear();
+    Lep_gen_isDirectPromptTauDecayProductFinalState->clear();
     // new variables
-    Lepton_cut->clear();
-    Lepton_BDT->clear();
-    Lepton_corrpt->clear();
-    Lepton_FR->clear();
-    Lepton_CF->clear();
-    Lepton_passConversion->clear();
-    Lepton_passMuTightCharge->clear();
-    Lepton_passEleTightCharge->clear();
-    Lepton_passMissHit->clear();
-    Lepton_isMatchRightCharge->clear();
+    Lep_cut->clear();
+    Lep_BDT->clear();
+    Lep_corrpt->clear();
+    Lep_FR->clear();
+    Lep_CF->clear();
+    Lep_passConversion->clear();
+    Lep_passMuTightCharge->clear();
+    Lep_passEleTightCharge->clear();
+    Lep_passMissHit->clear();
+    Lep_isMatchRightCharge->clear();
+    // Fakeable Leptons
+    FakeLep_pt->clear();
+    FakeLep_eta->clear();
+    FakeLep_phi->clear();
+    FakeLep_energy->clear();
+    FakeLep_dxy_pv->clear();
+    FakeLep_dz_pv->clear();
+    FakeLep_IP3Dsig->clear();
+    FakeLep_loose->clear();
+    FakeLep_miniIsoRel->clear();
+    FakeLep_charge->clear();
+    FakeLep_pdgId->clear();
+    FakeLep_isGlobal->clear();
+    FakeLep_chi2->clear();
+    FakeLep_chi2LocalPosition->clear();
+    FakeLep_trkKink->clear();
+    FakeLep_validFraction->clear();
+    FakeLep_segmentCompatibility->clear();
+    FakeLep_jetptratio->clear();
+    FakeLep_jetcsv->clear();
+    FakeLep_jetpt->clear();
+    FakeLep_lepjetchtrks->clear();
+    FakeLep_miniIsoCh->clear();
+    FakeLep_miniIsoPUsub->clear();
+    FakeLep_ptrel->clear();
+    FakeLep_pTErrOVpT_it->clear();
+    FakeLep_px->clear();
+    FakeLep_py->clear();
+    FakeLep_pz->clear();
+    FakeLep_jetdr->clear();
+    FakeLep_SCeta->clear();
+    FakeLep_mvaValue_HZZ->clear();
+    FakeLep_expectedMissingInnerHits->clear();
+    FakeLep_full5x5_sigmaIetaIeta->clear();
+    FakeLep_hOverE->clear();
+    FakeLep_dEtaIn->clear();
+    FakeLep_dPhiIn->clear();
+    FakeLep_ooEmooP->clear();
+    // gen
+    FakeLep_gen_pt->clear();
+    FakeLep_gen_eta->clear();
+    FakeLep_gen_phi->clear();
+    FakeLep_gen_en->clear();
+    FakeLep_gen_pdgId->clear();
+    FakeLep_genMother_pt->clear();
+    FakeLep_genMother_eta->clear();
+    FakeLep_genMother_phi->clear();
+    FakeLep_genMother_en->clear();
+    FakeLep_genMother_pdgId->clear();
+    FakeLep_genGrandMother_pt->clear();
+    FakeLep_genGrandMother_eta->clear();
+    FakeLep_genGrandMother_phi->clear();
+    FakeLep_genGrandMother_en->clear();
+    FakeLep_genGrandMother_pdgId->clear();
+    FakeLep_gen_isPromptFinalState->clear();
+    FakeLep_gen_isDirectPromptTauDecayProductFinalState->clear();
+    // new variables
+    FakeLep_cut->clear();
+    FakeLep_BDT->clear();
+    FakeLep_corrpt->clear();
+    FakeLep_FR->clear();
+    FakeLep_CF->clear();
+    FakeLep_passConversion->clear();
+    FakeLep_passMuTightCharge->clear();
+    FakeLep_passEleTightCharge->clear();
+    FakeLep_passMissHit->clear();
+    FakeLep_isMatchRightCharge->clear();
     //Tau
     taus->clear();
     Tau_pt->clear();
@@ -1493,6 +1768,17 @@ void wClearInitialization(string sample){
     Gen_BmotherIndex->clear();
     Gen_numMother->clear();
     Gen_status->clear();
+    // new hadronic Top and W
+    hadTop_Gen_pt->clear();
+    hadTop_Gen_eta->clear();
+    hadTop_Gen_phi->clear();
+    hadTop_Gen_energy->clear();
+    hadTop_Gen_pdgId->clear();
+    hadW_Gen_pt->clear();
+    hadW_Gen_eta->clear();
+    hadW_Gen_phi->clear();
+    hadW_Gen_energy->clear();
+    hadW_Gen_pdgId->clear();
 };
 
 
