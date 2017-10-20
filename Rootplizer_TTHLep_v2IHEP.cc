@@ -834,30 +834,35 @@ void GenParticle_sel(){
     Gen_type1PF_Meteta = rGen_type1PF_Meteta;
     Gen_type1PF_Metphi = rGen_type1PF_Metphi;
     Gen_type1PF_Meten = rGen_type1PF_Meten;
-    // find hadronic W boson
+    // find hadronic W and Top
     vector<uint> lep_W_Index;
+    vector<uint> hadW_Cand_Index;
+    //cout << rEVENT_event << endl;
     for(uint gp=0; gp<Gen_pdg_id->size(); gp++){
         // save the index of a leptonically decay W boson
-        if(!((fabs(Gen_pdg_id->at(gp))==12||fabs(Gen_pdg_id->at(gp))==14||fabs(Gen_pdg_id->at(gp)==16)) 
+        if(!((fabs(Gen_pdg_id->at(gp))==11||fabs(Gen_pdg_id->at(gp))==13||fabs(Gen_pdg_id->at(gp)==15)) 
             && (fabs(Gen_motherpdg_id->at(gp))==24))) continue;
         lep_W_Index.push_back(Gen_BmotherIndex->at(gp));
     }
     for(uint gp=0; gp<Gen_pdg_id->size(); gp++){
         // find the hadronically decay W boson
         if(!((fabs(Gen_pdg_id->at(gp))==24) 
-            && (std::find(lep_W_Index.begin(), lep_W_Index.end(), gp) == lep_W_Index.end())
+            && std::find(lep_W_Index.begin(), lep_W_Index.end(), gp) == lep_W_Index.end()
+            && std::find(hadW_Cand_Index.begin(), hadW_Cand_Index.end(), gp) == hadW_Cand_Index.end()
             )) continue;
-
+        //cout << " gp " << gp << endl;
         //Look for a mother which is not a W
         uint currIndex = gp;
-        uint curr_pdgId;
+        int curr_pdgId =0 ;
         do{
             curr_pdgId = Gen_pdg_id->at(currIndex);
+            hadW_Cand_Index.push_back(currIndex);
+            //cout << " currIndex in loop " << currIndex << " curr_pdgId " << curr_pdgId << endl;
             // set currIndex pointing to mother Index
             currIndex = Gen_BmotherIndex->at(currIndex);
-        }
-        while(Gen_pdg_id->at(currIndex) == curr_pdgId);
-        if(fabs(Gen_pdg_id->at(currIndex)==6)
+        }while(Gen_pdg_id->at(currIndex) == curr_pdgId);
+        //cout << " currIndex end loop " << currIndex << " Gen_pdg_id " << Gen_pdg_id->at(currIndex) <<endl;
+        if(fabs(Gen_pdg_id->at(currIndex))==6
             && std::find(hadTop_Gen_Index->begin(), hadTop_Gen_Index->end(), currIndex) == hadTop_Gen_Index->end()){
             // find a hadronic Top
             hadTop_Gen_pt->push_back(Gen_pt->at(currIndex));
@@ -866,7 +871,7 @@ void GenParticle_sel(){
             hadTop_Gen_energy->push_back(Gen_energy->at(currIndex));
             hadTop_Gen_pdgId->push_back(Gen_pdg_id->at(currIndex));
             hadTop_Gen_Index->push_back(currIndex);
-        }else if(fabs(Gen_pdg_id->at(currIndex))!=24){
+        }else if(fabs(Gen_pdg_id->at(currIndex))!=6){
             // find a hadronic W which is not from hadronic Top
             hadW_Gen_pt->push_back(Gen_pt->at(gp));
             hadW_Gen_eta->push_back(Gen_eta->at(gp));
@@ -876,6 +881,8 @@ void GenParticle_sel(){
             hadW_Gen_Index->push_back(gp);
         }
     }
+    hadTop_numGen = hadTop_Gen_pt->size();
+    hadW_numGen = hadW_Gen_pt->size();
 };
 
 
@@ -1531,6 +1538,8 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("hadW_Gen_energy",&hadW_Gen_energy);
     newtree->Branch("hadW_Gen_pdgId",&hadW_Gen_pdgId);
     newtree->Branch("hadW_Gen_Index",&hadW_Gen_Index);
+    newtree->Branch("hadTop_numGen",&hadTop_numGen);
+    newtree->Branch("hadW_numGen",&hadW_numGen);
 };
 
 
@@ -1831,6 +1840,8 @@ void wClearInitialization(string sample){
     hadW_Gen_energy->clear();
     hadW_Gen_pdgId->clear();
     hadW_Gen_Index->clear();
+    hadTop_numGen= -999;
+    hadW_numGen= -999;
 };
 
 

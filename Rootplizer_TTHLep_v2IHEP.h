@@ -634,3 +634,5 @@ vector<double>* hadW_Gen_phi = new std::vector<double>;
 vector<double>* hadW_Gen_energy = new std::vector<double>;
 vector<double>* hadW_Gen_pdgId = new std::vector<double>;
 vector<double>* hadW_Gen_Index = new std::vector<double>;
+double hadTop_numGen;
+double hadW_numGen;
