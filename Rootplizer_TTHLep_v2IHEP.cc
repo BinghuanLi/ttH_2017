@@ -1,4 +1,4 @@
-#include "Rootplizer_TTHLep_v2IHEP.h"
+#include "/publicfs/cms/user/libh/Submit_Condor/TTHLep/ttH_2017/interference/Rootplizer_TTHLep_v2IHEP.h"
 /////
 //   Main function
 /////
@@ -54,11 +54,9 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
         EleMuSR_sel();
         TriLepSR_sel();
         QuaLepSR_sel();
-        /*
         if(!(
             isDiEleSR==1 || isDiMuSR==1 || isEleMuSR ==1|| isTriLepSR ==1 || isQuaLepSR == 1
             )) continue;
-            */
         // Fill Tree
         newtree->Fill();
     }
