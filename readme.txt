@@ -1,3 +1,3 @@
 This is Rootplizer for TTH->multileptons study
-This is branch Temparory
+This is branch used for IHEP farm
 
