@@ -6,22 +6,22 @@ BoostJet& BoostJet::operator=(const BoostJet&) = default;
 
 //Object Identification
 void BoostJet::set_Wp_Top(int& numSoftTop, int& numLooseTop, int& numMediumTop, int& numTightTop){
-    if( pt > 200 && fabs(eta) <2.4 && tau32 < 0.46 && fabs(softdrop_mass-175)<25){
+    if( pt > 400 && fabs(eta) <2.4 && tau32 < 0.46 && fabs(softdrop_mass-162.5)<57.5){
         topCut = 4;
         numTightTop++; 
         numMediumTop++; 
         numLooseTop++; 
         numSoftTop++; 
-    }else if( pt > 200 && fabs(eta) <2.4 && tau32 < 0.54 && fabs(softdrop_mass-175)<25){
+    }else if( pt > 400 && fabs(eta) <2.4 && tau32 < 0.54 && fabs(softdrop_mass-162.5)<57.5){
         topCut = 3;
         numMediumTop++; 
         numLooseTop++; 
         numSoftTop++; 
-    }else if( pt > 200 && fabs(eta) <2.4 && tau32 < 0.65 && fabs(softdrop_mass-175)<25){
+    }else if( pt > 400 && fabs(eta) <2.4 && tau32 < 0.65 && fabs(softdrop_mass-162.5)<57.5){
         topCut = 2;
         numLooseTop++; 
         numSoftTop++; 
-    }else if( pt > 200 && fabs(eta) <2.4 && tau32 < 0.8 && fabs(softdrop_mass-175)<25){
+    }else if( pt > 400 && fabs(eta) <2.4 && tau32 < 0.8 && fabs(softdrop_mass-162.5)<57.5){
         topCut = 1;
         numSoftTop++; 
     }else{
