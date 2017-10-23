@@ -20,8 +20,9 @@ const double evt = 653077.;
 const bool sync_top = false;
 string sample = "mc";
 bool isHIPSafe = true;
-string data_path = "/publicfs/cms/user/libh/Submit_Condor/TTHLep/FullMorV1_1/data/";
 
+//string data_path = "/publicfs/cms/user/libh/Submit_Condor/TTHLep/FullMorV1_1/data/";
+string data_path = "/home/binghuan/Work/RootTestFiles/TTHLep_2017/data/weights/";
 
 //Variable handleling
 void rSetBranchAddress(TTree* readingtree, string sample);
