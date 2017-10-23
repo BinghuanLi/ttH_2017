@@ -857,7 +857,8 @@ void Find_Gen_HadTop_HadW(){
     vector<uint> hadW_Cand_Index;
     for(uint gp=0; gp<Gen_pdg_id->size(); gp++){
         // save the index of a leptonically decay W boson
-        if(!((fabs(Gen_pdg_id->at(gp))==11||fabs(Gen_pdg_id->at(gp))==13||fabs(Gen_pdg_id->at(gp)==15)) 
+        if(!((fabs(Gen_pdg_id->at(gp))==11||fabs(Gen_pdg_id->at(gp))==13
+            ||fabs(Gen_pdg_id->at(gp))==15||fabs(Gen_pdg_id->at(gp))==24) 
             && (fabs(Gen_motherpdg_id->at(gp))==24))) continue;
         lep_W_Index.push_back(Gen_BmotherIndex->at(gp));
     }
