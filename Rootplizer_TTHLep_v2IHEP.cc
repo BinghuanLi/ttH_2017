@@ -54,11 +54,9 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
         EleMuSR_sel();
         TriLepSR_sel();
         QuaLepSR_sel();
-        /*
         if(!(
             isDiEleSR==1 || isDiMuSR==1 || isEleMuSR ==1|| isTriLepSR ==1 || isQuaLepSR == 1
             )) continue;
-            */
         // Fill Tree
         newtree->Fill();
     }
@@ -857,11 +855,14 @@ void Find_Gen_HadTop_HadW(){
     // find hadronic W and Top
     vector<uint> lep_W_Index;
     vector<uint> hadW_Cand_Index;
+    //cout << rEVENT_event << endl;
     for(uint gp=0; gp<Gen_pdg_id->size(); gp++){
         // save the index of a leptonically decay W boson
-        if(!((fabs(Gen_pdg_id->at(gp))==11||fabs(Gen_pdg_id->at(gp))==13||fabs(Gen_pdg_id->at(gp)==15)) 
+        if(!((fabs(Gen_pdg_id->at(gp))==11||fabs(Gen_pdg_id->at(gp))==13
+            ||fabs(Gen_pdg_id->at(gp))==15||fabs(Gen_pdg_id->at(gp))==24 ) 
             && (fabs(Gen_motherpdg_id->at(gp))==24))) continue;
         lep_W_Index.push_back(Gen_BmotherIndex->at(gp));
+        //cout << " lepton W index " << Gen_BmotherIndex->at(gp) << endl;
     }
     for(uint gp=0; gp<Gen_pdg_id->size(); gp++){
         // find the hadronically decay W boson
