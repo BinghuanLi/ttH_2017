@@ -138,22 +138,22 @@ sample={
 
 #Mc
 ##samples not used in final ttHleptons
-#"TT_Tune":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/FullMorV2_TT/170531_195914/0000/',
+"TT_Tune":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/FullMorV2_TT/170531_195914/0000/',
 ##samples used in final ttHleptons
 ##Sig
-"TTHnobb":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/ttHToNonbb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/FullMorV2_ttHnobb/170530_161519/0000/',#'FullMorV1_ttHnobb', 108
+#"TTHnobb":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/ttHToNonbb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/FullMorV2_ttHnobb/170530_161519/0000/',#'FullMorV1_ttHnobb', 108
 ###Bkg
-"TTWToLNuext2":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/FullMorV2_amcTTWJetsToLNuext2/170531_182459/0000/',
-"TTWToLNuext1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/FullMorV2_amcTTWJetsToLNuext1/170531_182712/0000/',
-"TTZToLLNuNu":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8/FullMorV2_amcTTZToLLNuNu_M-10_ext1/170531_182920/0000/',
-"TTZToLL_M1to10":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTZToLL_M-1to10_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/FullMorV2_TTZToLL_M1to10/170531_183129/0000/',
+#"TTWToLNuext2":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/FullMorV2_amcTTWJetsToLNuext2/170531_182459/0000/',
+#"TTWToLNuext1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/FullMorV2_amcTTWJetsToLNuext1/170531_182712/0000/',
+#"TTZToLLNuNu":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8/FullMorV2_amcTTZToLLNuNu_M-10_ext1/170531_182920/0000/',
+#"TTZToLL_M1to10":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTZToLL_M-1to10_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/FullMorV2_TTZToLL_M1to10/170531_183129/0000/',
 #
-"TTJets_sinLepTbar_v1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/FullMorV2_TTJets_sinLepTbar/170531_190717/0000/',
-"TTJets_sinLepTbar_ext1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/FullMorV2_TTJets_sinLepTbar_ext1/170531_190925/0000/',
-"TTJets_sinLepT_v1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/FullMorV2_TTJets_sinLepT/170531_191441/0000/',
-"TTJets_sinLepT_ext1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/FullMorV2_TTJets_sinLepT_ext1/170531_191648/0000/',
-"TTJets_diLep_v1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/FullMorV2_TTJets_diLep/170531_191854/0000/',
-"TTJets_diLep_ext1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/FullMorV2_TTJets_diLep_ext1/170531_192103/0000/',
+#"TTJets_sinLepTbar_v1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/FullMorV2_TTJets_sinLepTbar/170531_190717/0000/',
+#"TTJets_sinLepTbar_ext1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/FullMorV2_TTJets_sinLepTbar_ext1/170531_190925/0000/',
+#"TTJets_sinLepT_v1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/FullMorV2_TTJets_sinLepT/170531_191441/0000/',
+#"TTJets_sinLepT_ext1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/FullMorV2_TTJets_sinLepT_ext1/170531_191648/0000/',
+#"TTJets_diLep_v1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/FullMorV2_TTJets_diLep/170531_191854/0000/',
+#"TTJets_diLep_ext1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/FullMorV2_TTJets_diLep_ext1/170531_192103/0000/',
 #
 #"TTGJets_ext1":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/TTGJets_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/FullMorV2_TTGJets_ext1/170621_150600/0000/',#239 files
 #"WGToLNuG_ext2":'/publicfs/cms/data/TopQuark/cms13TeV/FullMorV2/mc/WGToLNuG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/FullMorV2_WGToLNuG_ext2/170621_150118/0000/', #124 files
@@ -383,12 +383,18 @@ def prepareSubmitJob(submitFileName,cshFileName):
 	print >> cshFile, "Queue"
 
 def prepareCshJob(input,output,submitFileName,analyzerpath,stdOutFile,stdErrFile):
-        subFile      = file(submitFileName,"w")
+        subFile =file(submitFileName,"w")
         os.popen('chmod +x '+submitFileName)
-	print >> subFile, "#!/bin/bash"
-	print >> subFile, "/bin/hostname"
-	print >> subFile, "gcc -v"
-	print >> subFile, "pwd"
+        print >> subFile, "#!/bin/bash"
+        print >> subFile, "/bin/hostname"
+        #print >> subFile, "cd /cvmfs/cms.cern.ch"
+        #print >> subFile, "source cmsset_default.csh"
+        #print >> subFile, "cd slc6_amd64_gcc530/cms/cmssw/CMSSW_8_0_3"
+        #print >> subFile, "cmsenv"
+        #print >> subFile, "cd -"
+        print >> subFile, "gcc -v"
+        #print >> subFile, "root -b -v -q"
+        print >> subFile, "pwd"
 	#print >> subFile, "cd /publicfs/cms/data/TopQuark/cms13TeV/software/root/bin/"
 	#print >> subFile, "source thisroot.csh"
 	#print >> subFile, "cd /publicfs/cms/user/libh/CMSSW_5_3_9/src/ttH_13Tev"
