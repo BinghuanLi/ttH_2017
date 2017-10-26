@@ -8,6 +8,7 @@
 #include "../source/Tau.cc"
 #include "../source/Jet.cc"
 #include "../source/BoostJet.cc"
+#include "../source/utils_functions.cc"
 
 using namespace std;
 ////
@@ -21,8 +22,8 @@ const bool sync_top = false;
 string sample = "mc";
 bool isHIPSafe = true;
 
-string data_path = "/publicfs/cms/user/libh/Submit_Condor/TTHLep/FullMorV1_1/data/";
-//string data_path = "/home/binghuan/Work/RootTestFiles/TTHLep_2017/data/weights/";
+//string data_path = "/publicfs/cms/user/libh/Submit_Condor/TTHLep/FullMorV1_1/data/";
+string data_path = "/home/binghuan/Work/RootTestFiles/TTHLep_2017/data/weights/";
 
 //Variable handleling
 void rSetBranchAddress(TTree* readingtree, string sample);
@@ -50,9 +51,6 @@ void QuaLepSR_sel();
 /////
 //utils
 /////
-double deltaPhi(double phi1, double phi2);
-double deltaEta(double eta1, double eta2);
-double deltaR(double dphi, double deta);
 bool byPt(const Lepton& LeptonA, const Lepton& LeptonB);
 bool byConept(const Lepton& LeptonA, const Lepton& LeptonB);
 
@@ -336,6 +334,8 @@ vector<double>* rGen_motherpdg_id; TBranch* b_rGen_motherpdg_id =0;
 vector<double>* rGen_BmotherIndex; TBranch* b_rGen_BmotherIndex =0;
 vector<double>* rGen_numMother; TBranch* b_rGen_numMother =0;
 vector<double>* rGen_status; TBranch* b_rGen_status =0;
+vector<double>* rGen_numDaught; TBranch* b_rGen_numDaught =0;
+vector<double>* rGen_BmotherIndices; TBranch* b_rGen_BmotherIndices =0;
 
 //variables to be written
 
@@ -397,6 +397,20 @@ double Top_numMedium;
 double Top_numTight;
 double W_numLoose;
 double W_numTight;
+double W_numMedium;
+double W_numSoft;
+double MediumW_numMatch;
+double SoftW_numMatch;
+double LooseW_numMatch;
+double TightW_numMatch;
+double MediumW_numMatch_fromH;
+double SoftW_numMatch_fromH;
+double LooseW_numMatch_fromH;
+double TightW_numMatch_fromH;
+double MediumW_numMatch_fromNonH;
+double SoftW_numMatch_fromNonH;
+double LooseW_numMatch_fromNonH;
+double TightW_numMatch_fromNonH;
 double TTHLep_2Mu;
 double TTHLep_2Ele;
 double TTHLep_MuEle;
@@ -628,6 +642,12 @@ vector<double>* BoostedJet_tau21 = new std::vector<double>;
 vector<double>* BoostedJet_tau32 = new std::vector<double>;
 vector<double>* BoostedJet_wCut = new std::vector<double>;
 vector<double>* BoostedJet_topCut = new std::vector<double>;
+vector<double>* BoostedJet_matchW_pt = new std::vector<double>;
+vector<double>* BoostedJet_matchW_eta = new std::vector<double>;
+vector<double>* BoostedJet_matchW_phi = new std::vector<double>;
+vector<double>* BoostedJet_matchW_energy = new std::vector<double>;
+vector<double>* BoostedJet_matchW_mass = new std::vector<double>;
+vector<double>* BoostedJet_matchW_mother_pdgId = new std::vector<double>;
 
 //Gen
 vector<double>* Gen_pdg_id = new std::vector<double>;
@@ -638,7 +658,6 @@ vector<double>* Gen_energy = new std::vector<double>;
 vector<double>* Gen_motherpdg_id = new std::vector<double>;
 vector<double>* Gen_BmotherIndex = new std::vector<double>;
 vector<double>* Gen_numMother = new std::vector<double>;
-vector<double>* Gen_status = new std::vector<double>;
 //new hadronic Top and W
 vector<double>* hadTop_Gen_pt = new std::vector<double>;
 vector<double>* hadTop_Gen_eta = new std::vector<double>;
@@ -652,5 +671,10 @@ vector<double>* hadW_Gen_phi = new std::vector<double>;
 vector<double>* hadW_Gen_energy = new std::vector<double>;
 vector<double>* hadW_Gen_pdgId = new std::vector<double>;
 vector<double>* hadW_Gen_Index = new std::vector<double>;
+vector<double>* hadW_Gen_Mother_pdgId = new std::vector<double>;
+vector<double>* hadW_Gen_drjj = new std::vector<double>;
+vector<double>* hadW_Gen_mass = new std::vector<double>;
 double hadTop_numGen;
+double hadW_numGen_cone8;
+double hadW_numGen_pt190;
 double hadW_numGen;

@@ -16,9 +16,9 @@ workpath = "/publicfs/cms/user/libh/Test/Rootplizer/analyzer"
 #  CaseC   No       Yes     Jet_LooseID: you can not read it from ntuplas if there is not, but you want to save in rootplas 
 
 # Variable Case
-Case = "CaseA"
+#Case = "CaseA"
 #Case = "CaseB"
-#Case = "CaseC"
+Case = "CaseC"
 # Variable Definition
 
 rObject = "BoostedJet"
@@ -27,7 +27,7 @@ wObject = "BoostedJet"
 VariableType  = "double"
 VariableNames = [
 # CaseA Variables
-"pt","eta","phi","energy",
+#"pt","eta","phi","energy",
 #"charge",
 #"IP3Dsig","miniIsoRel","pdgId","gsfTrack_dxy_pv","gsfTrack_dz_pv",
 
@@ -50,14 +50,14 @@ VariableNames = [
 #"byMediumIsolationMVArun2v1DBdR03oldDMwLT",
 
 #Jets
-"Uncorr_pt",
-"pfCombinedInclusiveSecondaryVertexV2BJetTags","pfCombinedMVAV2BJetTags",
+#"Uncorr_pt",
+#"pfCombinedInclusiveSecondaryVertexV2BJetTags","pfCombinedMVAV2BJetTags",
 #"px","py","pz","mass",
 #"qg","axis2","ptD","mult",
 #"partonFlavour","hadronFlavour","genpt","geneta","genphi","genenergy",
 
 
-"JesSF","JesSFup","JesSFdown","JerSF","JerSFup","JerSFdown",
+#"JesSF","JesSFup","JesSFdown","JerSF","JerSFup","JerSFdown",
 #"neutralHadEnergyFraction","neutralEmEnergyFraction","chargedMultiplicity","numberOfConstituents","chargedHadronEnergyFraction", "chargedEmEnergyFraction",
 #"btag_sf",
 #"btag_jesup","btag_jesdown",
@@ -71,12 +71,12 @@ VariableNames = [
 #"btag_cerr2up","btag_cerr2down",
 
 #BoostedJet
-"tau1","tau2","tau3",
-"softdrop_mass","pruned_mass",
+#"tau1","tau2","tau3",
+#"softdrop_mass","pruned_mass",
 #"SDsubjet1_pt","SDsubjet1_eta","SDsubjet1_phi","SDsubjet1_energy","SDsubjet1_pfCSV2Bdisc",
 #"SDsubjet2_pt","SDsubjet2_eta","SDsubjet2_phi","SDsubjet2_energy","SDsubjet2_pfCSV2Bdisc",
 #"tau21","tau32",
-
+"matchW_pt","matchW_eta","matchW_phi","matchW_energy","matchW_mass","matchW_mother_pdgId",
 #Case B
 
 # Case C

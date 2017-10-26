@@ -1,5 +1,5 @@
-#include "/publicfs/cms/user/libh/Submit_Condor/TTHLep/BoostJet/interference/Rootplizer_TTHLep_v2IHEP.h"
-//#include "interference/Rootplizer_TTHLep_v2IHEP.h"
+//#include "/publicfs/cms/user/libh/Submit_Condor/TTHLep/BoostJet/interference/Rootplizer_TTHLep_v2IHEP.h"
+#include "interference/Rootplizer_TTHLep_v2IHEP.h"
 /////
 //   Main function
 /////
@@ -125,24 +125,6 @@ bool mu_isMedium( double isGlobal, double chi_square, double chi2_localposition,
 
 
 //utils
-double deltaPhi(double phi1, double phi2){
-    double result = phi1 - phi2;
-    while (result > M_PI) result -= 2*M_PI;
-    while (result <= -M_PI) result += 2*M_PI;
-    return result;
-}
-
-
-double deltaEta(double eta1, double eta2){
-    return (eta1-eta2);
-};
-
-
-double deltaR(double dphi, double deta){
-    return sqrt(pow(dphi,2)+pow(deta,2));
-};
-
-
 bool byPt(const Lepton& LeptonA, const Lepton& LeptonB){
     return LeptonA.pt > LeptonB.pt;
 };
@@ -601,6 +583,8 @@ void BoostedJet_sel(){
     int top_numMedium = 0;
     int top_numTight = 0;
     int w_numLoose = 0;
+    int w_numMedium = 0;
+    int w_numSoft = 0;
     int w_numTight = 0;
     for(uint boostedjet_en = 0; boostedjet_en<rBoostedJet_pt->size(); boostedjet_en++){
         BoostJet boostjet;
@@ -613,7 +597,7 @@ void BoostedJet_sel(){
         for(uint lep_en=0; lep_en < leptons->size(); lep_en++){
             Lepton lep = leptons->at(lep_en);
             if(lep.cut <=1) continue; // skip loose lepton
-            if(deltaR(deltaPhi(lep.phi,boostjet.phi),deltaEta(lep.eta,boostjet.eta))<0.4){
+            if(deltaR(deltaPhi(lep.phi,boostjet.phi),deltaEta(lep.eta,boostjet.eta))<0.8){
                 ismatched = true; 
                 break; 
             }
@@ -623,7 +607,7 @@ void BoostedJet_sel(){
         // check whether boostedjet overlaps with tau
         for(uint tau_en=0; tau_en < taus->size(); tau_en++){
             Tau tau = taus->at(tau_en);
-            if(deltaR(deltaPhi(tau.phi,boostjet.phi),deltaEta(tau.eta,boostjet.eta))<0.4){
+            if(deltaR(deltaPhi(tau.phi,boostjet.phi),deltaEta(tau.eta,boostjet.eta))<0.8){
                 ismatched = true; 
                 break; 
             }
@@ -649,7 +633,7 @@ void BoostedJet_sel(){
 
         // select boosted Top and W
         boostjet.set_Wp_Top(top_numSoft, top_numLoose, top_numMedium, top_numTight);
-        boostjet.set_Wp_W(w_numLoose, w_numTight);
+        boostjet.set_Wp_W(w_numSoft, w_numLoose, w_numMedium, w_numTight);
         
         BoostedJet_pt->push_back(boostjet.pt);
         BoostedJet_eta->push_back(rBoostedJet_eta->at(boostedjet_en));
@@ -683,6 +667,8 @@ void BoostedJet_sel(){
     Top_numTight = top_numTight;
     W_numLoose = w_numLoose;
     W_numTight = w_numTight;
+    W_numMedium = w_numMedium;
+    W_numSoft = w_numSoft;
 };
 
 void Lep_sel(){
@@ -836,7 +822,6 @@ void GenParticle_sel(){
         Gen_motherpdg_id->push_back(rGen_motherpdg_id->at(gen_en));
         Gen_BmotherIndex->push_back(rGen_BmotherIndex->at(gen_en));
         Gen_numMother->push_back(rGen_numMother->at(gen_en));
-        Gen_status->push_back(rGen_status->at(gen_en));
     }
     Gen_type1PF_Met = rGen_type1PF_Met;
     Gen_type1PF_Metpx = rGen_type1PF_Metpx;
@@ -848,7 +833,23 @@ void GenParticle_sel(){
     // find hadronic W and Top
     Find_Gen_HadTop_HadW();
     hadTop_numGen = hadTop_Gen_pt->size();
+    //hadW_numGen_cone8 = rhadW_numGen_cone8;
+    //hadW_numGen_pt190 = rhadW_numGen_pt190;
     hadW_numGen = hadW_Gen_pt->size();
+    /*
+    MediumW_numMatch = Mediumw_numMatch;
+    SoftW_numMatch = Softw_numMatch;
+    LooseW_numMatch = Loosew_numMatch;
+    TightW_numMatch = Tightw_numMatch;
+    MediumW_numMatch_fromH = rMediumW_numMatch_fromH;
+    SoftW_numMatch_fromH = rSoftW_numMatch_fromH;
+    LooseW_numMatch_fromH = rLooseW_numMatch_fromH;
+    TightW_numMatch_fromH = rTightW_numMatch_fromH;
+    MediumW_numMatch_fromNonH = rMediumW_numMatch_fromNonH;
+    SoftW_numMatch_fromNonH = rSoftW_numMatch_fromNonH;
+    LooseW_numMatch_fromNonH = rLooseW_numMatch_fromNonH;
+    TightW_numMatch_fromNonH = rTightW_numMatch_fromNonH;
+    */
 };
 
 
@@ -857,14 +858,28 @@ void Find_Gen_HadTop_HadW(){
     vector<uint> lep_W_Index;
     vector<uint> hadW_Cand_Index;
     for(uint gp=0; gp<Gen_pdg_id->size(); gp++){
-        // save the index of a leptonically decay W boson
-        if(!((fabs(Gen_pdg_id->at(gp))==11||fabs(Gen_pdg_id->at(gp))==13
-            ||fabs(Gen_pdg_id->at(gp))==15||fabs(Gen_pdg_id->at(gp))==24) 
-            && (fabs(Gen_motherpdg_id->at(gp))==24))) continue;
-        lep_W_Index.push_back(Gen_BmotherIndex->at(gp));
+        // save the index of W boson decays to ele/mu/W
+        if((fabs(Gen_pdg_id->at(gp))==11 || fabs(Gen_pdg_id->at(gp))==13
+            || fabs(Gen_pdg_id->at(gp))==24) && (fabs(Gen_motherpdg_id->at(gp))==24)){
+            lep_W_Index.push_back(Gen_BmotherIndex->at(gp));
+        }
+        // save the index of W boson decays to leptoncally decaying tau
+        if(!((fabs(Gen_pdg_id->at(gp))==11||fabs(Gen_pdg_id->at(gp))==13)
+            && fabs(Gen_motherpdg_id->at(gp))==15)) continue;
+        // Look for a grand mother which is not a tau
+        uint currIndex = Gen_BmotherIndex->at(gp);//currIndex point to tau
+        int curr_pdgId =0 ;
+        do{
+            curr_pdgId = Gen_pdg_id->at(currIndex);
+            // set currIndex pointing to mother Index
+            currIndex = Gen_BmotherIndex->at(currIndex);
+        }while(Gen_pdg_id->at(currIndex) == curr_pdgId);
+        if(fabs(Gen_pdg_id->at(currIndex))==24){
+            lep_W_Index.push_back(currIndex);
+        }
     }
+    // find the hadronically decay W boson
     for(uint gp=0; gp<Gen_pdg_id->size(); gp++){
-        // find the hadronically decay W boson
         if(!((fabs(Gen_pdg_id->at(gp))==24) 
             && std::find(lep_W_Index.begin(), lep_W_Index.end(), gp) == lep_W_Index.end()
             && std::find(hadW_Cand_Index.begin(), hadW_Cand_Index.end(), gp) == hadW_Cand_Index.end()
@@ -887,15 +902,30 @@ void Find_Gen_HadTop_HadW(){
             hadTop_Gen_energy->push_back(Gen_energy->at(currIndex));
             hadTop_Gen_pdgId->push_back(Gen_pdg_id->at(currIndex));
             hadTop_Gen_Index->push_back(currIndex);
-        }else if(fabs(Gen_pdg_id->at(currIndex))!=6){
-            // find a hadronic W which is not from hadronic Top
-            hadW_Gen_pt->push_back(Gen_pt->at(gp));
-            hadW_Gen_eta->push_back(Gen_eta->at(gp));
-            hadW_Gen_phi->push_back(Gen_phi->at(gp));
-            hadW_Gen_energy->push_back(Gen_energy->at(gp));
-            hadW_Gen_pdgId->push_back(Gen_pdg_id->at(gp));
-            hadW_Gen_Index->push_back(gp);
         }
+        // find the hadronically decay W boson
+        hadW_Gen_pt->push_back(Gen_pt->at(gp));
+        hadW_Gen_eta->push_back(Gen_eta->at(gp));
+        hadW_Gen_phi->push_back(Gen_phi->at(gp));
+        hadW_Gen_energy->push_back(Gen_energy->at(gp));
+        hadW_Gen_pdgId->push_back(Gen_pdg_id->at(gp));
+        hadW_Gen_Index->push_back(gp);
+        hadW_Gen_Mother_pdgId->push_back(Gen_motherpdg_id->at(currIndex));
+        TLorentzVector dau1={0,0,0,0};
+        TLorentzVector dau2={0,0,0,0};
+        TLorentzVector W={0,0,0,0};
+        W.SetPtEtaPhiE(Gen_pt->at(gp),Gen_eta->at(gp),Gen_phi->at(gp),Gen_energy->at(gp));
+        for(uint dau_en=gp; dau_en<Gen_pdg_id->size(); dau_en++){
+            // find the daughters of hadronically decay W boson
+            if(fabs(Gen_BmotherIndex->at(dau_en))==gp){
+                dau1.SetPtEtaPhiE(Gen_pt->at(dau_en),Gen_eta->at(dau_en),Gen_phi->at(dau_en),Gen_energy->at(dau_en));
+                dau2.SetPtEtaPhiE(Gen_pt->at(dau_en+1),Gen_eta->at(dau_en+1),Gen_phi->at(dau_en+1),Gen_energy->at(dau_en+1));
+                break;
+            }
+        }
+        double drjj = deltaR(deltaPhi(dau1.Phi(),dau2.Phi()),deltaEta(dau1.Eta(),dau2.Eta())); 
+        hadW_Gen_drjj->push_back(drjj);
+        hadW_Gen_mass->push_back(W.M());
     }
 };
 
@@ -1027,7 +1057,7 @@ void DiMuSR_sel(){
         && FakeLep_cut->at(0)==3 && FakeLep_cut->at(1) ==3
         && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
         && FakeLep_charge->at(0)*FakeLep_charge->at(1)==1
-        && Jet_numLoose>=4 
+        && Jet_numLoose>=3 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && !(massL < 12 && massL > 0)
         && fabs(mass_diele - 91.2)>10
@@ -1048,7 +1078,7 @@ void DiEleSR_sel(){
         && FakeLep_passEleTightCharge->at(0)==1&&FakeLep_passEleTightCharge->at(1)==1
         && FakeLep_passConversion->at(0)==1&&FakeLep_passConversion->at(1)==1
         && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
-        && Jet_numLoose>=4 
+        && Jet_numLoose>=3 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && metLD > 0.2
         && !(massL < 12 && massL > 0)
@@ -1068,7 +1098,7 @@ void EleMuSR_sel(){
         && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
         && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
         && fabs(FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))==24
-        && Jet_numLoose>=4 
+        && Jet_numLoose>=3 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && !(massL < 12 && massL > 0)
         && fabs(mass_diele - 91.2)>10
@@ -1438,6 +1468,8 @@ void rSetBranchAddress(TTree* readingtree, string sample){
     readingtree->SetBranchAddress("Gen_BmotherIndex",&rGen_BmotherIndex,&b_rGen_BmotherIndex);
     readingtree->SetBranchAddress("Gen_numMother",&rGen_numMother,&b_rGen_numMother);
     readingtree->SetBranchAddress("Gen_status",&rGen_status,&b_rGen_status);
+    readingtree->SetBranchAddress("Gen_numDaught",&rGen_numDaught,&b_rGen_numDaught);
+    readingtree->SetBranchAddress("Gen_BmotherIndices",&rGen_BmotherIndices,&b_rGen_BmotherIndices);
 };
 
 
@@ -1503,6 +1535,20 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("Top_numTight",&Top_numTight);
     newtree->Branch("W_numLoose",&W_numLoose);
     newtree->Branch("W_numTight",&W_numTight);
+    newtree->Branch("W_numMedium",&W_numMedium);
+    newtree->Branch("W_numSoft",&W_numSoft);
+    newtree->Branch("MediumW_numMatch",&MediumW_numMatch);
+    newtree->Branch("SoftW_numMatch",&SoftW_numMatch);
+    newtree->Branch("LooseW_numMatch",&LooseW_numMatch);
+    newtree->Branch("TightW_numMatch",&TightW_numMatch);
+    newtree->Branch("MediumW_numMatch_fromH",&MediumW_numMatch_fromH);
+    newtree->Branch("SoftW_numMatch_fromH",&SoftW_numMatch_fromH);
+    newtree->Branch("LooseW_numMatch_fromH",&LooseW_numMatch_fromH);
+    newtree->Branch("TightW_numMatch_fromH",&TightW_numMatch_fromH);
+    newtree->Branch("MediumW_numMatch_fromNonH",&MediumW_numMatch_fromNonH);
+    newtree->Branch("SoftW_numMatch_fromNonH",&SoftW_numMatch_fromNonH);
+    newtree->Branch("LooseW_numMatch_fromNonH",&LooseW_numMatch_fromNonH);
+    newtree->Branch("TightW_numMatch_fromNonH",&TightW_numMatch_fromNonH);
     newtree->Branch("TTHLep_2Mu",&TTHLep_2Mu);
     newtree->Branch("TTHLep_2Ele",&TTHLep_2Ele);
     newtree->Branch("TTHLep_MuEle",&TTHLep_MuEle);
@@ -1712,6 +1758,12 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("BoostedJet_tau32",&BoostedJet_tau32);
     newtree->Branch("BoostedJet_wCut",&BoostedJet_wCut);
     newtree->Branch("BoostedJet_topCut",&BoostedJet_topCut);
+    newtree->Branch("BoostedJet_matchW_pt",&BoostedJet_matchW_pt);
+    newtree->Branch("BoostedJet_matchW_eta",&BoostedJet_matchW_eta);
+    newtree->Branch("BoostedJet_matchW_phi",&BoostedJet_matchW_phi);
+    newtree->Branch("BoostedJet_matchW_energy",&BoostedJet_matchW_energy);
+    newtree->Branch("BoostedJet_matchW_mass",&BoostedJet_matchW_mass);
+    newtree->Branch("BoostedJet_matchW_mother_pdgId",&BoostedJet_matchW_mother_pdgId);
     //Gen
     newtree->Branch("Gen_pdg_id",&Gen_pdg_id);
     newtree->Branch("Gen_pt",&Gen_pt);
@@ -1721,7 +1773,6 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("Gen_motherpdg_id",&Gen_motherpdg_id);
     newtree->Branch("Gen_BmotherIndex",&Gen_BmotherIndex);
     newtree->Branch("Gen_numMother",&Gen_numMother);
-    newtree->Branch("Gen_status",&Gen_status);
     // new hadronic Top and W
     newtree->Branch("hadTop_Gen_pt",&hadTop_Gen_pt);
     newtree->Branch("hadTop_Gen_eta",&hadTop_Gen_eta);
@@ -1735,7 +1786,12 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("hadW_Gen_energy",&hadW_Gen_energy);
     newtree->Branch("hadW_Gen_pdgId",&hadW_Gen_pdgId);
     newtree->Branch("hadW_Gen_Index",&hadW_Gen_Index);
+    newtree->Branch("hadW_Gen_Mother_pdgId",&hadW_Gen_Mother_pdgId);
+    newtree->Branch("hadW_Gen_drjj",&hadW_Gen_drjj);
+    newtree->Branch("hadW_Gen_mass",&hadW_Gen_mass);
     newtree->Branch("hadTop_numGen",&hadTop_numGen);
+    newtree->Branch("hadW_numGen_cone8",&hadW_numGen_cone8);
+    newtree->Branch("hadW_numGen_pt190",&hadW_numGen_pt190);
     newtree->Branch("hadW_numGen",&hadW_numGen);
     // tthlep event selections
     newtree->Branch("massL_dipairSFOS",&massL_dipairSFOS);
@@ -1812,6 +1868,20 @@ void wClearInitialization(string sample){
     Top_numTight= -999;
     W_numLoose= -999;
     W_numTight= -999;
+    W_numMedium= -999;
+    W_numSoft= -999;
+    MediumW_numMatch= -999;
+    SoftW_numMatch= -999;
+    LooseW_numMatch= -999;
+    TightW_numMatch= -999;
+    MediumW_numMatch_fromH= -999;
+    SoftW_numMatch_fromH= -999;
+    LooseW_numMatch_fromH= -999;
+    TightW_numMatch_fromH= -999;
+    MediumW_numMatch_fromNonH= -999;
+    SoftW_numMatch_fromNonH= -999;
+    LooseW_numMatch_fromNonH= -999;
+    TightW_numMatch_fromNonH= -999;
     TTHLep_2Mu= -999;
     TTHLep_2Ele= -999;
     TTHLep_MuEle= -999;
@@ -2024,6 +2094,12 @@ void wClearInitialization(string sample){
     BoostedJet_tau32->clear();
     BoostedJet_wCut->clear();
     BoostedJet_topCut->clear();
+    BoostedJet_matchW_pt->clear();
+    BoostedJet_matchW_eta->clear();
+    BoostedJet_matchW_phi->clear();
+    BoostedJet_matchW_energy->clear();
+    BoostedJet_matchW_mass->clear();
+    BoostedJet_matchW_mother_pdgId->clear();
     // Gen
     Gen_pdg_id->clear();
     Gen_pt->clear();
@@ -2033,7 +2109,6 @@ void wClearInitialization(string sample){
     Gen_motherpdg_id->clear();
     Gen_BmotherIndex->clear();
     Gen_numMother->clear();
-    Gen_status->clear();
     // new hadronic Top and W
     hadTop_Gen_pt->clear();
     hadTop_Gen_eta->clear();
@@ -2047,7 +2122,12 @@ void wClearInitialization(string sample){
     hadW_Gen_energy->clear();
     hadW_Gen_pdgId->clear();
     hadW_Gen_Index->clear();
+    hadW_Gen_Mother_pdgId->clear();
+    hadW_Gen_drjj->clear();
+    hadW_Gen_mass->clear();
     hadTop_numGen= -999;
+    hadW_numGen_cone8= -999;
+    hadW_numGen_pt190= -999;
     hadW_numGen= -999;
     // tthlep event selections
     massL_dipairSFOS= -999;
@@ -2302,4 +2382,6 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rGen_BmotherIndex->GetEntry(tentry);
     b_rGen_numMother->GetEntry(tentry);
     b_rGen_status->GetEntry(tentry);
+    b_rGen_numDaught->GetEntry(tentry);
+    b_rGen_BmotherIndices->GetEntry(tentry);
 };
