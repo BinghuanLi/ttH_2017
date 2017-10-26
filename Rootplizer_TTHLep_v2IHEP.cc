@@ -833,23 +833,99 @@ void GenParticle_sel(){
     // find hadronic W and Top
     Find_Gen_HadTop_HadW();
     hadTop_numGen = hadTop_Gen_pt->size();
-    //hadW_numGen_cone8 = rhadW_numGen_cone8;
-    //hadW_numGen_pt190 = rhadW_numGen_pt190;
     hadW_numGen = hadW_Gen_pt->size();
-    /*
+    int numGen_pt190 =0;
+    int numGen_cone8 =0;
+    for(uint W_en=0; W_en<hadW_Gen_pt->size(); W_en++){
+        if(hadW_Gen_pt->at(W_en) >190) numGen_pt190 ++;
+        if(hadW_Gen_drjj->at(W_en) < 0.8 ) numGen_cone8 ++;
+    }
+    hadW_numGen_cone8 = numGen_cone8;
+    hadW_numGen_pt190 = numGen_pt190;
+    // calculate boostjets matching to Gen hadronic W
+    int Softw_numMatch =0;
+    int Loosew_numMatch =0;
+    int Mediumw_numMatch =0;
+    int Tightw_numMatch =0;
+    int Softw_numMatch_fromH =0;
+    int Loosew_numMatch_fromH =0;
+    int Mediumw_numMatch_fromH =0;
+    int Tightw_numMatch_fromH =0;
+    int Softw_numMatch_fromNonH =0;
+    int Loosew_numMatch_fromNonH =0;
+    int Mediumw_numMatch_fromNonH =0;
+    int Tightw_numMatch_fromNonH =0;
+    for(uint boost_en=0; boost_en<boostjets->size(); boost_en++){
+        BoostJet boostjet = boostjets->at(boost_en);
+        boostjet.match_genW(hadW_Gen_pt, hadW_Gen_eta, hadW_Gen_phi, hadW_Gen_energy,
+                hadW_Gen_mass, hadW_Gen_Mother_pdgId);
+        BoostedJet_matchW_pt->push_back(boostjet.matchW_pt);
+        BoostedJet_matchW_eta->push_back(boostjet.matchW_eta);
+        BoostedJet_matchW_phi->push_back(boostjet.matchW_phi);
+        BoostedJet_matchW_energy->push_back(boostjet.matchW_energy);
+        BoostedJet_matchW_mass->push_back(boostjet.matchW_mass);
+        BoostedJet_matchW_mother_pdgId->push_back(boostjet.matchW_mother_pdgId);
+        if(boostjet.matchW_pt <=0) continue;
+        if(boostjet.wCut == 4){
+         Softw_numMatch ++;
+         Loosew_numMatch ++;
+         Mediumw_numMatch ++;
+         Tightw_numMatch ++;
+         if(boostjet.matchW_mother_pdgId == 25){
+            Softw_numMatch_fromH ++;
+            Loosew_numMatch_fromH ++;
+            Mediumw_numMatch_fromH ++;
+            Tightw_numMatch_fromH ++;
+         }else{
+            Softw_numMatch_fromNonH ++;
+            Loosew_numMatch_fromNonH ++;
+            Mediumw_numMatch_fromNonH ++;
+            Tightw_numMatch_fromNonH ++;
+         }
+        }else if (boostjet.wCut==3){
+         Softw_numMatch ++;
+         Loosew_numMatch ++;
+         Mediumw_numMatch ++;
+         if(boostjet.matchW_mother_pdgId == 25){
+            Softw_numMatch_fromH ++;
+            Loosew_numMatch_fromH ++;
+            Mediumw_numMatch_fromH ++;
+         }else{
+            Softw_numMatch_fromNonH ++;
+            Loosew_numMatch_fromNonH ++;
+            Mediumw_numMatch_fromNonH ++;
+         }
+        }else if (boostjet.wCut==2){
+         Softw_numMatch ++;
+         Loosew_numMatch ++;
+         if(boostjet.matchW_mother_pdgId == 25){
+            Softw_numMatch_fromH ++;
+            Loosew_numMatch_fromH ++;
+         }else{
+            Softw_numMatch_fromNonH ++;
+            Loosew_numMatch_fromNonH ++;
+         }
+        }else if (boostjet.wCut==1){
+         Softw_numMatch ++;
+         if(boostjet.matchW_mother_pdgId == 25){
+            Softw_numMatch_fromH ++;
+         }else{
+            Softw_numMatch_fromNonH ++;
+         }
+        }
+    }
     MediumW_numMatch = Mediumw_numMatch;
     SoftW_numMatch = Softw_numMatch;
     LooseW_numMatch = Loosew_numMatch;
     TightW_numMatch = Tightw_numMatch;
-    MediumW_numMatch_fromH = rMediumW_numMatch_fromH;
-    SoftW_numMatch_fromH = rSoftW_numMatch_fromH;
-    LooseW_numMatch_fromH = rLooseW_numMatch_fromH;
-    TightW_numMatch_fromH = rTightW_numMatch_fromH;
-    MediumW_numMatch_fromNonH = rMediumW_numMatch_fromNonH;
-    SoftW_numMatch_fromNonH = rSoftW_numMatch_fromNonH;
-    LooseW_numMatch_fromNonH = rLooseW_numMatch_fromNonH;
-    TightW_numMatch_fromNonH = rTightW_numMatch_fromNonH;
-    */
+    MediumW_numMatch_fromH = Mediumw_numMatch_fromH;
+    SoftW_numMatch_fromH = Softw_numMatch_fromH;
+    LooseW_numMatch_fromH = Loosew_numMatch_fromH;
+    TightW_numMatch_fromH = Tightw_numMatch_fromH;
+    MediumW_numMatch_fromNonH = Mediumw_numMatch_fromNonH;
+    SoftW_numMatch_fromNonH = Softw_numMatch_fromNonH;
+    LooseW_numMatch_fromNonH = Loosew_numMatch_fromNonH;
+    TightW_numMatch_fromNonH = Tightw_numMatch_fromNonH;
 };
 
 

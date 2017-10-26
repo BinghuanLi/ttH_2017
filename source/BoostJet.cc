@@ -74,13 +74,15 @@ void BoostJet::match_genW(vector<double>* genW_pt, vector<double>* genW_eta, vec
     double min_diff_pt = 999.;
     for(uint gen_en=0; gen_en < genW_pt->size(); gen_en++){
         if(deltaR(deltaPhi(genW_phi->at(gen_en),phi),deltaEta(genW_eta->at(gen_en),eta))<0.8){
-            min_diff_pt = fabs(genW_pt->at(gen_en) - pt);
-            matchW_pt = genW_pt->at(gen_en); 
-            matchW_eta = genW_eta->at(gen_en); 
-            matchW_phi = genW_phi->at(gen_en); 
-            matchW_energy = genW_energy->at(gen_en); 
-            matchW_mass = genW_mass->at(gen_en); 
-            matchW_mother_pdgId = genW_motherId->at(gen_en); 
+            if(fabs(genW_pt->at(gen_en)-pt) < min_diff_pt ){
+                min_diff_pt = fabs(genW_pt->at(gen_en) - pt);
+                matchW_pt = genW_pt->at(gen_en); 
+                matchW_eta = genW_eta->at(gen_en); 
+                matchW_phi = genW_phi->at(gen_en); 
+                matchW_energy = genW_energy->at(gen_en); 
+                matchW_mass = genW_mass->at(gen_en); 
+                matchW_mother_pdgId = genW_motherId->at(gen_en); 
+            }
         }
     }
 };
