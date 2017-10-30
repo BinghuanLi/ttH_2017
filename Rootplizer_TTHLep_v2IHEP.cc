@@ -27,6 +27,7 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
  
     // Set MVA Weights
     set_wgtMVA();
+    set_hadTopMVA();
      
     //Fill new branches
     int nen = nentries; if(nentries==-1) nen = readingtree->GetEntries();
@@ -1078,6 +1079,9 @@ void Event_sel( string OutputName){
     lumi_wgt = get_wgtlumi(OutputName);
     // calculate different dilep mass
     Cal_dilep_mass();
+    //hadTop
+    Add_nullJet();
+    Reco_hadTop();
 }
 
 // tth event selections
@@ -1307,6 +1311,234 @@ double get_wgtlumi(string FileName){
     return wgt;
 }
 
+////////
+//hadTop
+////////
+void set_hadTopMVA(){
+    hadTop_reader_loose = new TMVA::Reader( "!Color:!Silent" );
+
+    hadTop_reader_loose->AddVariable( "b_from_leptop_bdt.csv", &varbjet_lepTop_csv );
+    hadTop_reader_loose->AddVariable( "b_from_hadtop_bdt.csv", &varbjet_hadTop_csv );
+    hadTop_reader_loose->AddVariable( "hadTop_tlv_bdt.Pt()", &varreco_hadTop_pt );
+    hadTop_reader_loose->AddVariable( "w_from_hadtop_tlv_bdt.M()", &varreco_WhadTop_mass );
+    hadTop_reader_loose->AddVariable( "hadTop_tlv_bdt.M()", &varreco_hadTop_mass );
+    hadTop_reader_loose->AddVariable( "lep_from_leptop_bdt.obj.pt()/lep_from_higgs_bdt.obj.pt()", &varPtRatio_leptOverleph );
+    hadTop_reader_loose->AddVariable( "dr_lepFromTop_bFromLepTop", &varDr_lept_bfromlTop );
+    hadTop_reader_loose->AddVariable( "dr_lepFromTop_bFromHadTop", &varDr_lept_bfromhTop );
+    hadTop_reader_loose->AddVariable( "dr_lepFromHiggs_bFromLepTop", &varDr_leph_bfromlTop );
+    string loose_file= data_path + "bloose_BDTG.weights.xml";
+    hadTop_reader_loose->BookMVA("BDTG method", loose_file);
+
+    hadTop_reader_tight = new TMVA::Reader( "!Color:!Silent" );
+
+    hadTop_reader_tight->AddVariable( "b_from_leptop_bdt.csv", &varbjet_lepTop_csv );
+    hadTop_reader_tight->AddVariable( "b_from_hadtop_bdt.csv", &varbjet_hadTop_csv );
+    hadTop_reader_tight->AddVariable( "hadTop_tlv_bdt.Pt()", &varreco_hadTop_pt );
+    hadTop_reader_tight->AddVariable( "w_from_hadtop_tlv_bdt.M()", &varreco_WhadTop_mass );
+    hadTop_reader_tight->AddVariable( "hadTop_tlv_bdt.M()", &varreco_hadTop_mass );
+    hadTop_reader_tight->AddVariable( "lep_from_leptop_bdt.obj.pt()/lep_from_higgs_bdt.obj.pt()", &varPtRatio_leptOverleph );
+    hadTop_reader_tight->AddVariable( "dr_lepFromTop_bFromLepTop", &varDr_lept_bfromlTop );
+    hadTop_reader_tight->AddVariable( "dr_lepFromTop_bFromHadTop", &varDr_lept_bfromhTop );
+    hadTop_reader_tight->AddVariable( "dr_lepFromHiggs_bFromLepTop", &varDr_leph_bfromlTop );
+    string tight_file= data_path + "btight_BDTG.weights.xml";
+    hadTop_reader_tight->BookMVA("BDTG method", tight_file);
+};
+
+
+double get_hadTopMVA(){
+    double BDToutput=0.;
+    if(Jet_numbMedium<2){
+        BDToutput = hadTop_reader_loose->EvaluateMVA("BDTG method");
+    }else{
+        BDToutput = hadTop_reader_tight->EvaluateMVA("BDTG method");
+    }
+    return BDToutput; 
+};
+
+
+void Add_nullJet(){
+    for(uint jet_en=0; jet_en<Jet_pt->size();jet_en++){
+        Jet_null_pt->push_back(Jet_pt->at(jet_en));
+        Jet_null_eta->push_back(Jet_eta->at(jet_en));
+        Jet_null_phi->push_back(Jet_phi->at(jet_en));
+        Jet_null_energy->push_back(Jet_energy->at(jet_en));
+        Jet_null_csv->push_back(Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags->at(jet_en));
+    }
+    if(Jet_numLoose<=7){
+        Jet_null_pt->push_back(0);
+        Jet_null_eta->push_back(0);
+        Jet_null_phi->push_back(0);
+        Jet_null_energy->push_back(0);
+        Jet_null_csv->push_back(-0.2);
+
+        Jet_null_pt->push_back(0);
+        Jet_null_eta->push_back(0);
+        Jet_null_phi->push_back(0);
+        Jet_null_energy->push_back(0);
+        Jet_null_csv->push_back(-0.2);
+
+        Jet_null_pt->push_back(0);
+        Jet_null_eta->push_back(0);
+        Jet_null_phi->push_back(0);
+        Jet_null_energy->push_back(0);
+        Jet_null_csv->push_back(-0.2);
+    }
+    else if(Jet_numLoose==8){
+        Jet_null_pt->push_back(0);
+        Jet_null_eta->push_back(0);
+        Jet_null_phi->push_back(0);
+        Jet_null_energy->push_back(0);
+        Jet_null_csv->push_back(-0.2);
+
+        Jet_null_pt->push_back(0);
+        Jet_null_eta->push_back(0);
+        Jet_null_phi->push_back(0);
+        Jet_null_energy->push_back(0);
+        Jet_null_csv->push_back(-0.2);
+    }
+    else{
+        Jet_null_pt->push_back(0);
+        Jet_null_eta->push_back(0);
+        Jet_null_phi->push_back(0);
+        Jet_null_energy->push_back(0);
+        Jet_null_csv->push_back(-0.2);
+    }
+};
+
+
+void Reco_hadTop(){
+ int bjet_lepTop_INDEX= -999;
+ int bjet_hadTop_INDEX= -999;
+ int wjet1_hadTop_INDEX= -999;
+ int wjet2_hadTop_INDEX= -999;
+ int lep_Top_INDEX= -999;
+ int lep_H_INDEX= -999;
+ TLorentzVector bjet_fromHadTop_tlv={0,0,0,0};
+ TLorentzVector bjet_fromLepTop_tlv={0,0,0,0};
+ TLorentzVector wjet1_fromHadTop_tlv={0,0,0,0};
+ TLorentzVector wjet2_fromHadTop_tlv={0,0,0,0};
+ TLorentzVector w_fromHadTop_tlv={0,0,0,0};
+ TLorentzVector lep_fromTop_tlv={0,0,0,0};
+ TLorentzVector lep_fromHiggs_tlv={0,0,0,0};
+ TLorentzVector lepTop_tlv={0,0,0,0};
+ TLorentzVector hadTop_tlv={0,0,0,0};
+ bjet_hadTop_INDEX = -1;
+ for(uint bhad_en=0; bhad_en < Jet_null_pt->size(); bhad_en++){
+  bjet_hadTop_INDEX +=1;
+  if(bhad_en!=0&& Jet_null_pt->at(bhad_en)==0 && Jet_null_pt->at(bhad_en-1)==0)continue;//skip useless empty b-jet iterations (skip all perms with 2 null bjets)
+  //if(Jet_null_pt->at(bhad_en)==0 && Jet_null_pt->at(bhad_en-1)==0)continue;//skip useless empty b-jet iterations (skip all perms with 2 null bjets)
+  if(Jet_numbMedium>=2 && Jet_null_csv->at(bhad_en)<0.8)continue;//speed improvement
+  if(Jet_null_csv->at(bhad_en)>0 && Jet_null_csv->at(bhad_en)<0.46)continue; //speed improvement
+  
+
+  bjet_lepTop_INDEX = -1;
+  for(uint blep_en=0; blep_en < Jet_null_pt->size();blep_en++){
+   bjet_lepTop_INDEX +=1;
+   if(bjet_lepTop_INDEX==bjet_hadTop_INDEX)continue;
+   if(Jet_null_pt->at(blep_en)==0 && Jet_null_pt->at(blep_en-1)==0)continue;//skip useless empty b-jet iterations (skip all perms with 2 null bjets)
+   if(Jet_numbMedium>=2 && Jet_null_csv->at(blep_en)<0.8)continue;//speed improvement
+   if(Jet_null_csv->at(blep_en)>0 && Jet_null_csv->at(blep_en)<0.46)continue; //speed improvement
+   if(!((Jet_null_csv->at(blep_en)>0.8||Jet_null_csv->at(bhad_en)>0.8)||(Jet_null_csv->at(blep_en)>0.46 && Jet_null_csv->at(bhad_en)>0.46)))continue;
+    
+   wjet1_hadTop_INDEX = -1;
+   for(uint wjet1_en=0; wjet1_en < Jet_null_pt->size(); wjet1_en++){
+    wjet1_hadTop_INDEX += 1;
+    if(wjet1_hadTop_INDEX==bjet_lepTop_INDEX)continue;
+    if(wjet1_hadTop_INDEX==bjet_hadTop_INDEX)continue;
+    
+    
+    wjet2_hadTop_INDEX = -1;
+    for(uint wjet2_en=0; wjet2_en < Jet_null_pt->size(); wjet2_en++){
+     wjet2_hadTop_INDEX += 1;
+     if(wjet2_hadTop_INDEX==bjet_lepTop_INDEX)continue;
+     if(wjet2_hadTop_INDEX==bjet_hadTop_INDEX)continue;
+     if(wjet2_hadTop_INDEX<=wjet1_hadTop_INDEX)continue;//skip duplicates
+     bjet_fromHadTop_tlv.SetPtEtaPhiE(Jet_null_pt->at(bhad_en),Jet_null_eta->at(bhad_en),Jet_null_phi->at(bhad_en),Jet_null_energy->at(bhad_en));
+     bjet_fromLepTop_tlv.SetPtEtaPhiE(Jet_null_pt->at(blep_en),Jet_null_eta->at(blep_en),Jet_null_phi->at(blep_en),Jet_null_energy->at(blep_en));
+     wjet1_fromHadTop_tlv.SetPtEtaPhiE(Jet_null_pt->at(wjet1_en),Jet_null_eta->at(wjet1_en),Jet_null_phi->at(wjet1_en),Jet_null_energy->at(wjet1_en));
+     wjet2_fromHadTop_tlv.SetPtEtaPhiE(Jet_null_pt->at(wjet2_en),Jet_null_eta->at(wjet2_en),Jet_null_phi->at(wjet2_en),Jet_null_energy->at(wjet2_en));
+     w_fromHadTop_tlv = wjet1_fromHadTop_tlv + wjet2_fromHadTop_tlv;
+     if (w_fromHadTop_tlv.M() > 120 ) continue; 
+     hadTop_tlv = w_fromHadTop_tlv + bjet_fromHadTop_tlv;
+     if ( hadTop_tlv.M() > 220 ) continue;
+
+     lep_Top_INDEX= -1;
+     for(uint ltop_en=0; ltop_en<2; ltop_en++){
+      lep_Top_INDEX += 1;
+     
+      lep_H_INDEX= -1;
+      for(uint lhig_en=0; lhig_en<2; lhig_en++){
+       lep_H_INDEX += 1;
+       if(lep_Top_INDEX==lep_H_INDEX)continue;
+       if(FakeLep_corrpt->size()>=2){
+        lep_fromTop_tlv.SetPtEtaPhiE(FakeLep_corrpt->at(ltop_en),FakeLep_eta->at(ltop_en),FakeLep_phi->at(ltop_en),FakeLep_energy->at(ltop_en));
+        lep_fromHiggs_tlv.SetPtEtaPhiE(FakeLep_corrpt->at(lhig_en),FakeLep_eta->at(lhig_en),FakeLep_phi->at(lhig_en),FakeLep_energy->at(lhig_en));
+       }else{
+        lep_fromTop_tlv.SetPtEtaPhiE(1,1,1,2);//set to 1,1,1,2 to avoid null at denominator
+        lep_fromHiggs_tlv.SetPtEtaPhiE(1,1,1,2); // set to 1,1,1,2 to avoid null at denominator
+       }
+       lepTop_tlv = lep_fromTop_tlv + bjet_fromLepTop_tlv;
+       if ( lepTop_tlv.M() > 180 ) continue;
+       //calculate all variables       
+       varbjet_lepTop_csv = Jet_null_csv->at(blep_en);
+       varbjet_hadTop_csv = Jet_null_csv->at(bhad_en);
+       varreco_hadTop_pt = hadTop_tlv.Pt();
+       varreco_hadTop_mass = hadTop_tlv.M();
+       varreco_WhadTop_mass = w_fromHadTop_tlv.M();
+       varPtRatio_leptOverleph = lep_fromTop_tlv.Pt()/lep_fromHiggs_tlv.Pt();
+       varDr_lept_bfromlTop = bjet_fromLepTop_tlv.Pt()==0 ? -1: deltaR(deltaPhi(lep_fromTop_tlv.Phi(),bjet_fromLepTop_tlv.Phi()),deltaEta(lep_fromTop_tlv.Eta(),bjet_fromLepTop_tlv.Eta()));
+       varDr_lept_bfromhTop = bjet_fromHadTop_tlv.Pt()==0? -1: deltaR(deltaPhi(lep_fromTop_tlv.Phi(),bjet_fromHadTop_tlv.Phi()),deltaEta(lep_fromTop_tlv.Eta(),bjet_fromHadTop_tlv.Eta()));
+       varDr_leph_bfromlTop = bjet_fromLepTop_tlv.Pt()==0? -1: deltaR(deltaPhi(lep_fromHiggs_tlv.Phi(),bjet_fromLepTop_tlv.Phi()),deltaEta(lep_fromHiggs_tlv.Eta(),bjet_fromLepTop_tlv.Eta()));
+       double mva_value= get_hadTopMVA();
+       if(mva_value > hadTop_BDT){
+        hadTop_BDT = mva_value;
+        bjet_lepTop_index = bjet_lepTop_INDEX;
+        bjet_hadTop_index = bjet_hadTop_INDEX;
+        wjet1_hadTop_index = wjet1_hadTop_INDEX;
+        wjet2_hadTop_index = wjet2_hadTop_INDEX;
+        lep_Top_index = lep_Top_INDEX;
+        lep_H_index = lep_H_INDEX;
+        bjet_lepTop_pt = bjet_fromLepTop_tlv.Pt();
+        bjet_hadTop_pt = bjet_fromHadTop_tlv.Pt();
+        wjet1_hadTop_pt = wjet1_fromHadTop_tlv.Pt();
+        wjet2_hadTop_pt = wjet2_fromHadTop_tlv.Pt();
+        lep_Top_pt = lep_fromTop_tlv.Pt();
+        lep_H_pt = lep_fromHiggs_tlv.Pt();
+        bjet_lepTop_eta = bjet_fromLepTop_tlv.Eta();
+        bjet_hadTop_eta = bjet_fromHadTop_tlv.Eta();
+        wjet1_hadTop_eta = wjet1_fromHadTop_tlv.Eta();
+        wjet2_hadTop_eta = wjet2_fromHadTop_tlv.Eta();
+        lep_Top_eta = lep_fromTop_tlv.Eta();
+        lep_H_eta = lep_fromHiggs_tlv.Eta();
+        bjet_lepTop_phi = bjet_fromLepTop_tlv.Phi();
+        bjet_hadTop_phi = bjet_fromHadTop_tlv.Phi();
+        wjet1_hadTop_phi = wjet1_fromHadTop_tlv.Phi();
+        wjet2_hadTop_phi = wjet2_fromHadTop_tlv.Phi();
+        lep_Top_phi = lep_fromTop_tlv.Phi();
+        lep_H_phi = lep_fromHiggs_tlv.Phi();
+        bjet_lepTop_energy = bjet_fromLepTop_tlv.E();
+        bjet_hadTop_energy = bjet_fromHadTop_tlv.E();
+        wjet1_hadTop_energy = wjet1_fromHadTop_tlv.E();
+        wjet2_hadTop_energy = wjet2_fromHadTop_tlv.E();
+        lep_Top_energy = lep_fromTop_tlv.E();
+        lep_H_energy = lep_fromHiggs_tlv.E();
+        bjet_lepTop_csv = varbjet_lepTop_csv;
+        bjet_hadTop_csv = varbjet_hadTop_csv;
+        reco_hadTop_pt = varreco_hadTop_pt;
+        reco_hadTop_mass = varreco_hadTop_mass;
+        reco_WhadTop_mass = varreco_WhadTop_mass;
+        PtRatio_leptOverleph = varPtRatio_leptOverleph;
+        Dr_lept_bfromlTop = varDr_lept_bfromlTop;
+        Dr_lept_bfromhTop = varDr_lept_bfromhTop;
+        Dr_leph_bfromlTop = varDr_leph_bfromlTop;
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+};
 
 //////
 // Variables handling
@@ -1893,6 +2125,8 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("isEleMuSR",&isEleMuSR);
     newtree->Branch("isTriLepSR",&isTriLepSR);
     newtree->Branch("isQuaLepSR",&isQuaLepSR);
+    // hadTop tagger
+    newtree->Branch("hadTop_BDT",&hadTop_BDT);
 };
 
 
@@ -2235,6 +2469,63 @@ void wClearInitialization(string sample){
     isEleMuSR= -999;
     isTriLepSR= -999;
     isQuaLepSR= -999;
+    ///////
+    //HadTop
+    ///////
+    Jet_null_pt->clear();
+    Jet_null_eta->clear();
+    Jet_null_phi->clear();
+    Jet_null_energy->clear();
+    Jet_null_csv->clear();
+    bjet_lepTop_index= 999;
+    bjet_hadTop_index= 999;
+    wjet1_hadTop_index= 999;
+    wjet2_hadTop_index= 999;
+    lep_Top_index= 999;
+    lep_H_index= 999;
+    bjet_lepTop_pt= -999;
+    bjet_hadTop_pt= -999;
+    wjet1_hadTop_pt= -999;
+    wjet2_hadTop_pt= -999;
+    lep_Top_pt= -999;
+    lep_H_pt= -999;
+    bjet_lepTop_eta= -999;
+    bjet_hadTop_eta= -999;
+    wjet1_hadTop_eta= -999;
+    wjet2_hadTop_eta= -999;
+    lep_Top_eta= -999;
+    lep_H_eta= -999;
+    bjet_lepTop_phi= -999;
+    bjet_hadTop_phi= -999;
+    wjet1_hadTop_phi= -999;
+    wjet2_hadTop_phi= -999;
+    lep_Top_phi= -999;
+    lep_H_phi= -999;
+    bjet_lepTop_energy= -999;
+    bjet_hadTop_energy= -999;
+    wjet1_hadTop_energy= -999;
+    wjet2_hadTop_energy= -999;
+    lep_Top_energy= -999;
+    lep_H_energy= -999;
+    bjet_lepTop_csv= -999;
+    bjet_hadTop_csv= -999;
+    reco_hadTop_pt= -999;
+    reco_hadTop_mass= -999;
+    reco_WhadTop_mass= -999;
+    PtRatio_leptOverleph= -999;
+    Dr_lept_bfromlTop= -999;
+    Dr_lept_bfromhTop= -999;
+    Dr_leph_bfromlTop= -999;
+    hadTop_BDT= -999;
+    varbjet_lepTop_csv= -999;
+    varbjet_hadTop_csv= -999;
+    varreco_hadTop_pt= -999;
+    varreco_hadTop_mass= -999;
+    varreco_WhadTop_mass= -999;
+    varPtRatio_leptOverleph= -999;
+    varDr_lept_bfromlTop= -999;
+    varDr_lept_bfromhTop= -999;
+    varDr_leph_bfromlTop= -999;
 };
 
 

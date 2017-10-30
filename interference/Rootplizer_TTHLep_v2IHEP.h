@@ -14,7 +14,7 @@ using namespace std;
 ////
 //   Declare constants
 /////
-const int nentries = -1;//-1 is all entries  51 for first DiMuSR
+const int nentries = 1000;//-1 is all entries  51 for first DiMuSR
 const bool debug =false;
 string synchro = "";
 const double evt = 653077.;
@@ -684,3 +684,74 @@ double hadTop_numGen;
 double hadW_numGen_cone8;
 double hadW_numGen_pt190;
 double hadW_numGen;
+
+
+////////////
+////HadTop
+///////////
+//Method
+void set_hadTopMVA();
+double get_hadTopMVA();
+void Add_nullJet();
+void Reco_hadTop();
+//Permutation
+vector<double>* Jet_null_pt = new std::vector<double>;
+vector<double>* Jet_null_eta = new std::vector<double>;
+vector<double>* Jet_null_phi = new std::vector<double>;
+vector<double>* Jet_null_energy = new std::vector<double>;
+vector<double>* Jet_null_csv = new std::vector<double>;
+int bjet_lepTop_index;
+int bjet_hadTop_index;
+int wjet1_hadTop_index;
+int wjet2_hadTop_index;
+int lep_Top_index;
+int lep_H_index;
+double bjet_lepTop_pt;
+double bjet_hadTop_pt;
+double wjet1_hadTop_pt;
+double wjet2_hadTop_pt;
+double lep_Top_pt;
+double lep_H_pt;
+double bjet_lepTop_eta;
+double bjet_hadTop_eta;
+double wjet1_hadTop_eta;
+double wjet2_hadTop_eta;
+double lep_Top_eta;
+double lep_H_eta;
+double bjet_lepTop_phi;
+double bjet_hadTop_phi;
+double wjet1_hadTop_phi;
+double wjet2_hadTop_phi;
+double lep_Top_phi;
+double lep_H_phi;
+double bjet_lepTop_energy;
+double bjet_hadTop_energy;
+double wjet1_hadTop_energy;
+double wjet2_hadTop_energy;
+double lep_Top_energy;
+double lep_H_energy;
+double bjet_lepTop_csv;
+double bjet_hadTop_csv;
+double reco_hadTop_pt;
+double reco_hadTop_mass;
+double reco_WhadTop_mass;
+double PtRatio_leptOverleph;
+double Dr_lept_bfromlTop;
+double Dr_lept_bfromhTop;
+double Dr_leph_bfromlTop;
+double hadTop_BDT;
+
+
+//MVA
+TMVA::Reader *hadTop_reader_loose;
+TMVA::Reader *hadTop_reader_tight;
+
+Float_t varbjet_lepTop_csv;
+Float_t varbjet_hadTop_csv;
+Float_t varreco_hadTop_pt;
+Float_t varreco_hadTop_mass;
+Float_t varreco_WhadTop_mass;
+Float_t varPtRatio_leptOverleph;
+Float_t varDr_lept_bfromlTop;
+Float_t varDr_lept_bfromhTop;
+Float_t varDr_leph_bfromlTop;
