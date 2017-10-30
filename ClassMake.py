@@ -22,7 +22,7 @@ Case = "CaseC"
 # Variable Definition
 
 rObject = "BoostedJet"
-wObject = "Lep"
+wObject = "Jet"
 
 VariableType  = "double"
 VariableNames = [
@@ -38,7 +38,7 @@ VariableNames = [
 #"genMother_pt","genMother_eta","genMother_phi","genMother_en","genMother_pdgId",
 #"genGrandMother_pt","genGrandMother_eta","genGrandMother_phi","genGrandMother_en","genGrandMother_pdgId",
 #"gen_isPromptFinalState","gen_isDirectPromptTauDecayProductFinalState",
-"mcPromptFS","mcMatchId","mcPromptGamma"
+#"mcPromptFS","mcMatchId","mcPromptGamma"
 
 # Electron only
 #"SCeta","expectedMissingInnerHits","full5x5_sigmaIetaIeta","hOverE","dEtaIn","dPhiIn","ooEmooP", 
@@ -56,7 +56,7 @@ VariableNames = [
 #"px","py","pz","mass",
 #"qg","axis2","ptD","mult",
 #"partonFlavour","hadronFlavour","genpt","geneta","genphi","genenergy",
-
+"BDT","lepdrmin","lepdrmax","isToptag"
 
 #"JesSF","JesSFup","JesSFdown","JerSF","JerSFup","JerSFdown",
 #"neutralHadEnergyFraction","neutralEmEnergyFraction","chargedMultiplicity","numberOfConstituents","chargedHadronEnergyFraction", "chargedEmEnergyFraction",
@@ -214,4 +214,4 @@ elif Case == "CaseC":
 
  print >> vector, "   //Write variables"
  for Variable in VariableNames:
-     print >> vector, "        "+wObject+"_"+Variable+"->push_back(leptons->at("+ParWrite+")."+Variable+");"
+     print >> vector, "        "+wObject+"_"+Variable+"->push_back(jets->at("+ParWrite+")."+Variable+");"

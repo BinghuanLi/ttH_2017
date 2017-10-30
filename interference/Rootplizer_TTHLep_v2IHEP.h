@@ -740,6 +740,7 @@ double Dr_lept_bfromlTop;
 double Dr_lept_bfromhTop;
 double Dr_leph_bfromlTop;
 double hadTop_BDT;
+vector<double>* Jet_isToptag = new std::vector<double>;
 
 
 //MVA
@@ -755,3 +756,20 @@ Float_t varPtRatio_leptOverleph;
 Float_t varDr_lept_bfromlTop;
 Float_t varDr_lept_bfromhTop;
 Float_t varDr_leph_bfromlTop;
+
+////
+// Hj tagger
+////
+double Hj1_BDT;
+vector<double>* Jet_BDT = new std::vector<double>;
+vector<double>* Jet_lepdrmin = new std::vector<double>;
+vector<double>* Jet_lepdrmax = new std::vector<double>;
+double get_JetMVA(Jet jet);
+void Jet_MVAsel();
+
+TMVA::Reader *readerjet;
+Float_t jetvarqg;
+Float_t jetvarlepdrmax;
+Float_t jetvarlepdrmin;
+Float_t jetvarpfCombinedInclusiveSecondaryVertexV2BJetTags;
+Float_t jetvarpt;

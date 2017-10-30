@@ -72,6 +72,7 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
 // Anaysis functions
 ////
 void set_wgtMVA(){
+    // set lepton MVAs
     string ele_wgt = data_path + "el_BDTG.weights.xml";
     string mu_wgt = data_path + "mu_BDTG.weights.xml";
     mu_reader_ = new TMVA::Reader("!Color:!Silent");
@@ -94,6 +95,16 @@ void set_wgtMVA(){
     mu_reader_->AddVariable("LepGood_segmentCompatibility", &varSegCompat);
     ele_reader_->BookMVA("BDTG method",ele_wgt); 
     mu_reader_->BookMVA("BDTG method",mu_wgt); 
+
+    // set Hj tagger MVA
+    string Hj_wgt = data_path + "Hj_csv_BDTG.weights.xml";
+    readerjet = new TMVA::Reader("!Color:!Silent");
+    readerjet->AddVariable("Jet_lepdrmin",&jetvarlepdrmin);
+    readerjet->AddVariable("Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags := max(Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags,0.)",&jetvarpfCombinedInclusiveSecondaryVertexV2BJetTags);
+    readerjet->AddVariable("Jet_qg := max(Jet_qg,0.)",&jetvarqg);
+    readerjet->AddVariable("Jet_lepdrmax",&jetvarlepdrmax);
+    readerjet->AddVariable("Jet_pt",&jetvarpt);
+    readerjet->BookMVA("BDTG method", Hj_wgt); 
 }; 
 
 
@@ -1082,6 +1093,8 @@ void Event_sel( string OutputName){
     //hadTop
     Add_nullJet();
     Reco_hadTop();
+    //Hj tagger
+    Jet_MVAsel();
 }
 
 // tth event selections
@@ -1540,6 +1553,67 @@ void Reco_hadTop(){
  }
 };
 
+
+////
+// Hj tagger
+////
+double get_JetMVA(Jet jet){
+    jetvarqg = jet.qg;
+    jetvarlepdrmax = jet.lepdrmax;
+    jetvarpt = jet.pt;
+    jetvarlepdrmin = jet.lepdrmin;
+    jetvarpfCombinedInclusiveSecondaryVertexV2BJetTags = jet.pfCombinedInclusiveSecondaryVertexV2BJetTags;
+    return readerjet->EvaluateMVA("BDTG method");
+}
+
+
+void Jet_MVAsel(){
+    TLorentzVector Lep1={0,0,0,0};
+    TLorentzVector Lep2={0,0,0,0};
+    int jet_index=-1;
+    double maxHj = -99;
+    for(uint jet_en=0; jet_en < jets->size(); jet_en++){
+        Jet curr_jet = jets->at(jet_en);
+        // check if the jet is a had top tagged jet
+        jet_index++;
+        curr_jet.jet_ishadtop( jet_index, bjet_hadTop_index, wjet1_hadTop_index, wjet2_hadTop_index);
+  
+        // calculate Hj variables
+        double lepdrmin = 0;
+        double lepdrmax = 0;
+        double lep1dr = 0;
+        double lep2dr = 0;
+        if(FakeLep_corrpt->size()<1){
+            lepdrmin = -1;
+            lepdrmax = -1;
+        }else if(FakeLep_corrpt->size()==1){
+            Lep1.SetPtEtaPhiE(FakeLep_corrpt->at(0),FakeLep_eta->at(0),FakeLep_phi->at(0),FakeLep_energy->at(0));
+            lepdrmin = deltaR(deltaPhi(Jet_phi->at(jet_en),Lep1.Phi()),deltaEta(Jet_eta->at(jet_en),Lep1.Eta()));
+            lepdrmax = lepdrmin; 
+        }else{
+            Lep1.SetPtEtaPhiE(FakeLep_corrpt->at(0),FakeLep_eta->at(0),FakeLep_phi->at(0),FakeLep_energy->at(0));
+            Lep2.SetPtEtaPhiE(FakeLep_corrpt->at(1),FakeLep_eta->at(1),FakeLep_phi->at(1),FakeLep_energy->at(1));
+            lep1dr = deltaR(deltaPhi(curr_jet.phi,Lep1.Phi()),deltaEta(curr_jet.eta,Lep1.Eta()));
+            lep2dr = deltaR(deltaPhi(curr_jet.phi,Lep2.Phi()),deltaEta(curr_jet.eta,Lep2.Eta()));
+            if(lep1dr<lep2dr){
+                lepdrmin = lep1dr;
+                lepdrmax = lep2dr;
+            }else{
+                lepdrmin = lep2dr;
+                lepdrmax = lep1dr;
+            }
+        }
+        curr_jet.lepdrmin = lepdrmin;
+        curr_jet.lepdrmax = lepdrmax;
+        if(curr_jet.isToptag !=1) curr_jet.BDT = get_JetMVA(curr_jet);
+        if(curr_jet.BDT > maxHj) maxHj = curr_jet.BDT;
+        Jet_lepdrmin->push_back(curr_jet.lepdrmin);
+        Jet_lepdrmax->push_back(curr_jet.lepdrmax);
+        Jet_BDT->push_back(curr_jet.BDT);
+        Jet_isToptag->push_back(curr_jet.isToptag);
+    }
+    Hj1_BDT=maxHj;
+};
 //////
 // Variables handling
 //////
@@ -2125,8 +2199,13 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("isEleMuSR",&isEleMuSR);
     newtree->Branch("isTriLepSR",&isTriLepSR);
     newtree->Branch("isQuaLepSR",&isQuaLepSR);
-    // hadTop tagger
+    // hadTop and Hj tagger
     newtree->Branch("hadTop_BDT",&hadTop_BDT);
+    newtree->Branch("Jet_isToptag",&Jet_isToptag);
+    newtree->Branch("Hj1_BDT",&Hj1_BDT);
+    newtree->Branch("Jet_BDT",&Jet_BDT);
+    newtree->Branch("Jet_lepdrmin",&Jet_lepdrmin);
+    newtree->Branch("Jet_lepdrmax",&Jet_lepdrmax);
 };
 
 
@@ -2526,6 +2605,11 @@ void wClearInitialization(string sample){
     varDr_lept_bfromlTop= -999;
     varDr_lept_bfromhTop= -999;
     varDr_leph_bfromlTop= -999;
+    Hj1_BDT= -999;
+    Jet_BDT->clear();
+    Jet_lepdrmin->clear();
+    Jet_lepdrmax->clear();
+    Jet_isToptag->clear();
 };
 
 

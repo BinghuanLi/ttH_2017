@@ -40,3 +40,9 @@ void Jet::set_Wp_bdisc(int& numbLoose, int& numbMedium, int& numbTight){
     }
 };
 
+
+// hadTop tagger
+void Jet::jet_ishadtop(int jet_index, int bjet_index, int w1_index, int w2_index){
+    if(jet_index == bjet_index || jet_index == w1_index || jet_index == w2_index) isToptag=1;
+    else isToptag = 0;
+}

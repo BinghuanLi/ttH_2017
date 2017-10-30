@@ -78,9 +78,14 @@ class Jet {
         // new variables
         double cut = -999;
         double bcut = -999;
+        double BDT = -2;
+        double lepdrmin = -999;
+        double lepdrmax = -999;
+        double isToptag = -999;
        
         //Object Identification
         bool jet_isLoose();
         void set_Wp_jets(int& numLoose);
         void set_Wp_bdisc(int& numbLoose, int& numbMedium, int& numbTight);
+        void jet_ishadtop(int jet_index, int bjet_index, int w1_index, int w2_index);
 };
