@@ -51,13 +51,26 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
         //Event
         Event_sel(Output);
         //tth event selection
+        // signal region
         DiMuSR_sel(); 
         DiEleSR_sel();
         EleMuSR_sel();
         TriLepSR_sel();
         QuaLepSR_sel();
+        // lepton mva region
+        EleMuMVAAR_sel();
+        DiEleMVAAR_sel();
+        DiMuMVAAR_sel();
+        // 2l os region
+        EleMuOSAR_sel();
+        DiEleOSAR_sel();
+        DiMuOSAR_sel();
+        // calculate ttH weight
+        cal_ttHweight();
         if(!(
             isDiEleSR==1 || isDiMuSR==1 || isEleMuSR ==1|| isTriLepSR ==1 || isQuaLepSR == 1
+            || isDiEleMVAAR==1 || isDiMuMVAAR==1 || isEleMuMVAAR ==1
+            || isDiEleOSAR ==1 || isDiMuOSAR ==1 || isEleMuOSAR ==1
             )) continue;
         // Fill Tree
         newtree->Fill();
@@ -1158,11 +1171,49 @@ void DiMuSR_sel(){
         && FakeLep_cut->at(0)==3 && FakeLep_cut->at(1) ==3
         && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
         && FakeLep_charge->at(0)*FakeLep_charge->at(1)==1
-        && Jet_numLoose>=3 
+        && Jet_numLoose>=4 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && !(massL < 12 && massL > 0)
         && fabs(mass_diele - 91.2)>10
     ) isDiMuSR = 1;
+}
+
+
+void DiMuMVAAR_sel(){
+    if(
+        FakeLep_pt->size()>=2
+        && (Muon_numTight + patElectron_numTight) <=2
+        && Tau_numMedium==0 
+        && TTHLep_2Mu==1
+        && fabs(FakeLep_pdgId->at(0))==13
+        && fabs(FakeLep_pdgId->at(1))==13
+        && FakeLep_passMuTightCharge->at(0)==1&&FakeLep_passMuTightCharge->at(1)==1
+        && !(FakeLep_cut->at(0)==3 && FakeLep_cut->at(1) ==3)
+        && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
+        && FakeLep_charge->at(0)*FakeLep_charge->at(1)==1
+        && Jet_numLoose>=4 
+        && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
+        && !(massL < 12 && massL > 0)
+        && fabs(mass_diele - 91.2)>10
+    ) isDiMuMVAAR = 1;
+}
+
+
+void DiMuOSAR_sel(){
+    if(
+        Muon_numTight==2 && patElectron_numTight ==0&& Tau_numMedium==0 
+        && TTHLep_2Mu==1
+        && fabs(FakeLep_pdgId->at(0))==13
+        && fabs(FakeLep_pdgId->at(1))==13
+        && FakeLep_passMuTightCharge->at(0)==1&&FakeLep_passMuTightCharge->at(1)==1
+        && FakeLep_cut->at(0)==3 && FakeLep_cut->at(1) ==3
+        && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
+        && FakeLep_charge->at(0)*FakeLep_charge->at(1)== -1
+        && Jet_numLoose>=4 
+        && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
+        && !(massL < 12 && massL > 0)
+        && fabs(mass_diele - 91.2)>10
+    ) isDiMuOSAR = 1;
 }
 
 
@@ -1179,12 +1230,58 @@ void DiEleSR_sel(){
         && FakeLep_passEleTightCharge->at(0)==1&&FakeLep_passEleTightCharge->at(1)==1
         && FakeLep_passConversion->at(0)==1&&FakeLep_passConversion->at(1)==1
         && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
-        && Jet_numLoose>=3 
+        && Jet_numLoose>=4 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && metLD > 0.2
         && !(massL < 12 && massL > 0)
         && fabs(mass_diele - 91.2)>10
     ) isDiEleSR = 1;
+};
+
+
+void DiEleMVAAR_sel(){
+    if( 
+        FakeLep_pt->size() >=2
+        && (Muon_numTight + patElectron_numTight) <=2 
+        && TTHLep_2Ele==1
+        && Tau_numMedium ==0
+        && fabs(FakeLep_pdgId->at(0))==11
+        && fabs(FakeLep_pdgId->at(1))==11
+        && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
+        && FakeLep_charge->at(0)*FakeLep_charge->at(1)==1
+        && !(FakeLep_cut->at(0)==3 && FakeLep_cut->at(1) ==3)
+        && FakeLep_passMuTightCharge->at(0)==1&&FakeLep_passMuTightCharge->at(1)==1
+        && FakeLep_passEleTightCharge->at(0)==1&&FakeLep_passEleTightCharge->at(1)==1
+        && FakeLep_passConversion->at(0)==1&&FakeLep_passConversion->at(1)==1
+        && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
+        && Jet_numLoose>=4 
+        && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
+        && metLD > 0.2
+        && !(massL < 12 && massL > 0)
+        && fabs(mass_diele - 91.2)>10
+    ) isDiEleMVAAR = 1;
+};
+
+
+void DiEleOSAR_sel(){
+    if( Muon_numTight==0 && patElectron_numTight ==2 
+        && TTHLep_2Ele==1
+        && Tau_numMedium ==0
+        && fabs(FakeLep_pdgId->at(0))==11
+        && fabs(FakeLep_pdgId->at(1))==11
+        && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
+        && FakeLep_charge->at(0)*FakeLep_charge->at(1)== -1
+        && FakeLep_cut->at(0)==3 && FakeLep_cut->at(1) ==3
+        && FakeLep_passMuTightCharge->at(0)==1&&FakeLep_passMuTightCharge->at(1)==1
+        && FakeLep_passEleTightCharge->at(0)==1&&FakeLep_passEleTightCharge->at(1)==1
+        && FakeLep_passConversion->at(0)==1&&FakeLep_passConversion->at(1)==1
+        && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
+        && Jet_numLoose>=4 
+        && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
+        && metLD > 0.2
+        && !(massL < 12 && massL > 0)
+        && fabs(mass_diele - 91.2)>10
+    ) isDiEleOSAR = 1;
 };
 
 
@@ -1199,11 +1296,51 @@ void EleMuSR_sel(){
         && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
         && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
         && fabs(FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))==24
-        && Jet_numLoose>=3 
+        && Jet_numLoose>=4 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && !(massL < 12 && massL > 0)
         && fabs(mass_diele - 91.2)>10
     ) isEleMuSR = 1;
+};
+
+
+void EleMuMVAAR_sel(){
+    if( 
+        FakeLep_pt->size()>=2
+        && (Muon_numTight+ patElectron_numTight) <=2 
+        && TTHLep_MuEle==1
+        && Tau_numMedium ==0
+        && !(FakeLep_cut->at(0)==3 && FakeLep_cut->at(1) ==3)
+        && FakeLep_passMuTightCharge->at(0)==1&&FakeLep_passMuTightCharge->at(1)==1
+        && FakeLep_passEleTightCharge->at(0)==1&&FakeLep_passEleTightCharge->at(1)==1
+        && FakeLep_passConversion->at(0)==1&&FakeLep_passConversion->at(1)==1
+        && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
+        && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
+        && fabs(FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))==24
+        && Jet_numLoose>=4 
+        && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
+        && !(massL < 12 && massL > 0)
+        && fabs(mass_diele - 91.2)>10
+    ) isEleMuMVAAR = 1;
+};
+
+
+void EleMuOSAR_sel(){
+    if( Muon_numTight==1 && patElectron_numTight ==1 
+        && TTHLep_MuEle==1
+        && Tau_numMedium ==0
+        && FakeLep_cut->at(0)==3 && FakeLep_cut->at(1) ==3
+        && FakeLep_passMuTightCharge->at(0)==1&&FakeLep_passMuTightCharge->at(1)==1
+        && FakeLep_passEleTightCharge->at(0)==1&&FakeLep_passEleTightCharge->at(1)==1
+        && FakeLep_passConversion->at(0)==1&&FakeLep_passConversion->at(1)==1
+        && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
+        && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
+        && fabs(FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))==2
+        && Jet_numLoose>=4 
+        && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
+        && !(massL < 12 && massL > 0)
+        && fabs(mass_diele - 91.2)>10
+    ) isEleMuOSAR = 1;
 };
 
 
@@ -1323,6 +1460,44 @@ double get_wgtlumi(string FileName){
     if(FileName.find("ZZTo4L") != std::string::npos) wgt=1.256/6669854;
     return wgt;
 }
+
+
+void cal_ttHweight(){
+    // signal region wgt
+    if(isDiMuSR==1||isDiEleSR==1||isEleMuSR==1||isTriLepSR==1|| isQuaLepSR==1) tthWeight_SR=1;
+    // lepton mva region wgt
+    // 2l 
+    if(isDiMuMVAAR==1||isDiEleMVAAR==1||isEleMuMVAAR==1){
+        int numFake =0;
+        double mvaWgt=1.;
+        for(uint lep_en=0;lep_en < 2;lep_en++){
+            double wgt_lepton = FakeLep_FR->at(lep_en)/(1-FakeLep_FR->at(lep_en));
+            if(FakeLep_cut->at(lep_en)==1){
+                numFake++;
+                mvaWgt=mvaWgt*wgt_lepton;
+            }
+        }
+        tthWeight_DiLepMVA=mvaWgt;
+        if(numFake==2)tthWeight_DiLepMVA=-1*mvaWgt;
+    }
+    //3l
+    if(isTriLepMVAAR==1){
+        int numFake =0;
+        double mvaWgt=1.;
+        for(uint lep_en=0;lep_en < 3;lep_en++){
+            double wgt_lepton = FakeLep_FR->at(lep_en)/(1-FakeLep_FR->at(lep_en));
+            if(FakeLep_cut->at(lep_en)==1){
+                numFake++;
+                mvaWgt=mvaWgt*wgt_lepton;
+            }
+        }
+        tthWeight_TriLepMVA=mvaWgt;
+        if(numFake==2)tthWeight_TriLepMVA=-1*mvaWgt;
+    }
+    // 2l OS region wgt
+    if(isDiMuOSAR==1||isDiEleOSAR==1||isEleMuOSAR==1)
+        tthWeight_OS=FakeLep_CF->at(0) + FakeLep_CF->at(1); 
+};
 
 ////////
 //hadTop
@@ -2199,6 +2374,19 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("isEleMuSR",&isEleMuSR);
     newtree->Branch("isTriLepSR",&isTriLepSR);
     newtree->Branch("isQuaLepSR",&isQuaLepSR);
+    newtree->Branch("isDiMuMVAAR",&isDiMuMVAAR);
+    newtree->Branch("isDiEleMVAAR",&isDiEleMVAAR);
+    newtree->Branch("isEleMuMVAAR",&isEleMuMVAAR);
+    newtree->Branch("isTriLepMVAAR",&isTriLepMVAAR);
+    newtree->Branch("isQuaLepMVAAR",&isQuaLepMVAAR);
+    newtree->Branch("isDiMuOSAR",&isDiMuOSAR);
+    newtree->Branch("isDiEleOSAR",&isDiEleOSAR);
+    newtree->Branch("isEleMuOSAR",&isEleMuOSAR);
+    // tth evt weight
+    newtree->Branch("tthWeight_SR",&tthWeight_SR);
+    newtree->Branch("tthWeight_OS",&tthWeight_OS);
+    newtree->Branch("tthWeight_DiLepMVA",&tthWeight_DiLepMVA);
+    newtree->Branch("tthWeight_TriLepMVA",&tthWeight_TriLepMVA);
     // hadTop and Hj tagger
     newtree->Branch("hadTop_BDT",&hadTop_BDT);
     newtree->Branch("Jet_isToptag",&Jet_isToptag);
@@ -2548,6 +2736,19 @@ void wClearInitialization(string sample){
     isEleMuSR= -999;
     isTriLepSR= -999;
     isQuaLepSR= -999;
+    isDiMuMVAAR= -999;
+    isDiEleMVAAR= -999;
+    isEleMuMVAAR= -999;
+    isTriLepMVAAR= -999;
+    isQuaLepMVAAR= -999;
+    isDiMuOSAR= -999;
+    isDiEleOSAR= -999;
+    isEleMuOSAR= -999;
+    // tth evt weight
+    tthWeight_SR= -999;
+    tthWeight_OS= -999;
+    tthWeight_DiLepMVA= -999;
+    tthWeight_TriLepMVA= -999;
     ///////
     //HadTop
     ///////

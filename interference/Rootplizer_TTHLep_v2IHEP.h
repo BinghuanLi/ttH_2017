@@ -14,7 +14,7 @@ using namespace std;
 ////
 //   Declare constants
 /////
-const int nentries = 1000;//-1 is all entries  51 for first DiMuSR
+const int nentries = -1;//-1 is all entries  51 for first DiMuSR
 const bool debug =false;
 string synchro = "";
 const double evt = 653077.;
@@ -42,11 +42,20 @@ void Find_Gen_HadTop_HadW();
 void Cal_dilep_mass();
 
 //tth event selections
+// 2l signal region
 void DiMuSR_sel();
 void DiEleSR_sel();
 void EleMuSR_sel();
 void TriLepSR_sel();
 void QuaLepSR_sel();
+// 2l lepton mva region
+void DiMuMVAAR_sel();
+void DiEleMVAAR_sel();
+void EleMuMVAAR_sel();
+// 2l os region
+void DiMuOSAR_sel();
+void DiEleOSAR_sel();
+void EleMuOSAR_sel();
 
 /////
 //utils
@@ -58,6 +67,7 @@ bool byConept(const Lepton& LeptonA, const Lepton& LeptonB);
 // event weights
 ///
 double get_wgtlumi(string FileName);
+void cal_ttHweight();
 
 //Read MVA's
 void set_wgtMVA();
@@ -429,6 +439,19 @@ double isDiEleSR;
 double isEleMuSR;
 double isTriLepSR;
 double isQuaLepSR;
+double isDiMuMVAAR;
+double isDiEleMVAAR;
+double isEleMuMVAAR;
+double isTriLepMVAAR;
+double isQuaLepMVAAR;
+double isDiMuOSAR;
+double isDiEleOSAR;
+double isEleMuOSAR;
+// tth evt weight
+double tthWeight_SR;
+double tthWeight_OS;
+double tthWeight_DiLepMVA;
+double tthWeight_TriLepMVA;
 
 
 //Lepton

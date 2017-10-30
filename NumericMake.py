@@ -109,7 +109,12 @@ VariableNames = [
 #"MediumW_numMatch","SoftW_numMatch","LooseW_numMatch","TightW_numMatch",
 #"MediumW_numMatch_fromH","SoftW_numMatch_fromH","LooseW_numMatch_fromH","TightW_numMatch_fromH",
 #"MediumW_numMatch_fromNonH","SoftW_numMatch_fromNonH","LooseW_numMatch_fromNonH","TightW_numMatch_fromNonH",
-"hadW_numGen_cone8"
+#"hadW_numGen_cone8"
+
+# ttH evt weight
+#"tthWeight_SR","tthWeight_OS","tthWeight_DiLepMVA","tthWeight_TriLepMVA"
+"isDiMuMVAAR","isDiEleMVAAR","isEleMuMVAAR","isTriLepMVAAR","isQuaLepMVAAR",
+"isDiMuOSAR","isDiEleOSAR","isEleMuOSAR",
 ]
 
 #VariableType  = "int"
