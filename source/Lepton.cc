@@ -180,6 +180,68 @@ void Lepton::cal_tight_property(){
 };
         
         
+void Lepton::cal_gen_property(vector<double>* rgen_pdg_id, vector<double>* rgen_pt, vector<double>* rgen_eta, vector<double>* rgen_phi, vector<double>* rgen_energy, vector<double>* rgen_status){
+    // calculate gen informations
+    // check whether it is a prompt lepton
+    if(gen_isDirectPromptTauDecayProductFinalState ==1 || gen_isPromptFinalState ==1 ) mcPromptFS = 1;
+    else mcPromptFS = 0;
+    // check whether it is a lepton matched Gamma/leptons at gen level
+    // Muon
+    if(fabs(pdgId)==13){
+        // mc Prompt Gamma is a ele variable
+        mcPromptGamma =0;
+        // calculate mcMatchId
+        for(uint gp=0; gp<rgen_pdg_id->size(); gp++){
+            //Take a mu match muon
+            if(!(fabs(rgen_pdg_id->at(gp))==13)) continue;
+            TLorentzVector GenMuon{0,0,0,0};
+            GenMuon.SetPtEtaPhiE(rgen_pt->at(gp),rgen_eta->at(gp),rgen_phi->at(gp),rgen_energy->at(gp));
+            double dR_mu = deltaR(deltaPhi(phi,GenMuon.Phi()),deltaEta(eta,GenMuon.Eta())); 
+            if(dR_mu >1.2)continue;
+            if(dR_mu <0.3) mcMatchId = 1;
+            else if( pt <10 && charge * rgen_pdg_id->at(gp) > 0) mcMatchId=0;
+            else if( dR_mu < 0.7) mcMatchId=1;
+            else if ( std::min(pt,GenMuon.Pt())/std::max(pt,GenMuon.Pt()) <0.3 ) mcMatchId=0;
+            else mcMatchId=1;
+            if(mcMatchId==1)break; 
+        }
+    }
+    // electrons
+    if(fabs(pdgId)==11){
+        double dpho = 999;
+        for(uint gp=0; gp<rgen_pdg_id->size(); gp++){
+            //Take a ele match gamma
+            if(!(fabs(rgen_pdg_id->at(gp))==22 && rgen_status->at(gp)==1 && rgen_pt->at(gp) >1)) continue;
+            TLorentzVector GenGamma{0,0,0,0};
+            GenGamma.SetPtEtaPhiE(rgen_pt->at(gp),rgen_eta->at(gp),rgen_phi->at(gp),rgen_energy->at(gp));
+            double dR_ele = deltaR(deltaPhi(phi,GenGamma.Phi()),deltaEta(eta,GenGamma.Eta())); 
+            if(!(dR_ele <0.3 && 0.3*GenGamma.Pt() < pt && 1.5*GenGamma.Pt()>pt))continue;
+            double dptrel = fabs(pt- GenGamma.Pt())/GenGamma.Pt();
+            double distance = dR_ele + 0.2*dptrel;
+            if(distance < dpho)dpho=distance;
+        }
+        double dlep=999; 
+        for(uint gp=0; gp<rgen_pdg_id->size(); gp++){
+            //Take a ele match ele
+            if(!(fabs(rgen_pdg_id->at(gp))==11)) continue;
+            TLorentzVector GenElectron{0,0,0,0};
+            GenElectron.SetPtEtaPhiE(rgen_pt->at(gp),rgen_eta->at(gp),rgen_phi->at(gp),rgen_energy->at(gp));
+            double dR_ele = deltaR(deltaPhi(phi, GenElectron.Phi()),deltaEta(eta, GenElectron.Eta())); 
+            if(dR_ele >=1.2 )continue;
+            if(dR_ele <0.7)mcMatchId = 1; 
+            else if ( std::min(pt,GenElectron.Pt())/std::max(pt,GenElectron.Pt()) <0.3 ) mcMatchId=0;
+            else mcMatchId = 1;
+            if ( mcMatchId !=1) continue;
+            double dptrel = fabs(pt- GenElectron.Pt())/GenElectron.Pt();
+            double distance = dR_ele + 0.2*dptrel;
+            if(distance < dlep)dlep=distance;
+        }
+        if(dpho<dlep)mcPromptGamma=1;
+        else mcPromptGamma =0;
+    }
+}
+
+
 double Lepton::get_valX_valY_binContent(TH2F* h, double valX, double valY){
     // return TH2F bin content of bin value (valX, valY) 
     int binX  = std::max(1, std::min(h->GetNbinsX(), h->GetXaxis()->FindBin(valX)));

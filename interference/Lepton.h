@@ -1,4 +1,15 @@
 #include "TH2F.h"
+#include "TLorentzVector.h"
+
+////
+// utils
+////
+//deltaR calculation 
+//defined in ../source/utils_functions
+       
+extern double deltaPhi(double phi1, double phi2);
+extern double deltaEta(double eta1, double eta2);
+extern double deltaR(double dphi, double deta);
 
 class Lepton {
     // this class define leptons
@@ -71,6 +82,9 @@ class Lepton {
         double passEleTightCharge = -999.;
         double passMissHit = -999.;
         double isMatchRightCharge = 1.; // lepton match gen right charge? default 1 (yes)
+        double mcPromptFS = 0.;
+        double mcMatchId = 0.;
+        double mcPromptGamma = 0.;
         
         // lepton gen
         double gen_pt = -999.;
@@ -101,6 +115,7 @@ class Lepton {
         void set_Wp_tthlep(bool isMedium, int& numLoose, int& numfake, int& numtight);
         void cal_conept(bool isMedium);
         void cal_tight_property();
+        void cal_gen_property(vector<double>* rgen_pdg_id, vector<double>* rgen_pt, vector<double>* rgen_eta, vector<double>* rgen_phi, vector<double>* rgen_energy, vector<double>* rgen_status);
         double get_valX_valY_binContent(TH2F* h, double valX, double valY);
 
     private:

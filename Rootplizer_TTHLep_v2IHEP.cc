@@ -212,6 +212,7 @@ void Muon_sel(string sample){
         // calculate new variables 
         Muon.set_Wp_tthlep( isMedium_ST, mu_numLoose, mu_numFake, mu_numTight );
         Muon.cal_tight_property();
+        Muon.cal_gen_property( rGen_pdg_id, rGen_pt, rGen_eta, rGen_phi, rGen_energy, rGen_status);
         Muon.CF = 0.;
         Muon.FR = Muon.get_valX_valY_binContent(hist_mu_fr, Muon.corrpt, Muon.eta);
         if(!(Muon.gen_pdgId * Muon.charge<0 && Muon.gen_pdgId!=-999))Muon.isMatchRightCharge=0.;
@@ -314,6 +315,7 @@ void patElectron_sel(string sample){
         // pass ismedium boolean, always true for electron
         patElectron.set_Wp_tthlep(true, ele_numLoose, ele_numFake, ele_numTight ); 
         patElectron.cal_tight_property();
+        patElectron.cal_gen_property( rGen_pdg_id, rGen_pt, rGen_eta, rGen_phi, rGen_energy, rGen_status);
         patElectron.CF = patElectron.get_valX_valY_binContent(
             hist_cf, patElectron.corrpt,patElectron.eta);
         patElectron.FR = patElectron.get_valX_valY_binContent(
@@ -730,6 +732,9 @@ void Lep_sel(){
         Lep_genGrandMother_pdgId->push_back(leptons->at(lep_en).genGrandMother_pdgId);
         Lep_gen_isPromptFinalState->push_back(leptons->at(lep_en).gen_isPromptFinalState);
         Lep_gen_isDirectPromptTauDecayProductFinalState->push_back(leptons->at(lep_en).gen_isDirectPromptTauDecayProductFinalState);
+        Lep_mcPromptFS->push_back(leptons->at(lep_en).mcPromptFS);
+        Lep_mcMatchId->push_back(leptons->at(lep_en).mcMatchId);
+        Lep_mcPromptGamma->push_back(leptons->at(lep_en).mcPromptGamma);
         Lep_SCeta->push_back(leptons->at(lep_en).SCeta);
         Lep_mvaValue_HZZ->push_back(leptons->at(lep_en).mvaValue_HZZ);
         Lep_expectedMissingInnerHits->push_back(leptons->at(lep_en).expectedMissingInnerHits);
@@ -799,6 +804,9 @@ void Lep_sel(){
         FakeLep_genGrandMother_pdgId->push_back(leptons->at(lep_en).genGrandMother_pdgId);
         FakeLep_gen_isPromptFinalState->push_back(leptons->at(lep_en).gen_isPromptFinalState);
         FakeLep_gen_isDirectPromptTauDecayProductFinalState->push_back(leptons->at(lep_en).gen_isDirectPromptTauDecayProductFinalState);
+        FakeLep_mcPromptFS->push_back(leptons->at(lep_en).mcPromptFS);
+        FakeLep_mcMatchId->push_back(leptons->at(lep_en).mcMatchId);
+        FakeLep_mcPromptGamma->push_back(leptons->at(lep_en).mcPromptGamma);
         FakeLep_SCeta->push_back(leptons->at(lep_en).SCeta);
         FakeLep_mvaValue_HZZ->push_back(leptons->at(lep_en).mvaValue_HZZ);
         FakeLep_expectedMissingInnerHits->push_back(leptons->at(lep_en).expectedMissingInnerHits);
@@ -1701,6 +1709,9 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("Lep_passEleTightCharge",&Lep_passEleTightCharge);
     newtree->Branch("Lep_passMissHit",&Lep_passMissHit);
     newtree->Branch("Lep_isMatchRightCharge",&Lep_isMatchRightCharge);
+    newtree->Branch("Lep_mcPromptFS",&Lep_mcPromptFS);
+    newtree->Branch("Lep_mcMatchId",&Lep_mcMatchId);
+    newtree->Branch("Lep_mcPromptGamma",&Lep_mcPromptGamma);
     //Fakeable leptons
     newtree->Branch("FakeLep_pt",&FakeLep_pt);
     newtree->Branch("FakeLep_eta",&FakeLep_eta);
@@ -1768,6 +1779,9 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("FakeLep_passEleTightCharge",&FakeLep_passEleTightCharge);
     newtree->Branch("FakeLep_passMissHit",&FakeLep_passMissHit);
     newtree->Branch("FakeLep_isMatchRightCharge",&FakeLep_isMatchRightCharge);
+    newtree->Branch("FakeLep_mcPromptFS",&FakeLep_mcPromptFS);
+    newtree->Branch("FakeLep_mcMatchId",&FakeLep_mcMatchId);
+    newtree->Branch("FakeLep_mcPromptGamma",&FakeLep_mcPromptGamma);
     //Tau
     newtree->Branch("Tau_pt",&Tau_pt);
     newtree->Branch("Tau_eta",&Tau_eta);
@@ -2035,6 +2049,9 @@ void wClearInitialization(string sample){
     Lep_passEleTightCharge->clear();
     Lep_passMissHit->clear();
     Lep_isMatchRightCharge->clear();
+    Lep_mcPromptFS->clear();
+    Lep_mcMatchId->clear();
+    Lep_mcPromptGamma->clear();
     // Fakeable Leptons
     FakeLep_pt->clear();
     FakeLep_eta->clear();
@@ -2102,6 +2119,9 @@ void wClearInitialization(string sample){
     FakeLep_passEleTightCharge->clear();
     FakeLep_passMissHit->clear();
     FakeLep_isMatchRightCharge->clear();
+    FakeLep_mcPromptFS->clear();
+    FakeLep_mcMatchId->clear();
+    FakeLep_mcPromptGamma->clear();
     //Tau
     taus->clear();
     Tau_pt->clear();

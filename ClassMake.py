@@ -22,7 +22,7 @@ Case = "CaseC"
 # Variable Definition
 
 rObject = "BoostedJet"
-wObject = "BoostedJet"
+wObject = "Lep"
 
 VariableType  = "double"
 VariableNames = [
@@ -38,6 +38,7 @@ VariableNames = [
 #"genMother_pt","genMother_eta","genMother_phi","genMother_en","genMother_pdgId",
 #"genGrandMother_pt","genGrandMother_eta","genGrandMother_phi","genGrandMother_en","genGrandMother_pdgId",
 #"gen_isPromptFinalState","gen_isDirectPromptTauDecayProductFinalState",
+"mcPromptFS","mcMatchId","mcPromptGamma"
 
 # Electron only
 #"SCeta","expectedMissingInnerHits","full5x5_sigmaIetaIeta","hOverE","dEtaIn","dPhiIn","ooEmooP", 
@@ -76,7 +77,7 @@ VariableNames = [
 #"SDsubjet1_pt","SDsubjet1_eta","SDsubjet1_phi","SDsubjet1_energy","SDsubjet1_pfCSV2Bdisc",
 #"SDsubjet2_pt","SDsubjet2_eta","SDsubjet2_phi","SDsubjet2_energy","SDsubjet2_pfCSV2Bdisc",
 #"tau21","tau32",
-"matchW_pt","matchW_eta","matchW_phi","matchW_energy","matchW_mass","matchW_mother_pdgId",
+#"matchW_pt","matchW_eta","matchW_phi","matchW_energy","matchW_mass","matchW_mother_pdgId",
 #Case B
 
 # Case C
@@ -112,8 +113,8 @@ WTreeptr = "newtree"
 #Name of Current Entry
 ParEntry = "tentry"
 #Name of index in Push_back
-ParSel = "boostedjet_en"
-ParWrite = "boostjet_en"
+ParSel = "lep_en"
+ParWrite = "lep_en"
 
 ###################
 ### Script itself
@@ -213,4 +214,4 @@ elif Case == "CaseC":
 
  print >> vector, "   //Write variables"
  for Variable in VariableNames:
-     print >> vector, "        "+wObject+"_"+Variable+"->push_back(jets->at("+ParWrite+")."+Variable+");"
+     print >> vector, "        "+wObject+"_"+Variable+"->push_back(leptons->at("+ParWrite+")."+Variable+");"

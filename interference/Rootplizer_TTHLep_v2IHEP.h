@@ -500,6 +500,9 @@ vector<double>* Lep_passMuTightCharge = new std::vector<double>;
 vector<double>* Lep_passEleTightCharge = new std::vector<double>;
 vector<double>* Lep_passMissHit = new std::vector<double>;
 vector<double>* Lep_isMatchRightCharge = new std::vector<double>;
+vector<double>* Lep_mcPromptFS = new std::vector<double>;
+vector<double>* Lep_mcMatchId = new std::vector<double>;
+vector<double>* Lep_mcPromptGamma = new std::vector<double>;
 
 //Fakeable Leptons
 vector<double>* FakeLep_pt = new std::vector<double>;
@@ -568,6 +571,9 @@ vector<double>* FakeLep_passMuTightCharge = new std::vector<double>;
 vector<double>* FakeLep_passEleTightCharge = new std::vector<double>;
 vector<double>* FakeLep_passMissHit = new std::vector<double>;
 vector<double>* FakeLep_isMatchRightCharge = new std::vector<double>;
+vector<double>* FakeLep_mcPromptFS = new std::vector<double>;
+vector<double>* FakeLep_mcMatchId = new std::vector<double>;
+vector<double>* FakeLep_mcPromptGamma = new std::vector<double>;
 
 // Tau
 vector<Tau>* taus = new std::vector<Tau>;
