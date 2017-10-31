@@ -61,7 +61,11 @@ class BoostJet {
 
         //Object Identification
         void set_Wp_Top(int& numSoftTop, int& numLooseTop, int& numMediumTop, int& numTightTop);
-        void set_Wp_W(int& numSoftW, int& numLooseW, int& numMediumW, int& numTightW);
+        void set_Wp_W(
+            int& numSoftW, int& numLooseW, int& numMediumW, int& numTightW,
+            int& numCleanSoftW, int& numCleanLooseW, int& numCleanMediumW, int& numCleanTightW,
+            vector<double>* jet_pt, vector<double>* jet_phi
+            );
         void set_Wp_W(int& numLooseW, int& numTightW);
         void match_genW(vector<double>* genW_pt, vector<double>* genW_eta, vector<double>* phi, 
             vector<double>* genW_energy, vector<double>* genW_mass, vector<double>* genW_motherId);

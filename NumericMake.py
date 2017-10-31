@@ -116,8 +116,17 @@ VariableNames = [
 #"isDiMuMVAAR","isDiEleMVAAR","isEleMuMVAAR","isTriLepMVAAR","isQuaLepMVAAR",
 #"isDiMuOSAR","isDiEleOSAR","isEleMuOSAR",
 #"SF_Trigger_3l","SF_Trigger_2l",
-"SF_Lepton_3l","SF_Lepton_2l",
+#"SF_Lepton_3l","SF_Lepton_2l",
 
+"W_numCleanSoft","W_numCleanMedium","W_numCleanLoose","W_numCleanTight",
+"ttbarBDT_2lss","ttvBDT_2lss","Bin2l",
+"leadLep_jetdr","secondLep_jetdr","leadLep_corrpt","secondLep_corrpt",
+"leadLep_jetcsv","secondLep_jetcsv","leadLep_BDT","secondLep_BDT",
+"maxeta","Mt_metleadlep","AvJetdR",
+"SubCat2l","massll","Sum2lCharge","Dilep_bestMVA","Dilep_worseMVA","Dilep_pdgId","Dilep_htllv",
+"Dilep_mtWmin","Dilep_nTight",
+"leadJetCSV","secondJetCSV","thirdJetCSV","fourthJetCSV","HighestJetCSV",
+"HtJet","nLepFO","nLepTight","minMllAFAS","minMllAFOS","minMllSFOS",
 ]
 
 #VariableType  = "int"

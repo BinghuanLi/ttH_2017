@@ -44,25 +44,55 @@ void BoostJet::set_Wp_W(int& numLooseW, int& numTightW){
 };
 
 
-void BoostJet::set_Wp_W(int& numSoftW, int& numLooseW, int& numMediumW, int& numTightW){
+void BoostJet::set_Wp_W(
+        int& numSoftW, int& numLooseW, int& numMediumW, int& numTightW,
+        int& numCleanSoftW, int& numCleanLooseW, int& numCleanMediumW, int& numCleanTightW,
+        vector<double>* jet_eta, vector<double>* jet_phi
+        ){
+    // check if the Ak-8 jet is overlap with a ak-4 jet
+    bool match = false;
+    for( uint jet_en=0; jet_en < jet_eta->size(); jet_en++){
+        if(deltaR(deltaPhi(jet_phi->at(jet_en),phi),deltaEta(jet_eta->at(jet_en),eta))<0.8){
+            match = true;
+            break;
+        }
+    }
     if( pt > 190 && fabs(eta)<2.4 && tau21 < 0.45 && fabs(pruned_mass-85)<20){
         wCut = 4;
         numTightW++; 
         numMediumW++; 
         numLooseW++; 
-        numSoftW++; 
+        numSoftW++;
+        if(!match){
+            numCleanTightW++; 
+            numCleanMediumW++; 
+            numCleanLooseW++; 
+            numCleanSoftW++;
+        }
     }else if( pt > 190 && fabs(eta)<2.4 && tau21 < 0.6 && fabs(pruned_mass-85)<20){
         wCut = 3;
         numMediumW++; 
         numLooseW++; 
         numSoftW++; 
+        if(!match){
+            numCleanMediumW++; 
+            numCleanLooseW++; 
+            numCleanSoftW++;
+        }
     }else if( pt > 190 && fabs(eta)<2.4 && tau21 < 0.6){
         wCut = 2;
         numLooseW++; 
         numSoftW++; 
+        if(!match){
+            numCleanLooseW++; 
+            numCleanSoftW++;
+        }
     }else if( pt > 190 && fabs(eta)<2.4){
         wCut = 1;
         numSoftW++; 
+        if(!match){
+            numCleanSoftW++;
+        }
     }else{
         wCut = 0;
     }

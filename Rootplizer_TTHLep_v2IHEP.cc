@@ -616,6 +616,10 @@ void BoostedJet_sel(){
     int w_numMedium = 0;
     int w_numSoft = 0;
     int w_numTight = 0;
+    int w_numCleanLoose = 0;
+    int w_numCleanMedium = 0;
+    int w_numCleanSoft = 0;
+    int w_numCleanTight = 0;
     for(uint boostedjet_en = 0; boostedjet_en<rBoostedJet_pt->size(); boostedjet_en++){
         BoostJet boostjet;
         boostjet.pt = rBoostedJet_Uncorr_pt->at(boostedjet_en)*rBoostedJet_JesSF->at(boostedjet_en);
@@ -663,7 +667,11 @@ void BoostedJet_sel(){
 
         // select boosted Top and W
         boostjet.set_Wp_Top(top_numSoft, top_numLoose, top_numMedium, top_numTight);
-        boostjet.set_Wp_W(w_numSoft, w_numLoose, w_numMedium, w_numTight);
+        boostjet.set_Wp_W(
+            w_numSoft, w_numLoose, w_numMedium, w_numTight,
+            w_numCleanSoft, w_numCleanLoose, w_numCleanMedium, w_numCleanTight,
+            Jet_eta, Jet_phi
+            );
         
         BoostedJet_pt->push_back(boostjet.pt);
         BoostedJet_eta->push_back(rBoostedJet_eta->at(boostedjet_en));
@@ -699,6 +707,10 @@ void BoostedJet_sel(){
     W_numTight = w_numTight;
     W_numMedium = w_numMedium;
     W_numSoft = w_numSoft;
+    W_numCleanLoose = w_numCleanLoose;
+    W_numCleanTight = w_numCleanTight;
+    W_numCleanMedium = w_numCleanMedium;
+    W_numCleanSoft = w_numCleanSoft;
 };
 
 void Lep_sel(){
@@ -2225,6 +2237,10 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("W_numTight",&W_numTight);
     newtree->Branch("W_numMedium",&W_numMedium);
     newtree->Branch("W_numSoft",&W_numSoft);
+    newtree->Branch("W_numCleanSoft",&W_numCleanSoft);
+    newtree->Branch("W_numCleanMedium",&W_numCleanMedium);
+    newtree->Branch("W_numCleanLoose",&W_numCleanLoose);
+    newtree->Branch("W_numCleanTight",&W_numCleanTight);
     newtree->Branch("MediumW_numMatch",&MediumW_numMatch);
     newtree->Branch("SoftW_numMatch",&SoftW_numMatch);
     newtree->Branch("LooseW_numMatch",&LooseW_numMatch);
@@ -2246,6 +2262,39 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("mht_met",&mht_met);
     newtree->Branch("mhtT",&mhtT);
     newtree->Branch("mht",&mht);
+    newtree->Branch("ttbarBDT_2lss",&ttbarBDT_2lss);
+    newtree->Branch("ttvBDT_2lss",&ttvBDT_2lss);
+    newtree->Branch("Bin2l",&Bin2l);
+    newtree->Branch("leadLep_jetdr",&leadLep_jetdr);
+    newtree->Branch("secondLep_jetdr",&secondLep_jetdr);
+    newtree->Branch("leadLep_corrpt",&leadLep_corrpt);
+    newtree->Branch("secondLep_corrpt",&secondLep_corrpt);
+    newtree->Branch("leadLep_jetcsv",&leadLep_jetcsv);
+    newtree->Branch("secondLep_jetcsv",&secondLep_jetcsv);
+    newtree->Branch("leadLep_BDT",&leadLep_BDT);
+    newtree->Branch("secondLep_BDT",&secondLep_BDT);
+    newtree->Branch("maxeta",&maxeta);
+    newtree->Branch("Mt_metleadlep",&Mt_metleadlep);
+    newtree->Branch("AvJetdR",&AvJetdR);
+    newtree->Branch("SubCat2l",&SubCat2l);
+    newtree->Branch("massll",&massll);
+    newtree->Branch("Sum2lCharge",&Sum2lCharge);
+    newtree->Branch("Dilep_bestMVA",&Dilep_bestMVA);
+    newtree->Branch("Dilep_worseMVA",&Dilep_worseMVA);
+    newtree->Branch("Dilep_pdgId",&Dilep_pdgId);
+    newtree->Branch("Dilep_htllv",&Dilep_htllv);
+    newtree->Branch("Dilep_mtWmin",&Dilep_mtWmin);
+    newtree->Branch("Dilep_nTight",&Dilep_nTight);
+    newtree->Branch("leadJetCSV",&leadJetCSV);
+    newtree->Branch("secondJetCSV",&secondJetCSV);
+    newtree->Branch("thirdJetCSV",&thirdJetCSV);
+    newtree->Branch("fourthJetCSV",&fourthJetCSV);
+    newtree->Branch("HighestJetCSV",&HighestJetCSV);
+    newtree->Branch("HtJet",&HtJet);
+    newtree->Branch("nLepFO",&nLepFO);
+    newtree->Branch("nLepTight",&nLepTight);
+    newtree->Branch("minMllAFAS",&minMllAFAS);
+    newtree->Branch("minMllAFOS",&minMllAFOS);
     //Lepton
     newtree->Branch("Lep_pt",&Lep_pt);
     newtree->Branch("Lep_eta",&Lep_eta);
@@ -2589,6 +2638,10 @@ void wClearInitialization(string sample){
     W_numTight= -999;
     W_numMedium= -999;
     W_numSoft= -999;
+    W_numCleanSoft= -999;
+    W_numCleanMedium= -999;
+    W_numCleanLoose= -999;
+    W_numCleanTight= -999;
     MediumW_numMatch= -999;
     SoftW_numMatch= -999;
     LooseW_numMatch= -999;
@@ -2610,6 +2663,39 @@ void wClearInitialization(string sample){
     mht_met= -999;
     mhtT= -999;
     mht= -999;
+    ttbarBDT_2lss= -999;
+    ttvBDT_2lss= -999;
+    Bin2l= -999;
+    leadLep_jetdr= -999;
+    secondLep_jetdr= -999;
+    leadLep_corrpt= -999;
+    secondLep_corrpt= -999;
+    leadLep_jetcsv= -999;
+    secondLep_jetcsv= -999;
+    leadLep_BDT= -999;
+    secondLep_BDT= -999;
+    maxeta= -999;
+    Mt_metleadlep= -999;
+    AvJetdR= -999;
+    SubCat2l= -999;
+    massll= -999;
+    Sum2lCharge= -999;
+    Dilep_bestMVA= -999;
+    Dilep_worseMVA= -999;
+    Dilep_pdgId= -999;
+    Dilep_htllv= -999;
+    Dilep_mtWmin= -999;
+    Dilep_nTight= -999;
+    leadJetCSV= -999;
+    secondJetCSV= -999;
+    thirdJetCSV= -999;
+    fourthJetCSV= -999;
+    HighestJetCSV= -999;
+    HtJet= -999;
+    nLepFO= -999;
+    nLepTight= -999;
+    minMllAFAS= -999;
+    minMllAFOS= -999;
     // Lepton
     leptons->clear();
     Lep_pt->clear();
