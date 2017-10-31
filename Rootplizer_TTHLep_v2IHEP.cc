@@ -46,7 +46,7 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
         Jet_sel(sample);
         //BoostJet
         BoostedJet_sel();
-        GenParticle_sel();
+        if(sample == "mc") GenParticle_sel();
         Lep_sel();
         //Event
         Event_sel(Output);
@@ -357,9 +357,6 @@ double getAvJetdR(){
 ////
 //Muon
 void Muon_sel(string sample){
-    if(sample == "data"){
-        cout<<" Hi, I'm data!"<<endl;
-    }
     int mu_numLoose = 0;
     int mu_numFake = 0;
     int mu_numTight = 0;
@@ -408,28 +405,29 @@ void Muon_sel(string sample){
         // pt, jetpt and BDT of Muon has to be seted before calling conept
         Muon.cal_conept(isMedium_ST);
        
-        Muon.gen_pt= rMuon_gen_pt->at(mu_en);
-        Muon.gen_eta= rMuon_gen_eta->at(mu_en);
-        Muon.gen_phi= rMuon_gen_phi->at(mu_en);
-        Muon.gen_en= rMuon_gen_en->at(mu_en);
-        Muon.gen_pdgId= rMuon_gen_pdgId->at(mu_en);
-        Muon.genMother_pt= rMuon_genMother_pt->at(mu_en);
-        Muon.genMother_eta= rMuon_genMother_eta->at(mu_en);
-        Muon.genMother_phi= rMuon_genMother_phi->at(mu_en);
-        Muon.genMother_en= rMuon_genMother_en->at(mu_en);
-        Muon.genMother_pdgId= rMuon_genMother_pdgId->at(mu_en);
-        Muon.genGrandMother_pt= rMuon_genGrandMother_pt->at(mu_en);
-        Muon.genGrandMother_eta= rMuon_genGrandMother_eta->at(mu_en);
-        Muon.genGrandMother_phi= rMuon_genGrandMother_phi->at(mu_en);
-        Muon.genGrandMother_en= rMuon_genGrandMother_en->at(mu_en);
-        Muon.genGrandMother_pdgId= rMuon_genGrandMother_pdgId->at(mu_en);
-        Muon.gen_isPromptFinalState= rMuon_gen_isPromptFinalState->at(mu_en);
-        Muon.gen_isDirectPromptTauDecayProductFinalState= rMuon_gen_isDirectPromptTauDecayProductFinalState->at(mu_en);
-       
+        if(sample == "mc"){
+            Muon.gen_pt= rMuon_gen_pt->at(mu_en);
+            Muon.gen_eta= rMuon_gen_eta->at(mu_en);
+            Muon.gen_phi= rMuon_gen_phi->at(mu_en);
+            Muon.gen_en= rMuon_gen_en->at(mu_en);
+            Muon.gen_pdgId= rMuon_gen_pdgId->at(mu_en);
+            Muon.genMother_pt= rMuon_genMother_pt->at(mu_en);
+            Muon.genMother_eta= rMuon_genMother_eta->at(mu_en);
+            Muon.genMother_phi= rMuon_genMother_phi->at(mu_en);
+            Muon.genMother_en= rMuon_genMother_en->at(mu_en);
+            Muon.genMother_pdgId= rMuon_genMother_pdgId->at(mu_en);
+            Muon.genGrandMother_pt= rMuon_genGrandMother_pt->at(mu_en);
+            Muon.genGrandMother_eta= rMuon_genGrandMother_eta->at(mu_en);
+            Muon.genGrandMother_phi= rMuon_genGrandMother_phi->at(mu_en);
+            Muon.genGrandMother_en= rMuon_genGrandMother_en->at(mu_en);
+            Muon.genGrandMother_pdgId= rMuon_genGrandMother_pdgId->at(mu_en);
+            Muon.gen_isPromptFinalState= rMuon_gen_isPromptFinalState->at(mu_en);
+            Muon.gen_isDirectPromptTauDecayProductFinalState= rMuon_gen_isDirectPromptTauDecayProductFinalState->at(mu_en);
+        }
         // calculate new variables 
         Muon.set_Wp_tthlep( isMedium_ST, mu_numLoose, mu_numFake, mu_numTight );
         Muon.cal_tight_property();
-        Muon.cal_gen_property( rGen_pdg_id, rGen_pt, rGen_eta, rGen_phi, rGen_energy, rGen_status);
+        if(sample == "mc") Muon.cal_gen_property( rGen_pdg_id, rGen_pt, rGen_eta, rGen_phi, rGen_energy, rGen_status);
         Muon.CF = 0.;
         Muon.FR = Muon.get_valX_valY_binContent(hist_mu_fr, Muon.corrpt, Muon.eta);
         if(!(Muon.gen_pdgId * Muon.charge<0 && Muon.gen_pdgId!=-999))Muon.isMatchRightCharge=0.;
@@ -443,9 +441,6 @@ void Muon_sel(string sample){
 
 //Electron
 void patElectron_sel(string sample){
-    if(sample == "data"){
-        cout<<" Hi, I'm data!"<<endl;
-    }
     int ele_numLoose = 0;
     int ele_numFake = 0;
     int ele_numTight = 0;
@@ -510,29 +505,31 @@ void patElectron_sel(string sample){
         patElectron.isGsfCtfScPixChargeConsistent= rpatElectron_isGsfCtfScPixChargeConsistent->at(ele_en);
         patElectron.isGsfScPixChargeConsistent= rpatElectron_isGsfScPixChargeConsistent->at(ele_en);
         patElectron.passConversion= rpatElectron_passConversionVeto->at(ele_en);
-        patElectron.gen_pt= rpatElectron_gen_pt->at(ele_en);
-        patElectron.gen_eta= rpatElectron_gen_eta->at(ele_en);
-        patElectron.gen_phi= rpatElectron_gen_phi->at(ele_en);
-        patElectron.gen_en= rpatElectron_gen_en->at(ele_en);
-        patElectron.gen_pdgId= rpatElectron_gen_pdgId->at(ele_en);
-        patElectron.genMother_pt= rpatElectron_genMother_pt->at(ele_en);
-        patElectron.genMother_eta= rpatElectron_genMother_eta->at(ele_en);
-        patElectron.genMother_phi= rpatElectron_genMother_phi->at(ele_en);
-        patElectron.genMother_en= rpatElectron_genMother_en->at(ele_en);
-        patElectron.genMother_pdgId= rpatElectron_genMother_pdgId->at(ele_en);
-        patElectron.genGrandMother_pt= rpatElectron_genGrandMother_pt->at(ele_en);
-        patElectron.genGrandMother_eta= rpatElectron_genGrandMother_eta->at(ele_en);
-        patElectron.genGrandMother_phi= rpatElectron_genGrandMother_phi->at(ele_en);
-        patElectron.genGrandMother_en= rpatElectron_genGrandMother_en->at(ele_en);
-        patElectron.genGrandMother_pdgId= rpatElectron_genGrandMother_pdgId->at(ele_en);
-        patElectron.gen_isPromptFinalState= rpatElectron_gen_isPromptFinalState->at(ele_en);
-        patElectron.gen_isDirectPromptTauDecayProductFinalState= rpatElectron_gen_isDirectPromptTauDecayProductFinalState->at(ele_en);
         
+        if(sample == "mc"){
+            patElectron.gen_pt= rpatElectron_gen_pt->at(ele_en);
+            patElectron.gen_eta= rpatElectron_gen_eta->at(ele_en);
+            patElectron.gen_phi= rpatElectron_gen_phi->at(ele_en);
+            patElectron.gen_en= rpatElectron_gen_en->at(ele_en);
+            patElectron.gen_pdgId= rpatElectron_gen_pdgId->at(ele_en);
+            patElectron.genMother_pt= rpatElectron_genMother_pt->at(ele_en);
+            patElectron.genMother_eta= rpatElectron_genMother_eta->at(ele_en);
+            patElectron.genMother_phi= rpatElectron_genMother_phi->at(ele_en);
+            patElectron.genMother_en= rpatElectron_genMother_en->at(ele_en);
+            patElectron.genMother_pdgId= rpatElectron_genMother_pdgId->at(ele_en);
+            patElectron.genGrandMother_pt= rpatElectron_genGrandMother_pt->at(ele_en);
+            patElectron.genGrandMother_eta= rpatElectron_genGrandMother_eta->at(ele_en);
+            patElectron.genGrandMother_phi= rpatElectron_genGrandMother_phi->at(ele_en);
+            patElectron.genGrandMother_en= rpatElectron_genGrandMother_en->at(ele_en);
+            patElectron.genGrandMother_pdgId= rpatElectron_genGrandMother_pdgId->at(ele_en);
+            patElectron.gen_isPromptFinalState= rpatElectron_gen_isPromptFinalState->at(ele_en);
+            patElectron.gen_isDirectPromptTauDecayProductFinalState= rpatElectron_gen_isDirectPromptTauDecayProductFinalState->at(ele_en);
+        }
         // calculate new variables 
         // pass ismedium boolean, always true for electron
         patElectron.set_Wp_tthlep(true, ele_numLoose, ele_numFake, ele_numTight ); 
         patElectron.cal_tight_property();
-        patElectron.cal_gen_property( rGen_pdg_id, rGen_pt, rGen_eta, rGen_phi, rGen_energy, rGen_status);
+        if(sample == "mc" ) patElectron.cal_gen_property( rGen_pdg_id, rGen_pt, rGen_eta, rGen_phi, rGen_energy, rGen_status);
         patElectron.CF = patElectron.get_valX_valY_binContent(
             hist_cf, patElectron.corrpt,patElectron.eta);
         patElectron.FR = patElectron.get_valX_valY_binContent(
@@ -599,9 +596,6 @@ void Tau_sel(){
 
 
 void Jet_sel(string sample){
-    if(sample == "data"){
-        cout<<" Hi, I'm data!"<<endl;
-    }
     int jet_numLoose   = 0;
     int jet_numbLoose = 0;
     int jet_numbMedium = 0;
@@ -690,16 +684,6 @@ void Jet_sel(string sample){
         jet.btag_cerr1down= rJet_btag_cerr1down->at(jet_en);
         jet.btag_cerr2up= rJet_btag_cerr2up->at(jet_en);
         jet.btag_cerr2down= rJet_btag_cerr2down->at(jet_en);
-        jet.genMother_pt= rJet_genMother_pt->at(jet_en);
-        jet.genMother_eta= rJet_genMother_eta->at(jet_en);
-        jet.genMother_phi= rJet_genMother_phi->at(jet_en);
-        jet.genMother_en= rJet_genMother_en->at(jet_en);
-        jet.genMother_pdgId= rJet_genMother_pdgId->at(jet_en);
-        jet.genGrandMother_pt= rJet_genGrandMother_pt->at(jet_en);
-        jet.genGrandMother_eta= rJet_genGrandMother_eta->at(jet_en);
-        jet.genGrandMother_phi= rJet_genGrandMother_phi->at(jet_en);
-        jet.genGrandMother_en= rJet_genGrandMother_en->at(jet_en);
-        jet.genGrandMother_pdgId= rJet_genGrandMother_pdgId->at(jet_en);
         jet.Uncorr_pt= rJet_Uncorr_pt->at(jet_en);
         jet.pfCombinedInclusiveSecondaryVertexV2BJetTags= rJet_pfCombinedInclusiveSecondaryVertexV2BJetTags->at(jet_en);
         jet.pfCombinedMVAV2BJetTags= rJet_pfCombinedMVAV2BJetTags->at(jet_en);
@@ -707,13 +691,40 @@ void Jet_sel(string sample){
         jet.axis2= rJet_axis2->at(jet_en);
         jet.ptD= rJet_ptD->at(jet_en);
         jet.mult= rJet_mult->at(jet_en);
-        jet.partonFlavour= rJet_partonFlavour->at(jet_en);
-        jet.hadronFlavour= rJet_hadronFlavour->at(jet_en);
-        jet.genpt= rJet_genpt->at(jet_en);
-        jet.geneta= rJet_geneta->at(jet_en);
-        jet.genphi= rJet_genphi->at(jet_en);
-        jet.genenergy= rJet_genenergy->at(jet_en);
-        
+        if(sample == "mc"){
+            jet.partonFlavour= rJet_partonFlavour->at(jet_en);
+            jet.hadronFlavour= rJet_hadronFlavour->at(jet_en);
+            jet.genpt= rJet_genpt->at(jet_en);
+            jet.geneta= rJet_geneta->at(jet_en);
+            jet.genphi= rJet_genphi->at(jet_en);
+            jet.genenergy= rJet_genenergy->at(jet_en);
+            jet.genMother_pt= rJet_genMother_pt->at(jet_en);
+            jet.genMother_eta= rJet_genMother_eta->at(jet_en);
+            jet.genMother_phi= rJet_genMother_phi->at(jet_en);
+            jet.genMother_en= rJet_genMother_en->at(jet_en);
+            jet.genMother_pdgId= rJet_genMother_pdgId->at(jet_en);
+            jet.genGrandMother_pt= rJet_genGrandMother_pt->at(jet_en);
+            jet.genGrandMother_eta= rJet_genGrandMother_eta->at(jet_en);
+            jet.genGrandMother_phi= rJet_genGrandMother_phi->at(jet_en);
+            jet.genGrandMother_en= rJet_genGrandMother_en->at(jet_en);
+            jet.genGrandMother_pdgId= rJet_genGrandMother_pdgId->at(jet_en);
+            Jet_partonFlavour->push_back(rJet_partonFlavour->at(jet_en));
+            Jet_hadronFlavour->push_back(rJet_hadronFlavour->at(jet_en));
+            Jet_genpt->push_back(rJet_genpt->at(jet_en));
+            Jet_geneta->push_back(rJet_geneta->at(jet_en));
+            Jet_genphi->push_back(rJet_genphi->at(jet_en));
+            Jet_genenergy->push_back(rJet_genenergy->at(jet_en));
+            Jet_genMother_pt->push_back(rJet_genMother_pt->at(jet_en));
+            Jet_genMother_eta->push_back(rJet_genMother_eta->at(jet_en));
+            Jet_genMother_phi->push_back(rJet_genMother_phi->at(jet_en));
+            Jet_genMother_en->push_back(rJet_genMother_en->at(jet_en));
+            Jet_genMother_pdgId->push_back(rJet_genMother_pdgId->at(jet_en));
+            Jet_genGrandMother_pt->push_back(rJet_genGrandMother_pt->at(jet_en));
+            Jet_genGrandMother_eta->push_back(rJet_genGrandMother_eta->at(jet_en));
+            Jet_genGrandMother_phi->push_back(rJet_genGrandMother_phi->at(jet_en));
+            Jet_genGrandMother_en->push_back(rJet_genGrandMother_en->at(jet_en));
+            Jet_genGrandMother_pdgId->push_back(rJet_genGrandMother_pdgId->at(jet_en));
+        }
         // calculate new variables 
         jet.set_Wp_jets(jet_numLoose);
         jet.set_Wp_bdisc(jet_numbLoose, jet_numbMedium, jet_numbTight);
@@ -724,25 +735,9 @@ void Jet_sel(string sample){
         Jet_axis2->push_back(rJet_axis2->at(jet_en));
         Jet_ptD->push_back(rJet_ptD->at(jet_en));
         Jet_mult->push_back(rJet_mult->at(jet_en));
-        Jet_partonFlavour->push_back(rJet_partonFlavour->at(jet_en));
-        Jet_hadronFlavour->push_back(rJet_hadronFlavour->at(jet_en));
-        Jet_genpt->push_back(rJet_genpt->at(jet_en));
-        Jet_geneta->push_back(rJet_geneta->at(jet_en));
-        Jet_genphi->push_back(rJet_genphi->at(jet_en));
-        Jet_genenergy->push_back(rJet_genenergy->at(jet_en));
         Jet_Uncorr_pt->push_back(rJet_Uncorr_pt->at(jet_en));
         Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags->push_back(rJet_pfCombinedInclusiveSecondaryVertexV2BJetTags->at(jet_en));
         Jet_pfCombinedMVAV2BJetTags->push_back(rJet_pfCombinedMVAV2BJetTags->at(jet_en));
-        Jet_genMother_pt->push_back(rJet_genMother_pt->at(jet_en));
-        Jet_genMother_eta->push_back(rJet_genMother_eta->at(jet_en));
-        Jet_genMother_phi->push_back(rJet_genMother_phi->at(jet_en));
-        Jet_genMother_en->push_back(rJet_genMother_en->at(jet_en));
-        Jet_genMother_pdgId->push_back(rJet_genMother_pdgId->at(jet_en));
-        Jet_genGrandMother_pt->push_back(rJet_genGrandMother_pt->at(jet_en));
-        Jet_genGrandMother_eta->push_back(rJet_genGrandMother_eta->at(jet_en));
-        Jet_genGrandMother_phi->push_back(rJet_genGrandMother_phi->at(jet_en));
-        Jet_genGrandMother_en->push_back(rJet_genGrandMother_en->at(jet_en));
-        Jet_genGrandMother_pdgId->push_back(rJet_genGrandMother_pdgId->at(jet_en));
         Jet_pt->push_back(jet.pt);
         Jet_eta->push_back(rJet_eta->at(jet_en));
         Jet_phi->push_back(rJet_phi->at(jet_en));
@@ -1394,7 +1389,7 @@ void DiMuSR_sel(){
         && FakeLep_cut->at(0)==3 && FakeLep_cut->at(1) ==3
         && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
         && FakeLep_charge->at(0)*FakeLep_charge->at(1)==1
-        && Jet_numLoose>=4 
+        && Jet_numLoose>=3 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && !(massL < 12 && massL > 0)
         && fabs(mass_diele - 91.2)>10
@@ -1414,7 +1409,7 @@ void DiMuMVAAR_sel(){
         && !(FakeLep_cut->at(0)==3 && FakeLep_cut->at(1) ==3)
         && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
         && FakeLep_charge->at(0)*FakeLep_charge->at(1)==1
-        && Jet_numLoose>=4 
+        && Jet_numLoose>=3 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && !(massL < 12 && massL > 0)
         && fabs(mass_diele - 91.2)>10
@@ -1432,7 +1427,7 @@ void DiMuOSAR_sel(){
         && FakeLep_cut->at(0)==3 && FakeLep_cut->at(1) ==3
         && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
         && FakeLep_charge->at(0)*FakeLep_charge->at(1)== -1
-        && Jet_numLoose>=4 
+        && Jet_numLoose>=3 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && !(massL < 12 && massL > 0)
         && fabs(mass_diele - 91.2)>10
@@ -1453,7 +1448,7 @@ void DiEleSR_sel(){
         && FakeLep_passEleTightCharge->at(0)==1&&FakeLep_passEleTightCharge->at(1)==1
         && FakeLep_passConversion->at(0)==1&&FakeLep_passConversion->at(1)==1
         && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
-        && Jet_numLoose>=4 
+        && Jet_numLoose>=3 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && metLD > 0.2
         && !(massL < 12 && massL > 0)
@@ -1477,7 +1472,7 @@ void DiEleMVAAR_sel(){
         && FakeLep_passEleTightCharge->at(0)==1&&FakeLep_passEleTightCharge->at(1)==1
         && FakeLep_passConversion->at(0)==1&&FakeLep_passConversion->at(1)==1
         && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
-        && Jet_numLoose>=4 
+        && Jet_numLoose>=3 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && metLD > 0.2
         && !(massL < 12 && massL > 0)
@@ -1499,7 +1494,7 @@ void DiEleOSAR_sel(){
         && FakeLep_passEleTightCharge->at(0)==1&&FakeLep_passEleTightCharge->at(1)==1
         && FakeLep_passConversion->at(0)==1&&FakeLep_passConversion->at(1)==1
         && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
-        && Jet_numLoose>=4 
+        && Jet_numLoose>=3 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && metLD > 0.2
         && !(massL < 12 && massL > 0)
@@ -1519,7 +1514,7 @@ void EleMuSR_sel(){
         && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
         && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
         && fabs(FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))==24
-        && Jet_numLoose>=4 
+        && Jet_numLoose>=3 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && !(massL < 12 && massL > 0)
         && fabs(mass_diele - 91.2)>10
@@ -1540,7 +1535,7 @@ void EleMuMVAAR_sel(){
         && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
         && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
         && fabs(FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))==24
-        && Jet_numLoose>=4 
+        && Jet_numLoose>=3 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && !(massL < 12 && massL > 0)
         && fabs(mass_diele - 91.2)>10
@@ -1559,7 +1554,7 @@ void EleMuOSAR_sel(){
         && FakeLep_passMissHit->at(0)==1&&FakeLep_passMissHit->at(1)==1
         && FakeLep_corrpt->at(0)>25 && FakeLep_corrpt->at(1) >15
         && fabs(FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))==2
-        && Jet_numLoose>=4 
+        && Jet_numLoose>=3 
         && (Jet_numbLoose>=2 || Jet_numbMedium>=1)
         && !(massL < 12 && massL > 0)
         && fabs(mass_diele - 91.2)>10
@@ -2136,22 +2131,11 @@ void Jet_MVAsel(){
 // Variables handling
 //////
 void rSetBranchAddress(TTree* readingtree, string sample){
-    if(sample == "data"){
-        cout<<" Hi, I'm data!"<<endl;
-    }
     //read setbranchaddress
     //Event
     readingtree->SetBranchAddress("EVENT_event",&rEVENT_event,&b_rEVENT_event);
     readingtree->SetBranchAddress("EVENT_genWeight",&rEVENT_genWeight,&b_rEVENT_genWeight);
-    readingtree->SetBranchAddress("HiggsDecay",&rHiggsDecay,&b_rHiggsDecay);
     readingtree->SetBranchAddress("PUWeight",&rPUWeight,&b_rPUWeight);
-    readingtree->SetBranchAddress("Gen_type1PF_Met",&rGen_type1PF_Met,&b_rGen_type1PF_Met);
-    readingtree->SetBranchAddress("Gen_type1PF_Metpx",&rGen_type1PF_Metpx,&b_rGen_type1PF_Metpx);
-    readingtree->SetBranchAddress("Gen_type1PF_Metpy",&rGen_type1PF_Metpy,&b_rGen_type1PF_Metpy);
-    readingtree->SetBranchAddress("Gen_type1PF_Metpz",&rGen_type1PF_Metpz,&b_rGen_type1PF_Metpz);
-    readingtree->SetBranchAddress("Gen_type1PF_Meteta",&rGen_type1PF_Meteta,&b_rGen_type1PF_Meteta);
-    readingtree->SetBranchAddress("Gen_type1PF_Metphi",&rGen_type1PF_Metphi,&b_rGen_type1PF_Metphi);
-    readingtree->SetBranchAddress("Gen_type1PF_Meten",&rGen_type1PF_Meten,&b_rGen_type1PF_Meten);
     readingtree->SetBranchAddress("Met_type1PF_pt",&rMet_type1PF_pt,&b_rMet_type1PF_pt);
     readingtree->SetBranchAddress("Met_type1PF_px",&rMet_type1PF_px,&b_rMet_type1PF_px);
     readingtree->SetBranchAddress("Met_type1PF_py",&rMet_type1PF_py,&b_rMet_type1PF_py);
@@ -2210,23 +2194,6 @@ void rSetBranchAddress(TTree* readingtree, string sample){
     readingtree->SetBranchAddress("Muon_py",&rMuon_py,&b_rMuon_py);
     readingtree->SetBranchAddress("Muon_pz",&rMuon_pz,&b_rMuon_pz);
     readingtree->SetBranchAddress("Muon_jetdr",&rMuon_jetdr,&b_rMuon_jetdr);
-    readingtree->SetBranchAddress("Muon_gen_pt",&rMuon_gen_pt,&b_rMuon_gen_pt);
-    readingtree->SetBranchAddress("Muon_gen_eta",&rMuon_gen_eta,&b_rMuon_gen_eta);
-    readingtree->SetBranchAddress("Muon_gen_phi",&rMuon_gen_phi,&b_rMuon_gen_phi);
-    readingtree->SetBranchAddress("Muon_gen_en",&rMuon_gen_en,&b_rMuon_gen_en);
-    readingtree->SetBranchAddress("Muon_gen_pdgId",&rMuon_gen_pdgId,&b_rMuon_gen_pdgId);
-    readingtree->SetBranchAddress("Muon_genMother_pt",&rMuon_genMother_pt,&b_rMuon_genMother_pt);
-    readingtree->SetBranchAddress("Muon_genMother_eta",&rMuon_genMother_eta,&b_rMuon_genMother_eta);
-    readingtree->SetBranchAddress("Muon_genMother_phi",&rMuon_genMother_phi,&b_rMuon_genMother_phi);
-    readingtree->SetBranchAddress("Muon_genMother_en",&rMuon_genMother_en,&b_rMuon_genMother_en);
-    readingtree->SetBranchAddress("Muon_genMother_pdgId",&rMuon_genMother_pdgId,&b_rMuon_genMother_pdgId);
-    readingtree->SetBranchAddress("Muon_genGrandMother_pt",&rMuon_genGrandMother_pt,&b_rMuon_genGrandMother_pt);
-    readingtree->SetBranchAddress("Muon_genGrandMother_eta",&rMuon_genGrandMother_eta,&b_rMuon_genGrandMother_eta);
-    readingtree->SetBranchAddress("Muon_genGrandMother_phi",&rMuon_genGrandMother_phi,&b_rMuon_genGrandMother_phi);
-    readingtree->SetBranchAddress("Muon_genGrandMother_en",&rMuon_genGrandMother_en,&b_rMuon_genGrandMother_en);
-    readingtree->SetBranchAddress("Muon_genGrandMother_pdgId",&rMuon_genGrandMother_pdgId,&b_rMuon_genGrandMother_pdgId);
-    readingtree->SetBranchAddress("Muon_gen_isPromptFinalState",&rMuon_gen_isPromptFinalState,&b_rMuon_gen_isPromptFinalState);
-    readingtree->SetBranchAddress("Muon_gen_isDirectPromptTauDecayProductFinalState",&rMuon_gen_isDirectPromptTauDecayProductFinalState,&b_rMuon_gen_isDirectPromptTauDecayProductFinalState);
     //Electron
     readingtree->SetBranchAddress("patElectron_pt",&rpatElectron_pt,&b_rpatElectron_pt);
     readingtree->SetBranchAddress("patElectron_eta",&rpatElectron_eta,&b_rpatElectron_eta);
@@ -2249,23 +2216,6 @@ void rSetBranchAddress(TTree* readingtree, string sample){
     readingtree->SetBranchAddress("patElectron_py",&rpatElectron_py,&b_rpatElectron_py);
     readingtree->SetBranchAddress("patElectron_pz",&rpatElectron_pz,&b_rpatElectron_pz);
     readingtree->SetBranchAddress("patElectron_jetdr",&rpatElectron_jetdr,&b_rpatElectron_jetdr);
-    readingtree->SetBranchAddress("patElectron_gen_pt",&rpatElectron_gen_pt,&b_rpatElectron_gen_pt);
-    readingtree->SetBranchAddress("patElectron_gen_eta",&rpatElectron_gen_eta,&b_rpatElectron_gen_eta);
-    readingtree->SetBranchAddress("patElectron_gen_phi",&rpatElectron_gen_phi,&b_rpatElectron_gen_phi);
-    readingtree->SetBranchAddress("patElectron_gen_en",&rpatElectron_gen_en,&b_rpatElectron_gen_en);
-    readingtree->SetBranchAddress("patElectron_gen_pdgId",&rpatElectron_gen_pdgId,&b_rpatElectron_gen_pdgId);
-    readingtree->SetBranchAddress("patElectron_genMother_pt",&rpatElectron_genMother_pt,&b_rpatElectron_genMother_pt);
-    readingtree->SetBranchAddress("patElectron_genMother_eta",&rpatElectron_genMother_eta,&b_rpatElectron_genMother_eta);
-    readingtree->SetBranchAddress("patElectron_genMother_phi",&rpatElectron_genMother_phi,&b_rpatElectron_genMother_phi);
-    readingtree->SetBranchAddress("patElectron_genMother_en",&rpatElectron_genMother_en,&b_rpatElectron_genMother_en);
-    readingtree->SetBranchAddress("patElectron_genMother_pdgId",&rpatElectron_genMother_pdgId,&b_rpatElectron_genMother_pdgId);
-    readingtree->SetBranchAddress("patElectron_genGrandMother_pt",&rpatElectron_genGrandMother_pt,&b_rpatElectron_genGrandMother_pt);
-    readingtree->SetBranchAddress("patElectron_genGrandMother_eta",&rpatElectron_genGrandMother_eta,&b_rpatElectron_genGrandMother_eta);
-    readingtree->SetBranchAddress("patElectron_genGrandMother_phi",&rpatElectron_genGrandMother_phi,&b_rpatElectron_genGrandMother_phi);
-    readingtree->SetBranchAddress("patElectron_genGrandMother_en",&rpatElectron_genGrandMother_en,&b_rpatElectron_genGrandMother_en);
-    readingtree->SetBranchAddress("patElectron_genGrandMother_pdgId",&rpatElectron_genGrandMother_pdgId,&b_rpatElectron_genGrandMother_pdgId);
-    readingtree->SetBranchAddress("patElectron_gen_isPromptFinalState",&rpatElectron_gen_isPromptFinalState,&b_rpatElectron_gen_isPromptFinalState);
-    readingtree->SetBranchAddress("patElectron_gen_isDirectPromptTauDecayProductFinalState",&rpatElectron_gen_isDirectPromptTauDecayProductFinalState,&b_rpatElectron_gen_isDirectPromptTauDecayProductFinalState);
     readingtree->SetBranchAddress("patElectron_SCeta",&rpatElectron_SCeta,&b_rpatElectron_SCeta);
     readingtree->SetBranchAddress("patElectron_mvaValue_HZZ",&rpatElectron_mvaValue_HZZ,&b_rpatElectron_mvaValue_HZZ);
     readingtree->SetBranchAddress("patElectron_expectedMissingInnerHits",&rpatElectron_expectedMissingInnerHits,&b_rpatElectron_expectedMissingInnerHits);
@@ -2293,16 +2243,6 @@ void rSetBranchAddress(TTree* readingtree, string sample){
     readingtree->SetBranchAddress("Jet_eta",&rJet_eta,&b_rJet_eta);
     readingtree->SetBranchAddress("Jet_phi",&rJet_phi,&b_rJet_phi);
     readingtree->SetBranchAddress("Jet_energy",&rJet_energy,&b_rJet_energy);
-    readingtree->SetBranchAddress("Jet_genMother_pt",&rJet_genMother_pt,&b_rJet_genMother_pt);
-    readingtree->SetBranchAddress("Jet_genMother_eta",&rJet_genMother_eta,&b_rJet_genMother_eta);
-    readingtree->SetBranchAddress("Jet_genMother_phi",&rJet_genMother_phi,&b_rJet_genMother_phi);
-    readingtree->SetBranchAddress("Jet_genMother_en",&rJet_genMother_en,&b_rJet_genMother_en);
-    readingtree->SetBranchAddress("Jet_genMother_pdgId",&rJet_genMother_pdgId,&b_rJet_genMother_pdgId);
-    readingtree->SetBranchAddress("Jet_genGrandMother_pt",&rJet_genGrandMother_pt,&b_rJet_genGrandMother_pt);
-    readingtree->SetBranchAddress("Jet_genGrandMother_eta",&rJet_genGrandMother_eta,&b_rJet_genGrandMother_eta);
-    readingtree->SetBranchAddress("Jet_genGrandMother_phi",&rJet_genGrandMother_phi,&b_rJet_genGrandMother_phi);
-    readingtree->SetBranchAddress("Jet_genGrandMother_en",&rJet_genGrandMother_en,&b_rJet_genGrandMother_en);
-    readingtree->SetBranchAddress("Jet_genGrandMother_pdgId",&rJet_genGrandMother_pdgId,&b_rJet_genGrandMother_pdgId);
     readingtree->SetBranchAddress("Jet_Uncorr_pt",&rJet_Uncorr_pt,&b_rJet_Uncorr_pt);
     readingtree->SetBranchAddress("Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags",&rJet_pfCombinedInclusiveSecondaryVertexV2BJetTags,&b_rJet_pfCombinedInclusiveSecondaryVertexV2BJetTags);
     readingtree->SetBranchAddress("Jet_pfCombinedMVAV2BJetTags",&rJet_pfCombinedMVAV2BJetTags,&b_rJet_pfCombinedMVAV2BJetTags);
@@ -2310,12 +2250,6 @@ void rSetBranchAddress(TTree* readingtree, string sample){
     readingtree->SetBranchAddress("Jet_axis2",&rJet_axis2,&b_rJet_axis2);
     readingtree->SetBranchAddress("Jet_ptD",&rJet_ptD,&b_rJet_ptD);
     readingtree->SetBranchAddress("Jet_mult",&rJet_mult,&b_rJet_mult);
-    readingtree->SetBranchAddress("Jet_partonFlavour",&rJet_partonFlavour,&b_rJet_partonFlavour);
-    readingtree->SetBranchAddress("Jet_hadronFlavour",&rJet_hadronFlavour,&b_rJet_hadronFlavour);
-    readingtree->SetBranchAddress("Jet_genpt",&rJet_genpt,&b_rJet_genpt);
-    readingtree->SetBranchAddress("Jet_geneta",&rJet_geneta,&b_rJet_geneta);
-    readingtree->SetBranchAddress("Jet_genphi",&rJet_genphi,&b_rJet_genphi);
-    readingtree->SetBranchAddress("Jet_genenergy",&rJet_genenergy,&b_rJet_genenergy);
     readingtree->SetBranchAddress("Jet_JesSF",&rJet_JesSF,&b_rJet_JesSF);
     readingtree->SetBranchAddress("Jet_JesSFup",&rJet_JesSFup,&b_rJet_JesSFup);
     readingtree->SetBranchAddress("Jet_JesSFdown",&rJet_JesSFdown,&b_rJet_JesSFdown);
@@ -2367,24 +2301,81 @@ void rSetBranchAddress(TTree* readingtree, string sample){
     readingtree->SetBranchAddress("BoostedJet_softdrop_mass",&rBoostedJet_softdrop_mass,&b_rBoostedJet_softdrop_mass);
     readingtree->SetBranchAddress("BoostedJet_pruned_mass",&rBoostedJet_pruned_mass,&b_rBoostedJet_pruned_mass);
     //Gen
-    readingtree->SetBranchAddress("Gen_pdg_id",&rGen_pdg_id,&b_rGen_pdg_id);
-    readingtree->SetBranchAddress("Gen_pt",&rGen_pt,&b_rGen_pt);
-    readingtree->SetBranchAddress("Gen_eta",&rGen_eta,&b_rGen_eta);
-    readingtree->SetBranchAddress("Gen_phi",&rGen_phi,&b_rGen_phi);
-    readingtree->SetBranchAddress("Gen_energy",&rGen_energy,&b_rGen_energy);
-    readingtree->SetBranchAddress("Gen_motherpdg_id",&rGen_motherpdg_id,&b_rGen_motherpdg_id);
-    readingtree->SetBranchAddress("Gen_BmotherIndex",&rGen_BmotherIndex,&b_rGen_BmotherIndex);
-    readingtree->SetBranchAddress("Gen_numMother",&rGen_numMother,&b_rGen_numMother);
-    readingtree->SetBranchAddress("Gen_status",&rGen_status,&b_rGen_status);
-    readingtree->SetBranchAddress("Gen_numDaught",&rGen_numDaught,&b_rGen_numDaught);
-    readingtree->SetBranchAddress("Gen_BmotherIndices",&rGen_BmotherIndices,&b_rGen_BmotherIndices);
+    if(sample=="mc"){
+        readingtree->SetBranchAddress("Muon_gen_pt",&rMuon_gen_pt,&b_rMuon_gen_pt);
+        readingtree->SetBranchAddress("Muon_gen_eta",&rMuon_gen_eta,&b_rMuon_gen_eta);
+        readingtree->SetBranchAddress("Muon_gen_phi",&rMuon_gen_phi,&b_rMuon_gen_phi);
+        readingtree->SetBranchAddress("Muon_gen_en",&rMuon_gen_en,&b_rMuon_gen_en);
+        readingtree->SetBranchAddress("Muon_gen_pdgId",&rMuon_gen_pdgId,&b_rMuon_gen_pdgId);
+        readingtree->SetBranchAddress("Muon_genMother_pt",&rMuon_genMother_pt,&b_rMuon_genMother_pt);
+        readingtree->SetBranchAddress("Muon_genMother_eta",&rMuon_genMother_eta,&b_rMuon_genMother_eta);
+        readingtree->SetBranchAddress("Muon_genMother_phi",&rMuon_genMother_phi,&b_rMuon_genMother_phi);
+        readingtree->SetBranchAddress("Muon_genMother_en",&rMuon_genMother_en,&b_rMuon_genMother_en);
+        readingtree->SetBranchAddress("Muon_genMother_pdgId",&rMuon_genMother_pdgId,&b_rMuon_genMother_pdgId);
+        readingtree->SetBranchAddress("Muon_genGrandMother_pt",&rMuon_genGrandMother_pt,&b_rMuon_genGrandMother_pt);
+        readingtree->SetBranchAddress("Muon_genGrandMother_eta",&rMuon_genGrandMother_eta,&b_rMuon_genGrandMother_eta);
+        readingtree->SetBranchAddress("Muon_genGrandMother_phi",&rMuon_genGrandMother_phi,&b_rMuon_genGrandMother_phi);
+        readingtree->SetBranchAddress("Muon_genGrandMother_en",&rMuon_genGrandMother_en,&b_rMuon_genGrandMother_en);
+        readingtree->SetBranchAddress("Muon_genGrandMother_pdgId",&rMuon_genGrandMother_pdgId,&b_rMuon_genGrandMother_pdgId);
+        readingtree->SetBranchAddress("Muon_gen_isPromptFinalState",&rMuon_gen_isPromptFinalState,&b_rMuon_gen_isPromptFinalState);
+        readingtree->SetBranchAddress("Muon_gen_isDirectPromptTauDecayProductFinalState",&rMuon_gen_isDirectPromptTauDecayProductFinalState,&b_rMuon_gen_isDirectPromptTauDecayProductFinalState);
+        readingtree->SetBranchAddress("patElectron_gen_pt",&rpatElectron_gen_pt,&b_rpatElectron_gen_pt);
+        readingtree->SetBranchAddress("patElectron_gen_eta",&rpatElectron_gen_eta,&b_rpatElectron_gen_eta);
+        readingtree->SetBranchAddress("patElectron_gen_phi",&rpatElectron_gen_phi,&b_rpatElectron_gen_phi);
+        readingtree->SetBranchAddress("patElectron_gen_en",&rpatElectron_gen_en,&b_rpatElectron_gen_en);
+        readingtree->SetBranchAddress("patElectron_gen_pdgId",&rpatElectron_gen_pdgId,&b_rpatElectron_gen_pdgId);
+        readingtree->SetBranchAddress("patElectron_genMother_pt",&rpatElectron_genMother_pt,&b_rpatElectron_genMother_pt);
+        readingtree->SetBranchAddress("patElectron_genMother_eta",&rpatElectron_genMother_eta,&b_rpatElectron_genMother_eta);
+        readingtree->SetBranchAddress("patElectron_genMother_phi",&rpatElectron_genMother_phi,&b_rpatElectron_genMother_phi);
+        readingtree->SetBranchAddress("patElectron_genMother_en",&rpatElectron_genMother_en,&b_rpatElectron_genMother_en);
+        readingtree->SetBranchAddress("patElectron_genMother_pdgId",&rpatElectron_genMother_pdgId,&b_rpatElectron_genMother_pdgId);
+        readingtree->SetBranchAddress("patElectron_genGrandMother_pt",&rpatElectron_genGrandMother_pt,&b_rpatElectron_genGrandMother_pt);
+        readingtree->SetBranchAddress("patElectron_genGrandMother_eta",&rpatElectron_genGrandMother_eta,&b_rpatElectron_genGrandMother_eta);
+        readingtree->SetBranchAddress("patElectron_genGrandMother_phi",&rpatElectron_genGrandMother_phi,&b_rpatElectron_genGrandMother_phi);
+        readingtree->SetBranchAddress("patElectron_genGrandMother_en",&rpatElectron_genGrandMother_en,&b_rpatElectron_genGrandMother_en);
+        readingtree->SetBranchAddress("patElectron_genGrandMother_pdgId",&rpatElectron_genGrandMother_pdgId,&b_rpatElectron_genGrandMother_pdgId);
+        readingtree->SetBranchAddress("patElectron_gen_isPromptFinalState",&rpatElectron_gen_isPromptFinalState,&b_rpatElectron_gen_isPromptFinalState);
+        readingtree->SetBranchAddress("patElectron_gen_isDirectPromptTauDecayProductFinalState",&rpatElectron_gen_isDirectPromptTauDecayProductFinalState,&b_rpatElectron_gen_isDirectPromptTauDecayProductFinalState);
+        readingtree->SetBranchAddress("Jet_partonFlavour",&rJet_partonFlavour,&b_rJet_partonFlavour);
+        readingtree->SetBranchAddress("Jet_hadronFlavour",&rJet_hadronFlavour,&b_rJet_hadronFlavour);
+        readingtree->SetBranchAddress("Jet_genpt",&rJet_genpt,&b_rJet_genpt);
+        readingtree->SetBranchAddress("Jet_geneta",&rJet_geneta,&b_rJet_geneta);
+        readingtree->SetBranchAddress("Jet_genphi",&rJet_genphi,&b_rJet_genphi);
+        readingtree->SetBranchAddress("Jet_genenergy",&rJet_genenergy,&b_rJet_genenergy);
+        readingtree->SetBranchAddress("Jet_genMother_pt",&rJet_genMother_pt,&b_rJet_genMother_pt);
+        readingtree->SetBranchAddress("Jet_genMother_eta",&rJet_genMother_eta,&b_rJet_genMother_eta);
+        readingtree->SetBranchAddress("Jet_genMother_phi",&rJet_genMother_phi,&b_rJet_genMother_phi);
+        readingtree->SetBranchAddress("Jet_genMother_en",&rJet_genMother_en,&b_rJet_genMother_en);
+        readingtree->SetBranchAddress("Jet_genMother_pdgId",&rJet_genMother_pdgId,&b_rJet_genMother_pdgId);
+        readingtree->SetBranchAddress("Jet_genGrandMother_pt",&rJet_genGrandMother_pt,&b_rJet_genGrandMother_pt);
+        readingtree->SetBranchAddress("Jet_genGrandMother_eta",&rJet_genGrandMother_eta,&b_rJet_genGrandMother_eta);
+        readingtree->SetBranchAddress("Jet_genGrandMother_phi",&rJet_genGrandMother_phi,&b_rJet_genGrandMother_phi);
+        readingtree->SetBranchAddress("Jet_genGrandMother_en",&rJet_genGrandMother_en,&b_rJet_genGrandMother_en);
+        readingtree->SetBranchAddress("Jet_genGrandMother_pdgId",&rJet_genGrandMother_pdgId,&b_rJet_genGrandMother_pdgId);
+        readingtree->SetBranchAddress("HiggsDecay",&rHiggsDecay,&b_rHiggsDecay);
+        readingtree->SetBranchAddress("Gen_type1PF_Met",&rGen_type1PF_Met,&b_rGen_type1PF_Met);
+        readingtree->SetBranchAddress("Gen_type1PF_Metpx",&rGen_type1PF_Metpx,&b_rGen_type1PF_Metpx);
+        readingtree->SetBranchAddress("Gen_type1PF_Metpy",&rGen_type1PF_Metpy,&b_rGen_type1PF_Metpy);
+        readingtree->SetBranchAddress("Gen_type1PF_Metpz",&rGen_type1PF_Metpz,&b_rGen_type1PF_Metpz);
+        readingtree->SetBranchAddress("Gen_type1PF_Meteta",&rGen_type1PF_Meteta,&b_rGen_type1PF_Meteta);
+        readingtree->SetBranchAddress("Gen_type1PF_Metphi",&rGen_type1PF_Metphi,&b_rGen_type1PF_Metphi);
+        readingtree->SetBranchAddress("Gen_type1PF_Meten",&rGen_type1PF_Meten,&b_rGen_type1PF_Meten);
+        readingtree->SetBranchAddress("Gen_pdg_id",&rGen_pdg_id,&b_rGen_pdg_id);
+        readingtree->SetBranchAddress("Gen_pt",&rGen_pt,&b_rGen_pt);
+        readingtree->SetBranchAddress("Gen_eta",&rGen_eta,&b_rGen_eta);
+        readingtree->SetBranchAddress("Gen_phi",&rGen_phi,&b_rGen_phi);
+        readingtree->SetBranchAddress("Gen_energy",&rGen_energy,&b_rGen_energy);
+        readingtree->SetBranchAddress("Gen_motherpdg_id",&rGen_motherpdg_id,&b_rGen_motherpdg_id);
+        readingtree->SetBranchAddress("Gen_BmotherIndex",&rGen_BmotherIndex,&b_rGen_BmotherIndex);
+        readingtree->SetBranchAddress("Gen_numMother",&rGen_numMother,&b_rGen_numMother);
+        readingtree->SetBranchAddress("Gen_status",&rGen_status,&b_rGen_status);
+        readingtree->SetBranchAddress("Gen_numDaught",&rGen_numDaught,&b_rGen_numDaught);
+        readingtree->SetBranchAddress("Gen_BmotherIndices",&rGen_BmotherIndices,&b_rGen_BmotherIndices);
+    }
 };
 
 
 void wSetBranchAddress(TTree* newtree, string sample){
-    if(sample == "data"){
-        cout<<" Hi, I'm data!"<<endl;
-    }
     //Write setbranchaddress
     newtree->Branch("lumi_wgt",&lumi_wgt);
     newtree->Branch("EVENT_event",&EVENT_event);
@@ -2786,9 +2777,6 @@ void wSetBranchAddress(TTree* newtree, string sample){
 
 
 void wClearInitialization(string sample){
-    if(sample == "data"){
-        cout<<" Hi, I'm data!"<<endl;
-    }
     //Initialize Number
     lumi_wgt= -999;
     EVENT_event= -999;
@@ -3248,21 +3236,10 @@ void wClearInitialization(string sample){
 
 
 void rGetEntry(Long64_t tentry, string sample){
-    if(sample == "data"){
-        cout<<" Hi, I'm data!"<<endl;
-    }
     //GetEntry
     b_rEVENT_event->GetEntry(tentry);
     b_rEVENT_genWeight->GetEntry(tentry);
-    b_rHiggsDecay->GetEntry(tentry);
     b_rPUWeight->GetEntry(tentry);
-    b_rGen_type1PF_Met->GetEntry(tentry);
-    b_rGen_type1PF_Metpx->GetEntry(tentry);
-    b_rGen_type1PF_Metpy->GetEntry(tentry);
-    b_rGen_type1PF_Metpz->GetEntry(tentry);
-    b_rGen_type1PF_Meteta->GetEntry(tentry);
-    b_rGen_type1PF_Metphi->GetEntry(tentry);
-    b_rGen_type1PF_Meten->GetEntry(tentry);
     b_rMet_type1PF_pt->GetEntry(tentry);
     b_rMet_type1PF_px->GetEntry(tentry);
     b_rMet_type1PF_py->GetEntry(tentry);
@@ -3321,23 +3298,6 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rMuon_py->GetEntry(tentry);
     b_rMuon_pz->GetEntry(tentry);
     b_rMuon_jetdr->GetEntry(tentry);
-    b_rMuon_gen_pt->GetEntry(tentry);
-    b_rMuon_gen_eta->GetEntry(tentry);
-    b_rMuon_gen_phi->GetEntry(tentry);
-    b_rMuon_gen_en->GetEntry(tentry);
-    b_rMuon_gen_pdgId->GetEntry(tentry);
-    b_rMuon_genMother_pt->GetEntry(tentry);
-    b_rMuon_genMother_eta->GetEntry(tentry);
-    b_rMuon_genMother_phi->GetEntry(tentry);
-    b_rMuon_genMother_en->GetEntry(tentry);
-    b_rMuon_genMother_pdgId->GetEntry(tentry);
-    b_rMuon_genGrandMother_pt->GetEntry(tentry);
-    b_rMuon_genGrandMother_eta->GetEntry(tentry);
-    b_rMuon_genGrandMother_phi->GetEntry(tentry);
-    b_rMuon_genGrandMother_en->GetEntry(tentry);
-    b_rMuon_genGrandMother_pdgId->GetEntry(tentry);
-    b_rMuon_gen_isPromptFinalState->GetEntry(tentry);
-    b_rMuon_gen_isDirectPromptTauDecayProductFinalState->GetEntry(tentry);
     //Electron
     b_rpatElectron_pt->GetEntry(tentry);
     b_rpatElectron_eta->GetEntry(tentry);
@@ -3360,23 +3320,6 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rpatElectron_py->GetEntry(tentry);
     b_rpatElectron_pz->GetEntry(tentry);
     b_rpatElectron_jetdr->GetEntry(tentry);
-    b_rpatElectron_gen_pt->GetEntry(tentry);
-    b_rpatElectron_gen_eta->GetEntry(tentry);
-    b_rpatElectron_gen_phi->GetEntry(tentry);
-    b_rpatElectron_gen_en->GetEntry(tentry);
-    b_rpatElectron_gen_pdgId->GetEntry(tentry);
-    b_rpatElectron_genMother_pt->GetEntry(tentry);
-    b_rpatElectron_genMother_eta->GetEntry(tentry);
-    b_rpatElectron_genMother_phi->GetEntry(tentry);
-    b_rpatElectron_genMother_en->GetEntry(tentry);
-    b_rpatElectron_genMother_pdgId->GetEntry(tentry);
-    b_rpatElectron_genGrandMother_pt->GetEntry(tentry);
-    b_rpatElectron_genGrandMother_eta->GetEntry(tentry);
-    b_rpatElectron_genGrandMother_phi->GetEntry(tentry);
-    b_rpatElectron_genGrandMother_en->GetEntry(tentry);
-    b_rpatElectron_genGrandMother_pdgId->GetEntry(tentry);
-    b_rpatElectron_gen_isPromptFinalState->GetEntry(tentry);
-    b_rpatElectron_gen_isDirectPromptTauDecayProductFinalState->GetEntry(tentry);
     b_rpatElectron_SCeta->GetEntry(tentry);
     b_rpatElectron_expectedMissingInnerHits->GetEntry(tentry);
     b_rpatElectron_full5x5_sigmaIetaIeta->GetEntry(tentry);
@@ -3404,16 +3347,6 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rJet_eta->GetEntry(tentry);
     b_rJet_phi->GetEntry(tentry);
     b_rJet_energy->GetEntry(tentry);
-    b_rJet_genMother_pt->GetEntry(tentry);
-    b_rJet_genMother_eta->GetEntry(tentry);
-    b_rJet_genMother_phi->GetEntry(tentry);
-    b_rJet_genMother_en->GetEntry(tentry);
-    b_rJet_genMother_pdgId->GetEntry(tentry);
-    b_rJet_genGrandMother_pt->GetEntry(tentry);
-    b_rJet_genGrandMother_eta->GetEntry(tentry);
-    b_rJet_genGrandMother_phi->GetEntry(tentry);
-    b_rJet_genGrandMother_en->GetEntry(tentry);
-    b_rJet_genGrandMother_pdgId->GetEntry(tentry);
     b_rJet_Uncorr_pt->GetEntry(tentry);
     b_rJet_pfCombinedInclusiveSecondaryVertexV2BJetTags->GetEntry(tentry);
     b_rJet_pfCombinedMVAV2BJetTags->GetEntry(tentry);
@@ -3421,12 +3354,6 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rJet_axis2->GetEntry(tentry);
     b_rJet_ptD->GetEntry(tentry);
     b_rJet_mult->GetEntry(tentry);
-    b_rJet_partonFlavour->GetEntry(tentry);
-    b_rJet_hadronFlavour->GetEntry(tentry);
-    b_rJet_genpt->GetEntry(tentry);
-    b_rJet_geneta->GetEntry(tentry);
-    b_rJet_genphi->GetEntry(tentry);
-    b_rJet_genenergy->GetEntry(tentry);
     b_rJet_JesSF->GetEntry(tentry);
     b_rJet_JesSFup->GetEntry(tentry);
     b_rJet_JesSFdown->GetEntry(tentry);
@@ -3478,15 +3405,75 @@ void rGetEntry(Long64_t tentry, string sample){
     b_rBoostedJet_softdrop_mass->GetEntry(tentry);
     b_rBoostedJet_pruned_mass->GetEntry(tentry);
     //Gen
-    b_rGen_pdg_id->GetEntry(tentry);
-    b_rGen_pt->GetEntry(tentry);
-    b_rGen_eta->GetEntry(tentry);
-    b_rGen_phi->GetEntry(tentry);
-    b_rGen_energy->GetEntry(tentry);
-    b_rGen_motherpdg_id->GetEntry(tentry);
-    b_rGen_BmotherIndex->GetEntry(tentry);
-    b_rGen_numMother->GetEntry(tentry);
-    b_rGen_status->GetEntry(tentry);
-    b_rGen_numDaught->GetEntry(tentry);
-    b_rGen_BmotherIndices->GetEntry(tentry);
+    if(sample=="mc"){
+        b_rMuon_gen_pt->GetEntry(tentry);
+        b_rMuon_gen_eta->GetEntry(tentry);
+        b_rMuon_gen_phi->GetEntry(tentry);
+        b_rMuon_gen_en->GetEntry(tentry);
+        b_rMuon_gen_pdgId->GetEntry(tentry);
+        b_rMuon_genMother_pt->GetEntry(tentry);
+        b_rMuon_genMother_eta->GetEntry(tentry);
+        b_rMuon_genMother_phi->GetEntry(tentry);
+        b_rMuon_genMother_en->GetEntry(tentry);
+        b_rMuon_genMother_pdgId->GetEntry(tentry);
+        b_rMuon_genGrandMother_pt->GetEntry(tentry);
+        b_rMuon_genGrandMother_eta->GetEntry(tentry);
+        b_rMuon_genGrandMother_phi->GetEntry(tentry);
+        b_rMuon_genGrandMother_en->GetEntry(tentry);
+        b_rMuon_genGrandMother_pdgId->GetEntry(tentry);
+        b_rMuon_gen_isPromptFinalState->GetEntry(tentry);
+        b_rMuon_gen_isDirectPromptTauDecayProductFinalState->GetEntry(tentry);
+        b_rpatElectron_gen_pt->GetEntry(tentry);
+        b_rpatElectron_gen_eta->GetEntry(tentry);
+        b_rpatElectron_gen_phi->GetEntry(tentry);
+        b_rpatElectron_gen_en->GetEntry(tentry);
+        b_rpatElectron_gen_pdgId->GetEntry(tentry);
+        b_rpatElectron_genMother_pt->GetEntry(tentry);
+        b_rpatElectron_genMother_eta->GetEntry(tentry);
+        b_rpatElectron_genMother_phi->GetEntry(tentry);
+        b_rpatElectron_genMother_en->GetEntry(tentry);
+        b_rpatElectron_genMother_pdgId->GetEntry(tentry);
+        b_rpatElectron_genGrandMother_pt->GetEntry(tentry);
+        b_rpatElectron_genGrandMother_eta->GetEntry(tentry);
+        b_rpatElectron_genGrandMother_phi->GetEntry(tentry);
+        b_rpatElectron_genGrandMother_en->GetEntry(tentry);
+        b_rpatElectron_genGrandMother_pdgId->GetEntry(tentry);
+        b_rpatElectron_gen_isPromptFinalState->GetEntry(tentry);
+        b_rpatElectron_gen_isDirectPromptTauDecayProductFinalState->GetEntry(tentry);
+        b_rJet_partonFlavour->GetEntry(tentry);
+        b_rJet_hadronFlavour->GetEntry(tentry);
+        b_rJet_genpt->GetEntry(tentry);
+        b_rJet_geneta->GetEntry(tentry);
+        b_rJet_genphi->GetEntry(tentry);
+        b_rJet_genenergy->GetEntry(tentry);
+        b_rJet_genMother_pt->GetEntry(tentry);
+        b_rJet_genMother_eta->GetEntry(tentry);
+        b_rJet_genMother_phi->GetEntry(tentry);
+        b_rJet_genMother_en->GetEntry(tentry);
+        b_rJet_genMother_pdgId->GetEntry(tentry);
+        b_rJet_genGrandMother_pt->GetEntry(tentry);
+        b_rJet_genGrandMother_eta->GetEntry(tentry);
+        b_rJet_genGrandMother_phi->GetEntry(tentry);
+        b_rJet_genGrandMother_en->GetEntry(tentry);
+        b_rJet_genGrandMother_pdgId->GetEntry(tentry);
+        b_rHiggsDecay->GetEntry(tentry);
+        b_rGen_type1PF_Met->GetEntry(tentry);
+        b_rGen_type1PF_Metpx->GetEntry(tentry);
+        b_rGen_type1PF_Metpy->GetEntry(tentry);
+        b_rGen_type1PF_Metpz->GetEntry(tentry);
+        b_rGen_type1PF_Meteta->GetEntry(tentry);
+        b_rGen_type1PF_Metphi->GetEntry(tentry);
+        b_rGen_type1PF_Meten->GetEntry(tentry);
+        b_rGen_pdg_id->GetEntry(tentry);
+        b_rGen_pt->GetEntry(tentry);
+        b_rGen_eta->GetEntry(tentry);
+        b_rGen_phi->GetEntry(tentry);
+        b_rGen_energy->GetEntry(tentry);
+        b_rGen_motherpdg_id->GetEntry(tentry);
+        b_rGen_BmotherIndex->GetEntry(tentry);
+        b_rGen_numMother->GetEntry(tentry);
+        b_rGen_status->GetEntry(tentry);
+        b_rGen_numDaught->GetEntry(tentry);
+        b_rGen_BmotherIndices->GetEntry(tentry);
+    }
 };

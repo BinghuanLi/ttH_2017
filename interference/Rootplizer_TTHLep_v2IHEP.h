@@ -15,7 +15,7 @@ using namespace std;
 ////
 //   Declare constants
 /////
-const int nentries = 1000;//-1 is all entries  51 for first DiMuSR
+const int nentries = -1;//-1 is all entries  51 for first DiMuSR
 const bool debug =false;
 string synchro = "";
 const double evt = 653077.;
