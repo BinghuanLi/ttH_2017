@@ -3,6 +3,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TMVA/Reader.h"
+#include "TGraphAsymmErrors.h"
 
 #include "../source/Lepton.cc"
 #include "../source/Tau.cc"
@@ -14,7 +15,7 @@ using namespace std;
 ////
 //   Declare constants
 /////
-const int nentries = -1;//-1 is all entries  51 for first DiMuSR
+const int nentries = 1000;//-1 is all entries  51 for first DiMuSR
 const bool debug =false;
 string synchro = "";
 const double evt = 653077.;
@@ -707,6 +708,43 @@ double hadTop_numGen;
 double hadW_numGen_cone8;
 double hadW_numGen_pt190;
 double hadW_numGen;
+
+//////
+/// Scale Factors
+//////
+void get_Trigger_SF();
+void get_Lepton_SF(int var=0);
+double get_RecoToLoose_SF(double pdgId, double pt, float eta, int var=0);
+double get_LooseToTight_SF(double pdgId, double pt, double eta, int lep_num);
+double SF_Trigger_3l;
+double SF_Trigger_2l;
+double SF_Lepton_3l;
+double SF_Lepton_2l;
+
+TFile* _file_recoToLoose_leptonSF_mu1 = new TFile( (data_path + "TnP_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root").c_str(),"read");
+TFile* _file_recoToLoose_leptonSF_mu2 = new TFile( (data_path+"TnP_NUM_MiniIsoLoose_DENOM_LooseID_VAR_map_pt_eta.root").c_str(),"read");
+TFile* _file_recoToLoose_leptonSF_mu3 = new TFile( (data_path+"TnP_NUM_TightIP2D_DENOM_MediumID_VAR_map_pt_eta.root").c_str(),"read");
+TFile* _file_recoToLoose_leptonSF_mu4 = new TFile( (data_path+"Tracking_EfficienciesAndSF_BCDEFGH.root").c_str(),"read");
+TFile* _file_recoToLoose_leptonSF_el = new TFile( (data_path+"el_scaleFactors_Moriond17.root").c_str(),"read");
+TFile* _file_recoToLoose_leptonSF_gsf = new TFile( (data_path+"egammaEffi.txt_EGM2D.root").c_str(),"read");
+TFile* _file_looseToTight_leptonSF_mu_2lss = new TFile( (data_path+"lepMVAEffSF_m_2lss.root").c_str(),"read");
+TFile* _file_looseToTight_leptonSF_el_2lss = new TFile( (data_path+"lepMVAEffSF_e_2lss.root").c_str(),"read");
+TFile* _file_looseToTight_leptonSF_mu_3l = new TFile( (data_path+"lepMVAEffSF_m_3l.root").c_str(),"read");
+TFile* _file_looseToTight_leptonSF_el_3l = new TFile( (data_path+"lepMVAEffSF_e_3l.root").c_str(),"read");
+
+
+TH2F* _histo_recoToLoose_leptonSF_mu1 = (TH2F*)(_file_recoToLoose_leptonSF_mu1->Get("SF"));
+TH2F* _histo_recoToLoose_leptonSF_mu2 = (TH2F*)(_file_recoToLoose_leptonSF_mu2->Get("SF"));
+TH2F* _histo_recoToLoose_leptonSF_mu3 = (TH2F*)(_file_recoToLoose_leptonSF_mu3->Get("SF"));
+TGraphAsymmErrors* _histo_recoToLoose_leptonSF_mu4 = (TGraphAsymmErrors*)(_file_recoToLoose_leptonSF_mu4->Get("ratio_eff_eta3_dr030e030_corr"));
+TH2F* _histo_recoToLoose_leptonSF_el1 = (TH2F*)(_file_recoToLoose_leptonSF_el->Get("GsfElectronToMVAVLooseFOIDEmuTightIP2D"));
+TH2F* _histo_recoToLoose_leptonSF_el2 = (TH2F*)(_file_recoToLoose_leptonSF_el->Get("MVAVLooseElectronToMini4"));
+TH2F* _histo_recoToLoose_leptonSF_el3 = (TH2F*)(_file_recoToLoose_leptonSF_el->Get("MVAVLooseElectronToConvVetoIHit1"));
+TH2F* _histo_recoToLoose_leptonSF_gsf = (TH2F*)(_file_recoToLoose_leptonSF_gsf->Get("EGamma_SF2D"));
+TH2F* _histo_looseToTight_leptonSF_mu_2lss = (TH2F*)(_file_looseToTight_leptonSF_mu_2lss->Get("sf"));
+TH2F* _histo_looseToTight_leptonSF_el_2lss = (TH2F*)(_file_looseToTight_leptonSF_el_2lss->Get("sf"));
+TH2F* _histo_looseToTight_leptonSF_mu_3l = (TH2F*)(_file_looseToTight_leptonSF_mu_3l->Get("sf"));
+TH2F* _histo_looseToTight_leptonSF_el_3l = (TH2F*)(_file_looseToTight_leptonSF_el_3l->Get("sf"));
 
 
 ////////////

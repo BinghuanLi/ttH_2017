@@ -67,6 +67,9 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
         DiMuOSAR_sel();
         // calculate ttH weight
         cal_ttHweight();
+        // calculate Scale Factors
+        get_Trigger_SF();
+        get_Lepton_SF();
         if(!(
             isDiEleSR==1 || isDiMuSR==1 || isEleMuSR ==1|| isTriLepSR ==1 || isQuaLepSR == 1
             || isDiEleMVAAR==1 || isDiMuMVAAR==1 || isEleMuMVAAR ==1
@@ -1499,6 +1502,126 @@ void cal_ttHweight(){
         tthWeight_OS=FakeLep_CF->at(0) + FakeLep_CF->at(1); 
 };
 
+
+// calculate Scale Factors
+// Trigger SF
+void get_Trigger_SF(){
+    SF_Trigger_3l=1;
+    SF_Trigger_2l=1;
+    if(sample=="mc"){
+        if(FakeLep_corrpt->size()>=2){
+            if(isTriLepSR==1 || isQuaLepSR==1)SF_Trigger_3l=1.;
+            if(fabs(FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))==26)SF_Trigger_2l=1.;//2mu
+            if(fabs(FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))==22)SF_Trigger_2l=1.01;//2ele
+            if(fabs(FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))==24)SF_Trigger_2l=1.01;//elemu
+        }
+    }
+};
+
+
+//Lepton SF
+void get_Lepton_SF( int var ){
+    double sf_lepton_2l=1;
+    double looseSF_2l=1;
+    double tightSF_2l=1;
+    double sf_lepton_3l=1;
+    double looseSF_3l=1;
+    double tightSF_3l=1;
+    if(sample=="mc"){
+        if(FakeLep_pt->size()>=3){
+        for(uint lep_en=0; lep_en<3;lep_en++){
+            looseSF_3l= get_RecoToLoose_SF(FakeLep_pdgId->at(lep_en),FakeLep_pt->at(lep_en),FakeLep_eta->at(lep_en), var);
+            if(FakeLep_cut->at(lep_en)==3){
+                tightSF_3l= get_LooseToTight_SF(FakeLep_pdgId->at(lep_en),FakeLep_pt->at(lep_en),FakeLep_eta->at(lep_en), 3);
+            }else tightSF_3l=1;
+            sf_lepton_3l *= looseSF_3l*tightSF_3l;
+        }
+    }
+        if(FakeLep_pt->size()>=2){
+            for(uint lep_en=0; lep_en<2;lep_en++){
+                looseSF_2l= get_RecoToLoose_SF(FakeLep_pdgId->at(lep_en),FakeLep_pt->at(lep_en),FakeLep_eta->at(lep_en), var);
+                if(FakeLep_cut->at(lep_en)==3){
+                    tightSF_2l= get_LooseToTight_SF(FakeLep_pdgId->at(lep_en),FakeLep_pt->at(lep_en),FakeLep_eta->at(lep_en), 2);
+                }else tightSF_2l=1;
+                sf_lepton_2l *= looseSF_2l*tightSF_2l;
+            }
+         }
+    }
+    SF_Lepton_2l = sf_lepton_2l;
+    SF_Lepton_3l = sf_lepton_3l;
+};
+
+
+double get_RecoToLoose_SF(double pdgId, double pt, float eta, int var){
+    
+    if (fabs(pdgId) == 13)
+      {  
+	    double out = 1;
+	
+	    TH2F *hist = _histo_recoToLoose_leptonSF_mu1;
+	    int ptbin  = std::max(1, std::min(hist->GetNbinsX(), hist->GetXaxis()->FindBin(pt)));
+	    int etabin = std::max(1, std::min(hist->GetNbinsY(), hist->GetYaxis()->FindBin(fabs(eta))));
+	    out *= hist->GetBinContent(ptbin,etabin);
+	
+	    hist = _histo_recoToLoose_leptonSF_mu2;
+	    ptbin  = std::max(1, std::min(hist->GetNbinsX(), hist->GetXaxis()->FindBin(pt)));
+	    etabin = std::max(1, std::min(hist->GetNbinsY(), hist->GetYaxis()->FindBin(fabs(eta))));
+	    out *= hist->GetBinContent(ptbin,etabin);
+	
+	    hist = _histo_recoToLoose_leptonSF_mu3;
+	    ptbin  = std::max(1, std::min(hist->GetNbinsX(), hist->GetXaxis()->FindBin(pt)));
+	    etabin = std::max(1, std::min(hist->GetNbinsY(), hist->GetYaxis()->FindBin(fabs(eta))));
+	    out *= hist->GetBinContent(ptbin,etabin);
+	
+	    TGraphAsymmErrors *hist1 = _histo_recoToLoose_leptonSF_mu4;
+	    double eta1 = std::max(float(hist1->GetXaxis()->GetXmin()+1e-5), std::min(float(hist1->GetXaxis()->GetXmax()-1e-5), eta));
+	    out *= hist1->Eval(eta1);
+	
+	    return out;
+      }
+    
+    if (fabs(pdgId) == 11)
+      {
+	    TH2F *hist = _histo_recoToLoose_leptonSF_el1;
+	    int ptbin  = std::max(1, std::min(hist->GetNbinsX(), hist->GetXaxis()->FindBin(pt)));
+	    int etabin = std::max(1, std::min(hist->GetNbinsY(), hist->GetYaxis()->FindBin(eta)));
+	    double out = hist->GetBinContent(ptbin,etabin)+var*hist->GetBinError(ptbin,etabin);
+	    
+        hist = _histo_recoToLoose_leptonSF_el2;
+	    ptbin  = std::max(1, std::min(hist->GetNbinsX(), hist->GetXaxis()->FindBin(pt)));
+	    etabin = std::max(1, std::min(hist->GetNbinsY(), hist->GetYaxis()->FindBin(eta)));
+	    out *= hist->GetBinContent(ptbin,etabin)+var*hist->GetBinError(ptbin,etabin);
+	
+        hist = _histo_recoToLoose_leptonSF_el3;
+	    ptbin  = std::max(1, std::min(hist->GetNbinsX(), hist->GetXaxis()->FindBin(pt)));
+	    etabin = std::max(1, std::min(hist->GetNbinsY(), hist->GetYaxis()->FindBin(eta)));
+	    out *= hist->GetBinContent(ptbin,etabin)+var*hist->GetBinError(ptbin,etabin);
+	
+	    hist = _histo_recoToLoose_leptonSF_gsf;
+	    etabin = std::max(1, std::min(hist->GetNbinsX(), hist->GetXaxis()->FindBin(eta))); // careful, different convention
+	    ptbin  = std::max(1, std::min(hist->GetNbinsY(), hist->GetYaxis()->FindBin(pt)));
+	    out *= (hist->GetBinContent(etabin,ptbin)+var*(hist->GetBinError(ptbin,etabin) + 0.01*((pt<20) || (pt>80))));
+	
+	    return out;
+      }
+    
+    std::cout << "ERROR" << std::endl;
+    std::abort();
+    return -999;
+}
+
+
+double get_LooseToTight_SF(double pdgId, double pt, double eta, int lep_num){
+    TH2F *hist = 0;
+    if (fabs(pdgId)==13) lep_num<3? hist = _histo_looseToTight_leptonSF_mu_2lss : hist=_histo_looseToTight_leptonSF_mu_3l;
+    else if (fabs(pdgId)==11) lep_num<3 ? hist = _histo_looseToTight_leptonSF_el_2lss : hist = _histo_looseToTight_leptonSF_el_3l;
+    if (!hist) {std::cout << "ERROR" << std::endl; std::abort();}
+    int ptbin  = std::max(1, std::min(hist->GetNbinsX(), hist->GetXaxis()->FindBin(pt)));
+    int etabin = std::max(1, std::min(hist->GetNbinsY(), hist->GetYaxis()->FindBin(fabs(eta))));
+    return hist->GetBinContent(ptbin,etabin);
+} 
+
+ 
 ////////
 //hadTop
 ////////
@@ -2387,6 +2510,11 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("tthWeight_OS",&tthWeight_OS);
     newtree->Branch("tthWeight_DiLepMVA",&tthWeight_DiLepMVA);
     newtree->Branch("tthWeight_TriLepMVA",&tthWeight_TriLepMVA);
+    // scale factors
+    newtree->Branch("SF_Trigger_3l",&SF_Trigger_3l);
+    newtree->Branch("SF_Trigger_2l",&SF_Trigger_2l);
+    newtree->Branch("SF_Lepton_3l",&SF_Lepton_3l);
+    newtree->Branch("SF_Lepton_2l",&SF_Lepton_2l);
     // hadTop and Hj tagger
     newtree->Branch("hadTop_BDT",&hadTop_BDT);
     newtree->Branch("Jet_isToptag",&Jet_isToptag);
@@ -2749,6 +2877,11 @@ void wClearInitialization(string sample){
     tthWeight_OS= -999;
     tthWeight_DiLepMVA= -999;
     tthWeight_TriLepMVA= -999;
+    // scale factors
+    SF_Trigger_3l= -999;
+    SF_Trigger_2l= -999;
+    SF_Lepton_3l= -999;
+    SF_Lepton_2l= -999;
     ///////
     //HadTop
     ///////

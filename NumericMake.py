@@ -113,8 +113,11 @@ VariableNames = [
 
 # ttH evt weight
 #"tthWeight_SR","tthWeight_OS","tthWeight_DiLepMVA","tthWeight_TriLepMVA"
-"isDiMuMVAAR","isDiEleMVAAR","isEleMuMVAAR","isTriLepMVAAR","isQuaLepMVAAR",
-"isDiMuOSAR","isDiEleOSAR","isEleMuOSAR",
+#"isDiMuMVAAR","isDiEleMVAAR","isEleMuMVAAR","isTriLepMVAAR","isQuaLepMVAAR",
+#"isDiMuOSAR","isDiEleOSAR","isEleMuOSAR",
+#"SF_Trigger_3l","SF_Trigger_2l",
+"SF_Lepton_3l","SF_Lepton_2l",
+
 ]
 
 #VariableType  = "int"
