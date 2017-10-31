@@ -70,6 +70,8 @@ void Rootplizer_TTHLep_v2IHEP(const char * Input = "", const char * Output ="", 
         // calculate Scale Factors
         get_Trigger_SF();
         get_Lepton_SF();
+        // calculate event level variables for plots
+        Cal_event_variables();
         if(!(
             isDiEleSR==1 || isDiMuSR==1 || isEleMuSR ==1|| isTriLepSR ==1 || isQuaLepSR == 1
             || isDiEleMVAAR==1 || isDiMuMVAAR==1 || isEleMuMVAAR ==1
@@ -121,6 +123,37 @@ void set_wgtMVA(){
     readerjet->AddVariable("Jet_lepdrmax",&jetvarlepdrmax);
     readerjet->AddVariable("Jet_pt",&jetvarpt);
     readerjet->BookMVA("BDTG method", Hj_wgt); 
+
+    // set event MVA
+    // 2l ttbar BDT
+    string Dilepttbar_wgt = data_path + "2lss_ttbar_withBDTv8_BDTG.weights.xml";
+    Dilepttbar_reader_ = new TMVA::Reader("!Color:!Silent");
+    Dilepttbar_reader_->AddVariable("max(abs(LepGood_eta[iLepFO_Recl[0]]),abs(LepGood_eta[iLepFO_Recl[1]]))",&Dilepttbar_maxlepeta);
+    Dilepttbar_reader_->AddVariable("nJet25_Recl",&Dilepttbar_numJets);
+    Dilepttbar_reader_->AddVariable("mindr_lep1_jet",&Dilepttbar_mindrlep1jet);
+    Dilepttbar_reader_->AddVariable("mindr_lep2_jet",&Dilepttbar_mindrlep2jet);
+    Dilepttbar_reader_->AddVariable("MT_met_lep1",&Dilepttbar_Mtmetlep1);
+    Dilepttbar_reader_->AddVariable("max(-1.1,BDTv8_eventReco_mvaValue)",&Dilepttbar_HadTopBDT);
+    Dilepttbar_reader_->AddSpectator("iLepFO_Recl[0]",&Dilepttbar_mindrlep1jet);
+    Dilepttbar_reader_->AddSpectator("iLepFO_Recl[1]",&Dilepttbar_mindrlep2jet);
+    Dilepttbar_reader_->AddSpectator("iLepFO_Recl[2]",&Dilepttbar_avgdrjet);
+    Dilepttbar_reader_->BookMVA("BDTG method", Dilepttbar_wgt);
+ 
+    // 2l ttv BDT
+    string Dilepttv_wgt = data_path + "2lss_ttV_withHj_BDTG.weights.xml";
+    Dilepttv_reader_ = new TMVA::Reader("!Color:!Silent");
+    Dilepttv_reader_->AddVariable("max(abs(LepGood_eta[iLepFO_Recl[0]]),abs(LepGood_eta[iLepFO_Recl[1]]))",&Dilepttv_maxlepeta);
+    Dilepttv_reader_->AddVariable("nJet25_Recl",&Dilepttv_numJets);
+    Dilepttv_reader_->AddVariable("mindr_lep1_jet",&Dilepttv_mindrlep1jet);
+    Dilepttv_reader_->AddVariable("mindr_lep2_jet",&Dilepttv_mindrlep2jet);
+    Dilepttv_reader_->AddVariable("MT_met_lep1",&Dilepttv_Mtmetlep1);
+    Dilepttv_reader_->AddVariable("LepGood_conePt[iLepFO_Recl[1]]",&Dilepttv_ptlep2);
+    Dilepttv_reader_->AddVariable("LepGood_conePt[iLepFO_Recl[0]]",&Dilepttv_ptlep1);
+    Dilepttv_reader_->AddVariable("max(-1.1,BDTv8_eventReco_Hj_score)",&Dilepttv_Hj1BDT);
+    Dilepttv_reader_->AddSpectator("iLepFO_Recl[0]",&Dilepttv_mindrlep1jet);
+    Dilepttv_reader_->AddSpectator("iLepFO_Recl[1]",&Dilepttv_mindrlep2jet);
+    Dilepttv_reader_->AddSpectator("iLepFO_Recl[2]",&Dilepttv_ptlep1);
+    Dilepttv_reader_->BookMVA("BDTG method", Dilepttv_wgt); 
 }; 
 
 
@@ -143,12 +176,143 @@ double get_LeptonMVA(Lepton lep){
     else return -1.;
 }
 
+
+// 2l ttbar MVA
+double get_Dilep_ttbarMVA(){
+    Dilepttbar_maxlepeta =maxeta;
+    Dilepttbar_numJets =Jet_numLoose;
+    Dilepttbar_mindrlep1jet= leadLep_jetdr;
+    Dilepttbar_mindrlep2jet= secondLep_jetdr;
+    Dilepttbar_met= min(Met_type1PF_pt,400.);
+    Dilepttbar_avgdrjet= AvJetdR;
+    Dilepttbar_Mtmetlep1=Mt_metleadlep;
+    Dilepttbar_Hj1BDT = max(-1.1,Hj1_BDT);
+    Dilepttbar_HadTopBDT = max(-1.1,hadTop_BDT) ;
+    //cout << "get_EleMVA end" << endl;
+    return Dilepttbar_reader_->EvaluateMVA("BDTG method");
+};
+
+
+//2l ttv mva
+double get_Dilep_ttvMVA(){
+    Dilepttv_maxlepeta =maxeta;
+    Dilepttv_Mtmetlep1=Mt_metleadlep;
+    Dilepttv_numJets =Jet_numLoose;
+    Dilepttv_mindrlep1jet= leadLep_jetdr;
+    Dilepttv_mindrlep2jet= secondLep_jetdr;
+    Dilepttv_ptlep1=leadLep_corrpt;
+    Dilepttv_ptlep2=secondLep_corrpt;
+    Dilepttv_Hj1BDT = max(-1.1,Hj1_BDT);
+    Dilepttv_HadTopBDT = max(-1.1,hadTop_BDT) ;
+    return Dilepttv_reader_->EvaluateMVA("BDTG method");
+};
+
+
+//2D Binning
+Int_t get_2DBDTBin(double BDT_ttbar, double BDT_ttV){
+    int BDTBin=0;
+    BDTBin = 1 + hBinning2l->GetBinContent(hBinning2l->FindBin(BDT_ttbar,BDT_ttV));
+    return BDTBin;
+};
+
 // Analysis functions
 
 bool mu_isMedium( double isGlobal, double chi_square, double chi2_localposition, double trkKink, double mu_isloose, double validFrac, double segment ,bool ishipsave){
     bool GoodGlobal = (isGlobal==1 && chi_square <3 && chi2_localposition < 12 && trkKink < 20);
     bool isMedium = mu_isloose ==1 && validFrac > (ishipsave? 0.49 : 0.80) && segment > ( GoodGlobal? 0.303 : 0.451);
     return isMedium;
+};
+
+
+// Calculate event variables for plots 
+void Cal_event_variables(){
+    TLorentzVector FakeLep1{0,0,0,0};
+    TLorentzVector FakeLep2{0,0,0,0};
+    TLorentzVector Lep1{0,0,0,0};
+    TLorentzVector Lep2{0,0,0,0};
+    double minMass_AFAS =999;
+    double minMass_AFOS =999;
+    double minMass_SFOS =999;
+    for(uint lep1_en=0; lep1_en<Lep_pt->size();lep1_en++){
+        for(uint lep2_en=lep1_en+1; lep2_en<Lep_pt->size();lep2_en++){
+            Lep1.SetPtEtaPhiE(Lep_pt->at(lep1_en),Lep_eta->at(lep1_en),Lep_phi->at(lep1_en),Lep_energy->at(lep1_en));
+            Lep2.SetPtEtaPhiE(Lep_pt->at(lep2_en),Lep_eta->at(lep2_en),Lep_phi->at(lep2_en),Lep_energy->at(lep2_en));
+            double curr_mass = (Lep1+Lep2).M();
+            if(curr_mass < minMass_AFAS )minMass_AFAS=curr_mass; 
+            if(curr_mass < minMass_AFOS && Lep_charge->at(lep1_en)*Lep_charge->at(lep2_en) < 0)minMass_AFOS=curr_mass; 
+            if(curr_mass < minMass_SFOS && Lep_charge->at(lep1_en)*Lep_charge->at(lep2_en) < 0 && fabs(Lep_pdgId->at(lep1_en))== fabs(Lep_pdgId->at(lep2_en)))minMass_SFOS=curr_mass; 
+        }
+    }
+    minMllAFOS = minMass_AFOS;
+    minMllAFAS = minMass_AFAS;
+    minMllSFOS = minMass_SFOS;
+    nLepFO = FakeLep_pt->size();
+    nLepTight = Muon_numTight + patElectron_numTight;
+    double maxCSV = -999;
+    double SumPt =0;
+    for(uint jet_en=0; jet_en < Jet_pt->size(); jet_en++){
+        SumPt = Jet_pt->at(jet_en) + SumPt;
+        if(jet_en == 0)leadJetCSV = Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags->at(jet_en);
+        if(jet_en == 1)secondJetCSV = Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags->at(jet_en);
+        if(jet_en == 2)thirdJetCSV = Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags->at(jet_en);
+        if(jet_en == 3)fourthJetCSV = Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags->at(jet_en);
+        if( maxCSV < Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags->at(jet_en)) maxCSV = Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags->at(jet_en);
+    }
+    HighestJetCSV = maxCSV;
+    HtJet = SumPt;
+    if(FakeLep_pt->size()>=2){
+        FakeLep1.SetPtEtaPhiE(FakeLep_corrpt->at(0),FakeLep_eta->at(0),FakeLep_phi->at(0),FakeLep_energy->at(0));
+        FakeLep2.SetPtEtaPhiE(FakeLep_corrpt->at(1),FakeLep_eta->at(1),FakeLep_phi->at(1),FakeLep_energy->at(1));
+        massll = (FakeLep1+FakeLep2).M();
+        leadLep_corrpt= FakeLep_corrpt->at(0);
+        secondLep_corrpt= FakeLep_corrpt->at(1);
+        leadLep_jetdr= FakeLep_loosejetdr->at(0);
+        secondLep_jetdr= FakeLep_loosejetdr->at(1);
+        leadLep_jetcsv = FakeLep_loosejetcsv->at(0);
+        secondLep_jetcsv = FakeLep_loosejetcsv->at(1);
+        leadLep_BDT = FakeLep_BDT->at(0);
+        secondLep_BDT = FakeLep_BDT->at(1);
+        Sum2lCharge= FakeLep_charge->at(0)+FakeLep_charge->at(1);
+        Dilep_bestMVA = std::max(FakeLep_BDT->at(0),FakeLep_BDT->at(1));
+        Dilep_worseMVA = std::min(FakeLep_BDT->at(0),FakeLep_BDT->at(1));
+        Dilep_pdgId = 26 - fabs((FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1)))/2;
+        Dilep_htllv = FakeLep_corrpt->at(0) + FakeLep_corrpt->at(1) + Met_type1PF_pt; 
+        if((FakeLep_cut->at(0) + FakeLep_cut->at(1))==6) Dilep_nTight = 2 ;
+        else if((FakeLep_cut->at(0) + FakeLep_cut->at(1))==5) Dilep_nTight = 1 ;
+        else Dilep_nTight = 0 ;
+        Mt_metleadlep = getMTlepmet(FakeLep_phi->at(0),Met_type1PF_phi,FakeLep_corrpt->at(0),Met_type1PF_pt); 
+        maxeta = max(fabs(FakeLep_eta->at(0)),fabs(FakeLep_eta->at(1)));
+        
+        Dilep_mtWmin = std::min(getMTlepmet(FakeLep_phi->at(1),Met_type1PF_phi,FakeLep_corrpt->at(1),Met_type1PF_pt), Mt_metleadlep); 
+        ttbarBDT_2lss = get_Dilep_ttbarMVA();
+        ttvBDT_2lss = get_Dilep_ttvMVA();
+        Bin2l = get_2DBDTBin(ttbarBDT_2lss, ttvBDT_2lss);
+    }
+    //2l sub category
+    if(FakeLep_pt->size()>=2){
+        if((FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))== 22) SubCat2l=1; // ee-
+        if((FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))== -22) SubCat2l=2; // ee+
+        if(fabs(FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))==24){ //eu
+            if(Jet_numbMedium<2){ //bl
+                if(FakeLep_charge->at(0)==-1)SubCat2l=3; // eubl-
+                if(FakeLep_charge->at(0)==1)SubCat2l=4; // eubl+
+            }else{//bt
+                if(FakeLep_charge->at(0)==-1)SubCat2l=5; // eubt-
+                if(FakeLep_charge->at(0)==1)SubCat2l=6; // eubt+
+            }
+        }
+        if(fabs(FakeLep_pdgId->at(0) + FakeLep_pdgId->at(1))==26){ //uu
+            if(Jet_numbMedium<2){ //bl
+                if(FakeLep_charge->at(0)==-1)SubCat2l=7; // uubl-
+                if(FakeLep_charge->at(0)==1)SubCat2l=8; // uubl+
+            }else{//bt
+                if(FakeLep_charge->at(0)==-1)SubCat2l=9; // uubt-
+                if(FakeLep_charge->at(0)==1)SubCat2l=10; // uubt+
+            }
+        }
+    }else{
+        SubCat2l=0;//others
+    }
 };
 
 
@@ -160,6 +324,31 @@ bool byPt(const Lepton& LeptonA, const Lepton& LeptonB){
 
 bool byConePt(const Lepton& LeptonA, const Lepton& LeptonB){
     return LeptonA.corrpt > LeptonB.corrpt;
+};
+
+
+double getMTlepmet(double phi1, double phi2, double pt1, double pt2){
+    double Mass =0;
+    Mass = sqrt(2*pt1*pt2*(1-cos(deltaPhi(phi1,phi2))));
+    return Mass;
+};
+
+
+double getAvJetdR(){
+    double AvjetdR = 0;
+    double SumJetdR = 0;
+    int jetpair = 0;
+    for(uint jet0_en = 0; jet0_en+1<Jet_pt->size(); jet0_en++){
+        for(uint jet1_en = 1; jet0_en+jet1_en<Jet_pt->size(); jet1_en++){
+            double dr = deltaR(deltaPhi(Jet_phi->at(jet0_en),Jet_phi->at(jet0_en+jet1_en)),deltaEta(Jet_eta->at(jet0_en),Jet_eta->at(jet0_en+jet1_en)));
+            SumJetdR = dr + SumJetdR;
+            jetpair ++;
+        }
+    }
+    if(jetpair>0){
+        AvjetdR = SumJetdR/jetpair; 
+    }
+    return AvjetdR;
 };
 
 
@@ -714,6 +903,21 @@ void BoostedJet_sel(){
 };
 
 void Lep_sel(){
+    // Fill some new variables
+    for(uint lep_en=0; lep_en < leptons->size(); lep_en++){
+       double closejetdr = 999;
+       double closejetcsv = -999;
+        for(uint jet_en = 0; jet_en<Jet_pt->size(); jet_en++){
+            double dr = deltaR(deltaPhi(leptons->at(lep_en).phi,Jet_phi->at(jet_en)),deltaEta(leptons->at(lep_en).eta,Jet_eta->at(jet_en)));
+            double csv = Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags->at(jet_en); 
+            if(dr< closejetdr && dr>=0.4 ){
+                closejetdr = dr;
+                closejetcsv = csv;
+            }
+        }
+       leptons->at(lep_en).loosejetdr = closejetdr;
+       leptons->at(lep_en).loosejetcsv = closejetcsv;
+    }
     sort(leptons->begin(), leptons->end(), byPt); 
     for(uint lep_en=0; lep_en < leptons->size(); lep_en++){
         Lep_pt->push_back(leptons->at(lep_en).pt);
@@ -855,6 +1059,8 @@ void Lep_sel(){
         FakeLep_dEtaIn->push_back(leptons->at(lep_en).dEtaIn);
         FakeLep_dPhiIn->push_back(leptons->at(lep_en).dPhiIn);
         FakeLep_ooEmooP->push_back(leptons->at(lep_en).ooEmooP);
+        FakeLep_loosejetcsv->push_back(leptons->at(lep_en).loosejetcsv);
+        FakeLep_loosejetdr->push_back(leptons->at(lep_en).loosejetdr);
     }
 };
 
@@ -1114,6 +1320,8 @@ void Event_sel( string OutputName){
     mht_met = mht + Met_type1PF_pt;
     mhtT_met = mhtT + Met_type1PF_pt;
     metLD =  0.00397*Met_type1PF_pt+0.00265*mht;  
+    //average jet dr
+    AvJetdR = getAvJetdR();
     //lumi_wgt
     lumi_wgt = get_wgtlumi(OutputName);
     // calculate different dilep mass
@@ -2295,6 +2503,7 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("nLepTight",&nLepTight);
     newtree->Branch("minMllAFAS",&minMllAFAS);
     newtree->Branch("minMllAFOS",&minMllAFOS);
+    newtree->Branch("minMllSFOS",&minMllSFOS);
     //Lepton
     newtree->Branch("Lep_pt",&Lep_pt);
     newtree->Branch("Lep_eta",&Lep_eta);
@@ -2422,6 +2631,8 @@ void wSetBranchAddress(TTree* newtree, string sample){
     newtree->Branch("FakeLep_gen_isPromptFinalState",&FakeLep_gen_isPromptFinalState);
     newtree->Branch("FakeLep_gen_isDirectPromptTauDecayProductFinalState",&FakeLep_gen_isDirectPromptTauDecayProductFinalState);
     // new variables
+    newtree->Branch("FakeLep_loosejetcsv",&FakeLep_loosejetcsv);
+    newtree->Branch("FakeLep_loosejetdr",&FakeLep_loosejetdr);
     newtree->Branch("FakeLep_cut",&FakeLep_cut);
     newtree->Branch("FakeLep_BDT",&FakeLep_BDT);
     newtree->Branch("FakeLep_corrpt",&FakeLep_corrpt);
@@ -2696,6 +2907,7 @@ void wClearInitialization(string sample){
     nLepTight= -999;
     minMllAFAS= -999;
     minMllAFOS= -999;
+    minMllSFOS= -999;
     // Lepton
     leptons->clear();
     Lep_pt->clear();
@@ -2824,6 +3036,8 @@ void wClearInitialization(string sample){
     FakeLep_gen_isPromptFinalState->clear();
     FakeLep_gen_isDirectPromptTauDecayProductFinalState->clear();
     // new variables
+    FakeLep_loosejetcsv->clear();
+    FakeLep_loosejetdr->clear();
     FakeLep_cut->clear();
     FakeLep_BDT->clear();
     FakeLep_corrpt->clear();

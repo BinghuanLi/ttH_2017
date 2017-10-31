@@ -41,6 +41,7 @@ void Lep_sel();
 void GenParticle_sel();
 void Find_Gen_HadTop_HadW();
 void Cal_dilep_mass();
+void Cal_event_variables();
 
 //tth event selections
 // 2l signal region
@@ -63,6 +64,8 @@ void EleMuOSAR_sel();
 /////
 bool byPt(const Lepton& LeptonA, const Lepton& LeptonB);
 bool byConept(const Lepton& LeptonA, const Lepton& LeptonB);
+double getAvJetdR();
+double getMTlepmet(double phi1, double phi2, double pt1, double pt2);
 
 ////
 // event weights
@@ -73,6 +76,8 @@ void cal_ttHweight();
 //Read MVA's
 void set_wgtMVA();
 double get_LeptonMVA(Lepton lep); 
+double get_Dilep_ttbarMVA();
+double get_Dilep_ttvMVA();
 
 // lepton mva
 TMVA::Reader *mu_reader_;
@@ -90,6 +95,35 @@ Float_t varmvaId;
 Float_t vardxy;
 Float_t vardz;
 Float_t varSegCompat;
+
+// event mva
+TMVA::Reader *Dilepttbar_reader_;
+TMVA::Reader *Dilepttv_reader_;
+
+Float_t Dilepttbar_maxlepeta;
+Float_t Dilepttbar_numJets;
+Float_t Dilepttbar_mindrlep1jet;
+Float_t Dilepttbar_mindrlep2jet;
+Float_t Dilepttbar_met;
+Float_t Dilepttbar_avgdrjet;
+Float_t Dilepttbar_Mtmetlep1;
+Float_t Dilepttbar_Hj1BDT;
+Float_t Dilepttbar_HadTopBDT;
+
+Float_t Dilepttv_maxlepeta;
+Float_t Dilepttv_Mtmetlep1;
+Float_t Dilepttv_numJets;
+Float_t Dilepttv_mindrlep1jet;
+Float_t Dilepttv_mindrlep2jet;
+Float_t Dilepttv_ptlep1;
+Float_t Dilepttv_ptlep2;
+Float_t Dilepttv_Hj1BDT;
+Float_t Dilepttv_HadTopBDT;
+
+//2D BDT Binning
+Int_t get_2DBDTBin(double BDT_ttbar, double BDT_ttV);
+TFile* fileBDTBin2l = new TFile((data_path+"binning_2l.root").c_str(),"read");
+TH2F*  hBinning2l = (TH2F*) fileBDTBin2l->Get("hTargetBinning");
 
 //Charge Flip
 string ChargeFlipName = data_path + "QF_data_el.root";
@@ -472,6 +506,7 @@ double nLepFO;
 double nLepTight;
 double minMllAFAS;
 double minMllAFOS;
+double minMllSFOS;
 double isDiMuSR;
 double isDiEleSR;
 double isEleMuSR;
@@ -622,6 +657,8 @@ vector<double>* FakeLep_dPhiIn = new std::vector<double>;
 vector<double>* FakeLep_ooEmooP = new std::vector<double>;
 
 //new variables
+vector<double>* FakeLep_loosejetcsv = new std::vector<double>;
+vector<double>* FakeLep_loosejetdr = new std::vector<double>;
 vector<double>* FakeLep_cut = new std::vector<double>;
 vector<double>* FakeLep_BDT = new std::vector<double>;
 vector<double>* FakeLep_corrpt = new std::vector<double>;

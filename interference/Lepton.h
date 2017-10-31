@@ -72,6 +72,8 @@ class Lepton {
         
         
         // New variables
+        double loosejetdr = -999.;
+        double loosejetcsv = -999.;
         double cut = -999.; 
         double BDT = -999.;
         double corrpt = -999.;

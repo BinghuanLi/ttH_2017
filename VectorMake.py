@@ -16,9 +16,9 @@ workpath = "/publicfs/cms/user/libh/Test/Rootplizer/analyzer"
 #  CaseC   No       Yes     Jet_LooseID: you can not read it from ntuplas if there is not, but you want to save in rootplas 
 
 # Variable Case
-Case = "CaseA"
+#Case = "CaseA"
 #Case = "CaseB"
-#Case = "CaseC"
+Case = "CaseC"
 # Variable Definition
 
 VariableType  = "double"
@@ -115,8 +115,9 @@ VariableNames = [
 #"Muon_mcMatchId","patElectron_mcMatchId","Lep_mcMatchId","FakeLep_mcMatchId",
 #"hadW_Gen_Mother_pdgId","hadW_Gen_drjj","hadW_Gen_mass",
 
-"Gen_numDaught","Gen_BmotherIndices"
+#"Gen_numDaught","Gen_BmotherIndices"
 
+"FakeLep_loosejetcsv","FakeLep_loosejetdr"
 ]
 
 #VariableType  = "int"
