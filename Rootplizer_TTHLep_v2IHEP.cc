@@ -1690,7 +1690,7 @@ void cal_ttHweight(){
         double mvaWgt=1.;
         for(uint lep_en=0;lep_en < 2;lep_en++){
             double wgt_lepton = FakeLep_FR->at(lep_en)/(1-FakeLep_FR->at(lep_en));
-            if(FakeLep_cut->at(lep_en)==1){
+            if(FakeLep_cut->at(lep_en)==2){
                 numFake++;
                 mvaWgt=mvaWgt*wgt_lepton;
             }
@@ -1704,7 +1704,7 @@ void cal_ttHweight(){
         double mvaWgt=1.;
         for(uint lep_en=0;lep_en < 3;lep_en++){
             double wgt_lepton = FakeLep_FR->at(lep_en)/(1-FakeLep_FR->at(lep_en));
-            if(FakeLep_cut->at(lep_en)==1){
+            if(FakeLep_cut->at(lep_en)==2){
                 numFake++;
                 mvaWgt=mvaWgt*wgt_lepton;
             }
